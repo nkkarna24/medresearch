@@ -21,24 +21,49 @@ if (!fs.existsSync(CHAT_FILE)) fs.writeFileSync(CHAT_FILE, '{}');
 
 // Reusable email sender
 async function sendEmail({ fromName, replyTo, subject, text }) {
-  const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
-  const useSmtp = process.env.SMTP_HOST && process.env.SMTP_USER && !process.env.SMTP_USER.includes('your.email') && pass.length > 8;
-  if (!useSmtp) { console.log('[email skipped]', subject); return; }
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: false, requireTLS: true,
-    auth: { user: process.env.SMTP_USER, pass },
-  });
+  if (!transporter) {
+    console.log("[Email skipped]", subject);
+    return;
+  }
+
   await transporter.sendMail({
-    from: `"${fromName}" <${process.env.SMTP_USER}>`,
+    from: process.env.MAIL_FROM || `"${fromName}" <info@medresearch.me>`,
     replyTo,
-    to: process.env.CONTACT_EMAIL || 'medresearch77@gmail.com',
-    subject, text,
+    to: process.env.CONTACT_EMAIL,
+    subject,
+    text,
   });
 }
 
 const upload = multer({ dest: path.join(__dirname, 'uploads'), limits: { fileSize: 50 * 1024 * 1024 } });
+// Create SMTP transporter once
+const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+
+const transporter =
+  process.env.SMTP_HOST &&
+  process.env.SMTP_USER &&
+  smtpPass.length > 8
+    ? nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: false,
+        requireTLS: true,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: smtpPass,
+        },
+      })
+    : null;
+
+if (transporter) {
+  transporter.verify((err) => {
+    if (err) {
+      console.error("SMTP connection failed:", err.message);
+    } else {
+      console.log("✅ SMTP server is ready.");
+    }
+  });
+}
 
 // Admin -> client project file uploads (keeps original filename)
 const PROJECT_UPLOADS = path.join(__dirname, 'project-uploads');
