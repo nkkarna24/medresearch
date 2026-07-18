@@ -21,37 +21,94 @@ if (!fs.existsSync(ORDERS_FILE)) fs.writeFileSync(ORDERS_FILE, '[]');
 if (!fs.existsSync(CHAT_FILE)) fs.writeFileSync(CHAT_FILE, '{}');
 if (!fs.existsSync(EMAILS_FILE)) fs.writeFileSync(EMAILS_FILE, '[]');
 
-// Reusable email sender
+// Reusable email sender (chat notifications, etc.) — routes through sendHtmlEmail
+// so it benefits from the Brevo API fallback when SMTP egress is blocked.
 async function sendEmail({ fromName, replyTo, subject, text }) {
-  if (!transporter) {
-    console.log("[Email skipped]", subject);
-    return;
+  try {
+    await sendHtmlEmail({
+      to: process.env.CONTACT_EMAIL,
+      replyTo: replyTo || process.env.CONTACT_EMAIL,
+      subject,
+      text,
+    });
+  } catch (e) {
+    console.error('[Email skipped]', subject, '-', e.message);
   }
-
-  await transporter.sendMail({
-    from: process.env.MAIL_FROM || `"${fromName}" <info@medresearch.me>`,
-    replyTo,
-    to: process.env.CONTACT_EMAIL,
-    subject,
-    text,
-  });
 }
 
-// Reusable HTML email sender — uses the single shared transporter and MAIL_FROM.
-async function sendHtmlEmail({ to, cc, bcc, subject, html, text, replyTo, attachments }) {
-  if (!transporter) throw new Error('SMTP is not configured on the server.');
-  const info = await transporter.sendMail({
-    from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>',
-    to,
-    cc: cc || undefined,
-    bcc: bcc || undefined,
-    replyTo: replyTo || (process.env.CONTACT_EMAIL || 'info@medresearch.me'),
+// Send via Brevo REST API (HTTPS/443) — works even when outbound SMTP (25/465/587)
+// is blocked by the hosting network. Brevo SMTP credentials are also valid API keys.
+async function sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, attachments }) {
+  const apiKey = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+  if (!apiKey) throw new Error('Brevo API key (SMTP_PASS) is not configured.');
+  const fromStr = process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>';
+  // Parse "Name <email>" into { name, email }
+  const m = fromStr.match(/^(?:"?([^"<]+)"?\s*)?<(.+?)>$/);
+  const sender = m ? { name: m[1].trim(), email: m[2].trim() } : { email: fromStr.trim() };
+
+  const buildRecipients = (val) => {
+    if (!val) return [];
+    return String(val).split(',').map(s => s.trim()).filter(Boolean).map(email => ({ email }));
+  };
+  const msg = {
+    sender,
+    to: buildRecipients(to),
     subject,
-    text: text || (html ? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : ''),
-    html,
-    attachments: attachments || [],
-  });
-  return info;
+    html: html || undefined,
+    text: text || (html ? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : undefined),
+    replyTo: replyTo || process.env.CONTACT_EMAIL || 'info@medresearch.me',
+  };
+  const ccList = buildRecipients(cc);
+  const bccList = buildRecipients(bcc);
+  if (ccList.length) msg.cc = ccList;
+  if (bccList.length) msg.bcc = bccList;
+  if (attachments && attachments.length) {
+    msg.attachment = attachments.map(a => ({
+      name: a.filename || 'attachment',
+      content: fs.readFileSync(a.path).toString('base64'),
+    }));
+  }
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), 20000);
+  try {
+    const resp = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': apiKey, 'Content-Type': 'application/json', 'accept': 'application/json' },
+      body: JSON.stringify(msg),
+      signal: controller.signal,
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      throw new Error(data.message || ('Brevo API error ' + resp.status));
+    }
+    return { messageId: data.messageId || ('brevo-' + Date.now()), via: 'api' };
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+// Reusable HTML email sender — tries the SMTP transporter first, falls back to
+// Brevo's HTTPS API when SMTP is unavailable or times out (Render blocks SMTP egress).
+async function sendHtmlEmail({ to, cc, bcc, subject, html, text, replyTo, attachments }) {
+  if (transporter) {
+    try {
+      const info = await transporter.sendMail({
+        from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>',
+        to,
+        cc: cc || undefined,
+        bcc: bcc || undefined,
+        replyTo: replyTo || (process.env.CONTACT_EMAIL || 'info@medresearch.me'),
+        subject,
+        text: text || (html ? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : ''),
+        html,
+        attachments: attachments || [],
+      });
+      return { messageId: info.messageId, via: 'smtp' };
+    } catch (smtpErr) {
+      console.error('SMTP send failed, falling back to Brevo API:', smtpErr.message);
+    }
+  }
+  return await sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, attachments });
 }
 
 const upload = multer({ dest: path.join(__dirname, 'uploads'), limits: { fileSize: 50 * 1024 * 1024 } });
@@ -712,15 +769,22 @@ app.post('/api/admin/emails/send', adminAuth, emailUpload.array('attachments', 1
 
 // SMTP connectivity status (admin diagnostic)
 app.get('/api/admin/smtp/status', adminAuth, (req, res) => {
+  const apiKey = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+  const apiAvailable = !!apiKey;
   if (!transporter) {
-    return res.json({ configured: false, reason: 'SMTP environment variables are not set on the server.', host: process.env.SMTP_HOST || null });
+    if (apiAvailable) {
+      return res.json({ configured: false, smtp: false, api: true, mode: 'api', reason: 'SMTP not connected; will send via Brevo HTTPS API.', from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>' });
+    }
+    return res.json({ configured: false, smtp: false, api: false, reason: 'SMTP environment variables are not set on the server.', host: process.env.SMTP_HOST || null });
   }
   const done = (payload) => { if (!res.headersSent) res.json(payload); };
-  const timer = setTimeout(() => done({ configured: true, connected: false, error: 'Connection timed out (15s). Check SMTP_PORT / network egress.', host: process.env.SMTP_HOST }), 16000);
+  const timer = setTimeout(() => done({ configured: true, smtp: false, api: apiAvailable, mode: apiAvailable ? 'api' : 'none', error: 'SMTP connection timed out. ' + (apiAvailable ? 'Will fall back to Brevo HTTPS API.' : 'Check SMTP_PORT / network egress.'), host: process.env.SMTP_HOST, from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>' }), 16000);
   transporter.verify((err) => {
     clearTimeout(timer);
-    if (err) return done({ configured: true, connected: false, error: err.message, host: process.env.SMTP_HOST });
-    done({ configured: true, connected: true, host: process.env.SMTP_HOST, from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>' });
+    if (err) {
+      return done({ configured: true, smtp: false, api: apiAvailable, mode: apiAvailable ? 'api' : 'none', error: err.message + (apiAvailable ? ' — falling back to Brevo HTTPS API.' : ''), host: process.env.SMTP_HOST, from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>' });
+    }
+    done({ configured: true, smtp: true, api: apiAvailable, mode: 'smtp', host: process.env.SMTP_HOST, from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>' });
   });
 });
 

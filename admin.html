@@ -860,8 +860,10 @@ async function loadSmtpStatus() {
   try {
     const res = await apiFetch('/api/admin/smtp/status');
     const d = await res.json();
-    if (d.configured && d.connected) {
+    if (d.mode === 'smtp') {
       box.innerHTML = '<span class="badge b-completed">&#x2713; SMTP connected</span> <span class="client" style="font-size:0.82rem;margin-left:0.4rem;">' + esc(d.host) + ' &middot; from ' + esc(d.from) + '</span>';
+    } else if (d.mode === 'api') {
+      box.innerHTML = '<span class="badge b-completed">&#x2713; Ready (Brevo API)</span> <span class="client" style="font-size:0.82rem;margin-left:0.4rem;">SMTP egress blocked &mdash; sending via HTTPS API &middot; from ' + esc(d.from) + '</span>';
     } else if (d.configured && !d.connected) {
       box.innerHTML = '<span class="badge b-rejected">&#x2717; SMTP error</span> <span class="client" style="font-size:0.82rem;margin-left:0.4rem;">' + esc(d.error || 'connection failed') + '</span>';
     } else {
