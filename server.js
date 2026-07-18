@@ -37,14 +37,25 @@ async function sendEmail({ fromName, replyTo, subject, text }) {
 }
 
 // ── Brand email banner ──
-// Referenced as a hosted absolute URL (not a data-URI) so the email stays small
-// and Gmail does not clip it with "[Message clipped]". The image is served from
-// the site itself at /brand/email-banner.png.
-const SITE_URL = (process.env.SITE_URL || 'https://medresearch.me').replace(/\/+$/, '');
-const BANNER_URL = SITE_URL + '/brand/email-banner.png';
+// Public path where the banner is served, plus an inlined data-URI copy so the
+// banner always renders even if a mail client blocks external images.
+const BANNER_PUBLIC_URL = '/brand/email-banner.png';
+const BANNER_FILE = path.join(__dirname, 'public', 'brand', 'email-banner.png');
+let _bannerDataUri = null;
+function getBannerDataUri() {
+  if (_bannerDataUri) return _bannerDataUri;
+  try {
+    const buf = fs.readFileSync(BANNER_FILE);
+    const ext = path.extname(BANNER_FILE).replace('.', '') || 'png';
+    _bannerDataUri = 'data:image/' + ext + ';base64,' + buf.toString('base64');
+  } catch (e) { _bannerDataUri = ''; }
+  return _bannerDataUri;
+}
 function wrapWithBanner(html, brandBanner) {
   if (!brandBanner) return html;
-  const banner = `<div style="margin:0 0 18px 0;text-align:center;"><img src="${BANNER_URL}" alt="medresearch.me" style="max-width:600px;width:100%;height:auto;border:0;display:inline-block;" /></div>`;
+  const uri = getBannerDataUri();
+  if (!uri) return html;
+  const banner = `<div style="margin:0 0 18px 0;text-align:center;"><img src="${uri}" alt="medresearch.me" style="max-width:600px;width:100%;height:auto;border:0;display:inline-block;" /></div>`;
   return banner + (html || '');
 }
 
@@ -404,7 +415,6 @@ app.post('/api/contact', async (req, res) => {
         to: process.env.CONTACT_EMAIL || 'medresearch77@gmail.com',
         replyTo: email,
         subject: `[medresearch.me] New Inquiry — ${String(subjectService).slice(0, 60)}`,
-        brandBanner: true,
         text: body,
       });
       console.log('Contact email sent:', info.messageId);
