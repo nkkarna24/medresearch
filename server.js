@@ -44,19 +44,20 @@ async function sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, atta
   const fromStr = process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>';
   // Parse "Name <email>" into { name, email }
   const m = fromStr.match(/^(?:"?([^"<]+)"?\s*)?<(.+?)>$/);
-  const sender = m ? { name: m[1].trim(), email: m[2].trim() } : { email: fromStr.trim() };
+  const sender = m && m[2] ? { name: m[1] ? m[1].trim() : undefined, email: m[2].trim() } : { email: fromStr.trim() };
 
   const buildRecipients = (val) => {
     if (!val) return [];
     return String(val).split(',').map(s => s.trim()).filter(Boolean).map(email => ({ email }));
   };
+  const replyToVal = (replyTo || process.env.CONTACT_EMAIL || 'info@medresearch.me');
   const msg = {
     sender,
     to: buildRecipients(to),
     subject,
     html: html || undefined,
     text: text || (html ? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : undefined),
-    replyTo: replyTo || process.env.CONTACT_EMAIL || 'info@medresearch.me',
+    replyTo: { email: String(replyToVal).trim() },
   };
   const ccList = buildRecipients(cc);
   const bccList = buildRecipients(bcc);
