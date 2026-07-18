@@ -256,6 +256,11 @@ select.pay-state[data-paystate] { }
     <!-- SECURITY -->
     <div id="pnlSecurity" style="display:none;">
       <div class="card">
+        <h3>&#x1F4EC; Email / SMTP Status</h3>
+        <p class="muted" style="font-size:0.85rem;margin-bottom:0.8rem;">Shows whether the server can connect to your Brevo SMTP relay and send emails on behalf of the company.</p>
+        <div id="smtpStatusBox"><span class="badge b-pending">Checking…</span></div>
+      </div>
+      <div class="card">
         <h3>&#x1F6E1; Admin Security</h3>
         <p class="muted" style="font-size:0.85rem;margin-bottom:1rem;">Change the admin username and password used to sign in to this portal.</p>
         <form id="credForm">
@@ -849,7 +854,26 @@ $('#credForm').addEventListener('submit', async (e) => {
 });
 
 /* ── 2FA enrollment ── */
+async function loadSmtpStatus() {
+  const box = $('#smtpStatusBox');
+  if (!box) return;
+  try {
+    const res = await apiFetch('/api/admin/smtp/status');
+    const d = await res.json();
+    if (d.configured && d.connected) {
+      box.innerHTML = '<span class="badge b-completed">&#x2713; SMTP connected</span> <span class="client" style="font-size:0.82rem;margin-left:0.4rem;">' + esc(d.host) + ' &middot; from ' + esc(d.from) + '</span>';
+    } else if (d.configured && !d.connected) {
+      box.innerHTML = '<span class="badge b-rejected">&#x2717; SMTP error</span> <span class="client" style="font-size:0.82rem;margin-left:0.4rem;">' + esc(d.error || 'connection failed') + '</span>';
+    } else {
+      box.innerHTML = '<span class="badge b-rejected">&#x2717; Not configured</span> <span class="client" style="font-size:0.82rem;margin-left:0.4rem;">' + esc(d.reason || 'SMTP vars missing') + '</span>';
+    }
+  } catch (e) {
+    box.innerHTML = '<span class="badge b-pending">Unable to check</span>';
+  }
+}
+
 async function loadTwoFactorState() {
+  loadSmtpStatus();
   const res = await apiFetch('/api/admin/2fa/status');
   const d = await res.json();
   const enabled = !!d.enabled;
@@ -1206,12 +1230,12 @@ async function loadEmailHistory() {
       const att = (e.attachments || []).map(a => esc(a.name)).join(', ') || '—';
       const st = e.status === 'sent'
         ? '<span class="badge b-completed">Sent</span>'
-        : '<span class="badge b-rejected">Failed</span>';
+        : '<span class="badge b-rejected" title="' + esc(e.error || '') + '">Failed</span>';
       return `<tr>
         <td class="client">${new Date(e.sentAt).toLocaleString()}</td>
         <td>${esc(e.to)}</td>
         <td class="client">${e.cc ? esc(e.cc) : '—'}</td>
-        <td><strong>${esc(e.subject)}</strong></td>
+        <td><strong>${esc(e.subject)}</strong>${e.error ? '<br><span class="client" style="color:#c62828;font-size:0.72rem;">' + esc(e.error) + '</span>' : ''}</td>
         <td class="client">${att}</td>
         <td>${st}</td>
         <td class="client" style="font-size:0.75rem;">${esc(e.messageId || '—')}</td>

@@ -312,14 +312,14 @@ app.post('/api/contact', async (req, res) => {
       requireTLS: true,
       auth: { user: process.env.SMTP_USER, pass },
     });
-    try {
-      const info = await transporter.sendMail({
-        from: `"${name}" <${process.env.SMTP_USER}>`,
-        replyTo: email,
-        to: process.env.CONTACT_EMAIL || 'medresearch77@gmail.com',
-        subject: `[medresearch.me] New Inquiry — ${String(subjectService).slice(0, 60)}`,
-        text: body,
-      });
+     try {
+       const info = await transporter.sendMail({
+         from: process.env.MAIL_FROM || `"${name}" <info@medresearch.me>`,
+         replyTo: email,
+         to: process.env.CONTACT_EMAIL || 'medresearch77@gmail.com',
+         subject: `[medresearch.me] New Inquiry — ${String(subjectService).slice(0, 60)}`,
+         text: body,
+       });
       console.log('Email sent:', info.messageId);
       return res.json({ ok: true });
     } catch (err) {
@@ -677,11 +677,15 @@ app.post('/api/admin/emails/send', adminAuth, emailUpload.array('attachments', 1
     }));
 
     let info;
+    let sendError = null;
     try {
       info = await sendHtmlEmail({ to, cc, bcc, subject, html, attachments: attachments.map(a => ({ filename: a.filename, path: a.path })) });
+    } catch (e) {
+      sendError = e.message || 'Failed to send email.';
+      console.error('Email send error:', sendError);
     } finally {
       // Clean up temp attachment files regardless of outcome
-      for (const f of (req.files || [])) { try { fs.unlinkSync(f.path); } catch (e) {} }
+      for (const f of (req.files || [])) { try { fs.unlinkSync(f.path); } catch (e2) {} }
     }
 
     const record = {
@@ -693,19 +697,33 @@ app.post('/api/admin/emails/send', adminAuth, emailUpload.array('attachments', 1
       html,
       attachments: attachments.map(a => ({ name: a.filename, size: a.size })),
       sentAt: new Date().toISOString(),
-      status: 'sent',
+      status: sendError ? 'failed' : 'sent',
+      error: sendError || '',
       messageId: info && info.messageId ? String(info.messageId) : '',
-      admin: adminUser && adminUser.role === 'admin' ? 'admin' : 'admin'
+      admin: 'admin'
     };
     const all = readJSON(EMAILS_FILE);
     all.unshift(record);
     writeJSON(EMAILS_FILE, all);
+
+    if (sendError) return res.status(502).json({ error: sendError, messageId: '' });
     res.json({ ok: true, messageId: record.messageId });
   } catch (e) {
     for (const f of (req.files || [])) { try { fs.unlinkSync(f.path); } catch (er) {} }
     console.error('Email send error:', e.message);
     res.status(500).json({ error: e.message || 'Failed to send email.' });
   }
+});
+
+// SMTP connectivity status (admin diagnostic)
+app.get('/api/admin/smtp/status', adminAuth, (req, res) => {
+  if (!transporter) {
+    return res.json({ configured: false, reason: 'SMTP environment variables are not set on the server.', host: process.env.SMTP_HOST || null });
+  }
+  transporter.verify((err) => {
+    if (err) return res.json({ configured: true, connected: false, error: err.message, host: process.env.SMTP_HOST });
+    res.json({ configured: true, connected: true, host: process.env.SMTP_HOST, from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>' });
+  });
 });
 
 // Email history (with optional search + status/recipient filtering)
