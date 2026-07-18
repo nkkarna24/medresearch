@@ -137,6 +137,24 @@ select.pay-state[data-paystate] { }
 .chat-thread .cfoot button:hover { background:#0052a3; }
 .chat-empty { margin:auto; color:var(--text-muted); font-size:0.9rem; text-align:center; padding:2rem; }
 @media (max-width:768px) { th,td { padding:0.6rem; font-size:0.82rem; } .hide-sm { display:none; } .container { padding:1rem; } }
+
+/* Email center */
+.client-picker { position:absolute; z-index:20; top:100%; left:0; right:0; background:#fff; border:1.5px solid #dde3ed; border-radius:10px; box-shadow:var(--shadow); max-height:240px; overflow:auto; margin-top:0.2rem; }
+.client-picker .cp-item { padding:0.6rem 0.9rem; cursor:pointer; border-bottom:1px solid #f0f2f6; font-size:0.88rem; }
+.client-picker .cp-item:hover, .client-picker .cp-item.active { background:var(--accent-light); }
+.client-picker .cp-item .cp-em { font-size:0.78rem; color:var(--text-muted); }
+.client-picker .cp-empty { padding:0.6rem 0.9rem; color:var(--text-muted); font-size:0.85rem; }
+.rte-toolbar { display:flex; flex-wrap:wrap; gap:0.3rem; align-items:center; padding:0.5rem; border:1.5px solid #dde3ed; border-bottom:none; border-radius:10px 10px 0 0; background:var(--bg-alt); }
+.rte-toolbar button { background:#fff; border:1.5px solid #dde3ed; border-radius:8px; padding:0.35rem 0.6rem; font-family:inherit; font-size:0.82rem; cursor:pointer; color:var(--text); }
+.rte-toolbar button:hover { border-color:var(--accent); color:var(--accent); }
+.rte-toolbar .rte-sep { width:1px; height:22px; background:#dde3ed; margin:0 0.2rem; }
+.rte-toolbar input[type=color] { width:30px; height:30px; border:1.5px solid #dde3ed; border-radius:8px; background:#fff; padding:2px; cursor:pointer; }
+.rte { border:1.5px solid #dde3ed; border-radius:0 0 10px 10px; padding:1rem; min-height:240px; font-size:0.95rem; outline:none; background:#fff; }
+.rte:focus { border-color:var(--accent); }
+.rte p { margin:0 0 0.6rem; }
+.email-preview { width:100%; min-height:360px; border:1.5px solid #dde3ed; border-radius:10px; background:#fff; }
+.email-preview-meta { font-size:0.82rem; color:var(--text-muted); margin-bottom:0.6rem; }
+.email-preview-meta b { color:var(--primary); }
 </style>
 </head>
 <body>
@@ -180,6 +198,7 @@ select.pay-state[data-paystate] { }
       <div class="tab" data-tab="agreements" id="tabAgreements">Agreements</div>
       <div class="tab" data-tab="chat" id="tabChat">Chat <span class="badge b-pending" id="chatTabBadge" style="display:none;margin-left:0.3rem;">0</span></div>
       <div class="tab" data-tab="clients" id="tabClients">Clients</div>
+      <div class="tab" data-tab="email" id="tabEmail">Email</div>
       <div class="tab" data-tab="security" id="tabSecurity">Security</div>
     </div>
 
@@ -225,7 +244,7 @@ select.pay-state[data-paystate] { }
             <tr>
               <th>Project</th><th>Client</th><th>Service / Plan</th>
               <th class="hide-sm">Payment Link</th><th>Payment Status</th><th>Client Access</th>
-              <th>Agreement</th><th>Status</th><th class="hide-sm">Notes</th><th></th>
+              <th>Agreement</th><th>Status</th><th class="hide-sm">Notes</th><th>Email</th><th></th>
             </tr>
           </thead>
           <tbody id="ordersBody"></tbody>
@@ -343,6 +362,98 @@ select.pay-state[data-paystate] { }
         </table>
       </div>
     </div>
+
+    <!-- EMAIL -->
+    <div id="pnlEmail" style="display:none;">
+      <div class="card">
+        <h3>&#x2709; Compose Email</h3>
+        <form id="emailComposeForm">
+          <div class="form-row">
+            <div style="flex:2;position:relative;">
+              <label>Client (search &amp; select, or leave blank to email externally)</label>
+              <input type="text" id="emailClientSearch" placeholder="Type a client name or email…" autocomplete="off">
+              <div id="emailClientResults" class="client-picker" style="display:none;"></div>
+              <input type="hidden" id="emailClientId">
+            </div>
+            <div style="flex:2;"><label>Recipient Email *</label><input type="email" id="emailTo" placeholder="client@example.com" required></div>
+          </div>
+          <div class="form-row">
+            <div style="flex:1;"><label>Cc</label><input type="email" id="emailCc" placeholder="optional"></div>
+            <div style="flex:1;"><label>Bcc</label><input type="email" id="emailBcc" placeholder="optional"></div>
+          </div>
+          <div class="form-row">
+            <div style="flex:2;"><label>Subject *</label><input type="text" id="emailSubject" placeholder="Subject line" required></div>
+            <div style="flex:1;"><label>Template</label>
+              <select id="emailTemplate"><option value="">— Choose a template —</option></select>
+            </div>
+          </div>
+
+          <label>Message</label>
+          <div class="rte-toolbar" id="rteToolbar">
+            <button type="button" data-cmd="bold" title="Bold"><b>B</b></button>
+            <button type="button" data-cmd="italic" title="Italic"><i>I</i></button>
+            <button type="button" data-cmd="underline" title="Underline"><u>U</u></button>
+            <button type="button" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+            <span class="rte-sep"></span>
+            <button type="button" data-cmd="insertUnorderedList" title="Bullet list">&bull; List</button>
+            <button type="button" data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+            <span class="rte-sep"></span>
+            <button type="button" data-cmd="justifyLeft" title="Align left">&#x2630;</button>
+            <button type="button" data-cmd="justifyCenter" title="Align center">&#x2631;</button>
+            <button type="button" data-cmd="justifyRight" title="Align right">&#x2632;</button>
+            <span class="rte-sep"></span>
+            <button type="button" id="rteLinkBtn" title="Insert link">&#x1F517; Link</button>
+            <button type="button" id="rteImgBtn" title="Insert image URL">&#x1F5BC; Image</button>
+            <span class="rte-sep"></span>
+            <input type="color" id="rteColor" title="Text color" value="#0a2540">
+            <button type="button" id="rteColorBtn" title="Apply color">Color</button>
+            <button type="button" data-cmd="removeFormat" title="Clear formatting">&#x2715; Clear</button>
+          </div>
+          <div id="emailBody" class="rte" contenteditable="true"></div>
+
+          <div style="margin:0.8rem 0;">
+            <label>Attachments</label>
+            <label class="file-up" for="emailAttachments">
+              <span id="emailAttachLabel">&#x1F4E5; Click to add attachments (PDF, DOCX, ZIP, images…)</span>
+              <input type="file" id="emailAttachments" multiple style="display:none;">
+            </label>
+            <div id="emailAttachList" class="files" style="margin-top:0.4rem;"></div>
+          </div>
+
+          <div class="row-actions" style="margin-top:0.5rem;">
+            <button type="button" class="btn btn-ghost btn-sm" id="emailPreviewBtn">&#x1F441; Live Preview</button>
+            <button type="submit" class="btn btn-green">&#x1F4E4; Send Email</button>
+            <span id="emailFeedback" class="muted" style="margin-left:0.6rem;font-size:0.85rem;"></span>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" id="emailPreviewCard" style="display:none;">
+        <h3>&#x1F441; Preview</h3>
+        <div class="email-preview-meta" id="emailPreviewMeta"></div>
+        <iframe id="emailPreviewFrame" class="email-preview" title="Email preview"></iframe>
+      </div>
+
+      <div class="card">
+        <h3>&#x1F4DC; Sent Email History</h3>
+        <div class="form-row" style="margin-bottom:1rem;">
+          <div style="flex:2;"><input type="text" id="emailHistSearch" placeholder="Search recipient, subject, or content…"></div>
+          <div style="flex:1;">
+            <select id="emailHistStatus">
+              <option value="">All statuses</option>
+              <option value="sent">Sent</option>
+              <option value="failed">Failed</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="scroll-x">
+            <thead><tr><th>Sent</th><th>To</th><th>Cc</th><th>Subject</th><th>Attachments</th><th>Status</th><th>Message ID</th></tr></thead>
+            <tbody id="emailHistBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -420,10 +531,12 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
   $('#pnlAgreements').style.display = t.dataset.tab === 'agreements' ? 'block' : 'none';
   $('#pnlChat').style.display = t.dataset.tab === 'chat' ? 'block' : 'none';
   $('#pnlClients').style.display = t.dataset.tab === 'clients' ? 'block' : 'none';
+  $('#pnlEmail').style.display = t.dataset.tab === 'email' ? 'block' : 'none';
   $('#pnlSecurity').style.display = t.dataset.tab === 'security' ? 'block' : 'none';
   if (t.dataset.tab === 'agreements') loadAgreements();
   if (t.dataset.tab === 'chat') loadConversations();
   if (t.dataset.tab === 'security') loadTwoFactorState();
+  if (t.dataset.tab === 'email') loadEmailTab();
 }));
 
 async function loadAll() {
@@ -533,6 +646,7 @@ function renderProjects(orders) {
       <td>${o.agreementAccepted ? `<span class="badge b-completed">&#x2713; ${new Date(o.agreementAcceptedAt).toLocaleDateString()}</span>` : `<span class="badge b-pending">Not yet</span>`}</td>
       <td><span class="badge ${STATUS_BADGE[o.status]}">${o.status.replace('-',' ')}</span><br><select class="status-select" data-status="${o.id}" style="margin-top:0.4rem;">${opts}</select></td>
       <td class="hide-sm"><input class="link-edit" data-notes="${o.id}" value="${o.notes || ''}" placeholder="note to client…"></td>
+      <td><button class="btn btn-ghost btn-sm" data-email-project="${o.id}">&#x2709; Email</button></td>
       <td><button class="del" data-delp="${o.id}">Delete</button></td>
     </tr>`;
   }).join('');
@@ -559,6 +673,14 @@ function bindProjectActions() {
     loadProjects();
   }));
   document.querySelectorAll('[data-detail]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); openDetail(a.dataset.detail); }));
+  document.querySelectorAll('[data-email-project]').forEach(b => b.addEventListener('click', async () => {
+    const res = await apiFetch('/api/admin/orders');
+    const list = await res.json();
+    const o = list.find(x => String(x.id) === String(b.dataset.emailProject));
+    if (!o) return;
+    switchTab('email');
+    composeEmailToClient(o.clientEmail || o.userEmail || '', o.client || '', o.title || '', o.service || '', Number(o.amount) || 0, o.id);
+  }));
   loadOverview();
   loadChatSummary();
 }
@@ -620,6 +742,7 @@ async function openDetail(id) {
     <div class="row-actions" style="margin-bottom:1rem;">
       <button class="btn btn-ghost btn-sm" onclick="previewInvoice(${o.id})">&#x1F4C4; Preview Invoice</button>
       <button class="btn btn-ghost btn-sm" onclick="previewRTA(${o.id})">&#x1F4E1; Preview Right Transfer</button>
+      <button class="btn btn-green btn-sm" onclick="composeEmailToClient('${o.clientEmail || o.userEmail || ''}', '${o.client || ''}', '${o.title || ''}', '${o.service || ''}', '${Number(o.amount) || 0}', '${o.id}')">&#x2709; Email Client</button>
     </div>
     <div style="margin:0.5rem 0 1rem;padding:0.7rem 0.9rem;background:#eafaf0;border:1px solid #bfe6c8;border-radius:8px;font-size:0.8rem;color:#1b5e20;">Files &amp; the Right Transfer Agreement are released to the client only after <b>100% payment</b> is marked.</div>
     <div class="muted" style="margin-bottom:1rem;">Agreement accepted: ${o.agreementAccepted ? 'Yes (' + (o.agreementAcceptedAt ? new Date(o.agreementAcceptedAt).toLocaleString() : '') + ')' : 'No'}</div>
@@ -831,6 +954,11 @@ function renderAgreements(list) {
 
 function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
+function switchTab(name) {
+  const t = document.querySelector('.tab[data-tab="' + name + '"]');
+  if (t) t.click();
+}
+
 /* ── Chat (admin) ── */
 let activeConv = null;
 let chatRefreshTimer = null;
@@ -904,6 +1032,196 @@ chatRefreshTimer = setInterval(() => {
 }, 5000);
 
 if (getToken()) showAdmin();
+
+/* ── Email Center ── */
+let emailClients = [];
+let emailAttachments = [];
+
+async function loadEmailTab() {
+  // Load clients for template + (templates loaded once)
+  try {
+    const res = await apiFetch('/api/admin/clients');
+    emailClients = await res.json();
+  } catch(e) { emailClients = []; }
+  if (!$('#emailTemplate').options.length || $('#emailTemplate').options[0].value !== '') {
+    loadEmailTemplates();
+  }
+  loadEmailHistory();
+}
+
+async function loadEmailTemplates() {
+  try {
+    const res = await apiFetch('/api/admin/emails/templates');
+    const list = await res.json();
+    const sel = $('#emailTemplate');
+    sel.innerHTML = '<option value="">— Choose a template —</option>' + list.map(t => `<option value="${t.id}">${esc(t.subject)}</option>`).join('');
+  } catch(e) {}
+}
+
+// Searchable client picker
+$('#emailClientSearch').addEventListener('input', () => {
+  const q = $('#emailClientSearch').value.trim().toLowerCase();
+  const box = $('#emailClientResults');
+  if (!q) { box.style.display = 'none'; return; }
+  const matches = emailClients.filter(c => c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q)).slice(0, 8);
+  if (!matches.length) { box.innerHTML = '<div class="cp-empty">No matching clients. Type an external email in Recipient instead.</div>'; box.style.display = 'block'; return; }
+  box.innerHTML = matches.map(c => `<div class="cp-item" data-id="${c.id}" data-name="${esc(c.name)}" data-email="${esc(c.email)}"><strong>${esc(c.name)}</strong><div class="cp-em">${esc(c.email)}</div></div>`).join('');
+  box.style.display = 'block';
+  box.querySelectorAll('.cp-item').forEach(el => el.addEventListener('click', () => {
+    $('#emailClientId').value = el.dataset.id;
+    $('#emailClientSearch').value = el.dataset.name;
+    $('#emailTo').value = el.dataset.email;
+    box.style.display = 'none';
+  }));
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#emailClientSearch') && !e.target.closest('#emailClientResults')) $('#emailClientResults').style.display = 'none';
+});
+
+// Template selection fills subject + body (with placeholder substitution for known client)
+$('#emailTemplate').addEventListener('change', async () => {
+  const id = $('#emailTemplate').value;
+  if (!id) return;
+  // Templates are static on the server; re-fetch list to get html body
+  const res = await apiFetch('/api/admin/emails/templates');
+  const list = await res.json();
+  // Server only returns subjects; we fetch full template html via a dedicated route is overkill —
+  // instead build body client-side from a known map mirrored here.
+  const tpl = EMAIL_TEMPLATE_BODIES[id];
+  if (!tpl) return;
+  $('#emailSubject').value = fillTemplate(tpl.subject);
+  $('#emailBody').innerHTML = fillTemplate(tpl.html);
+});
+
+// Mirror of server template bodies (ids must match server EMAIL_TEMPLATES)
+const EMAIL_TEMPLATE_BODIES = {
+  'project-started': { subject: 'Your project has started — medresearch.me', html: '<p>Dear {{client}},</p><p>We are pleased to confirm that work on your project <strong>{{title}}</strong> has now started.</p><p>Our team will keep you updated at every milestone. You can review progress, chat with us, and download deliverables any time from your client dashboard.</p><p>If you have any questions or additional materials, simply reply to this email or use the chat in your dashboard.</p><p>Best regards,<br>The medresearch.me Team</p>' },
+  'payment-reminder': { subject: 'Payment reminder — {{title}}', html: '<p>Dear {{client}},</p><p>This is a friendly reminder that payment for your project <strong>{{title}}</strong> is now due so we can begin (or continue) work.</p><p>You can complete payment securely from your client dashboard using the link provided there.</p><p>If you have already paid, please disregard this message. Thank you!</p><p>Best regards,<br>The medresearch.me Team</p>' },
+  'deposit-received': { subject: '50% payment received — thank you!', html: '<p>Dear {{client}},</p><p>Thank you! We have received your 50% deposit for <strong>{{title}}</strong>.</p><p>We will now proceed with the next phase of the work. The remaining 50% will be due upon completion, before final deliverables are released.</p><p>Best regards,<br>The medresearch.me Team</p>' },
+  'remaining-payment-reminder': { subject: 'Remaining payment due — {{title}}', html: '<p>Dear {{client}},</p><p>Your project <strong>{{title}}</strong> is complete and ready for delivery. The remaining 50% payment is now due.</p><p>Once payment is confirmed, your final deliverables and the Right Transfer Agreement will be released to your dashboard.</p><p>Best regards,<br>The medresearch.me Team</p>' },
+  'project-completed': { subject: 'Your project is complete — {{title}}', html: '<p>Dear {{client}},</p><p>Great news! Your project <strong>{{title}}</strong> is now complete.</p><p>Please complete any outstanding payment, after which your final deliverables and the Right Transfer Agreement will be available in your dashboard.</p><p>We hope the work meets your expectations. We would be glad to support any future research needs.</p><p>Best regards,<br>The medresearch.me Team</p>' },
+  'revision-request': { subject: 'Revision request — {{title}}', html: '<p>Dear {{client}},</p><p>We have reviewed your feedback on <strong>{{title}}</strong> and will incorporate the requested revisions.</p><p>We will notify you as soon as the updated deliverables are ready in your dashboard.</p><p>Best regards,<br>The medresearch.me Team</p>' },
+  'invoice-attached': { subject: 'Invoice attached — {{title}}', html: '<p>Dear {{client}},</p><p>Please find attached the invoice for your project <strong>{{title}}</strong>.</p><p>For your records: the total fee is <strong>{{amount}}</strong>. You may pay via the link in your client dashboard.</p><p>Thank you for your business.</p><p>Best regards,<br>The medresearch.me Team</p>' },
+  'agreement-reminder': { subject: 'Please review & sign your agreement — {{title}}', html: '<p>Dear {{client}},</p><p>Before we begin delivery, please review and accept the Right Transfer Agreement for <strong>{{title}}</strong> from your client dashboard.</p><p>Accepting the agreement unlocks your payment link and lets us proceed smoothly.</p><p>Best regards,<br>The medresearch.me Team</p>' }
+};
+
+let emailCtx = { client: '', title: '', service: '', amount: '' };
+function fillTemplate(str) {
+  return (str || '')
+    .replace(/\{\{client\}\}/g, emailCtx.client || 'Client')
+    .replace(/\{\{title\}\}/g, emailCtx.title || 'your project')
+    .replace(/\{\{service\}\}/g, emailCtx.service || '')
+    .replace(/\{\{amount\}\}/g, '$' + (Number(emailCtx.amount) || 0).toFixed(2));
+}
+
+// Open composer pre-filled for a client (from project table or client detail)
+function composeEmailToClient(email, clientName, title, service, amount, projectId) {
+  emailCtx = { client: clientName || '', title: title || '', service: service || '', amount: amount || 0 };
+  if (email) $('#emailTo').value = email;
+  if (clientName) { $('#emailClientSearch').value = clientName; }
+  loadEmailTab();
+}
+
+// Rich-text toolbar
+document.querySelectorAll('#rteToolbar [data-cmd]').forEach(btn => btn.addEventListener('click', () => {
+  document.getElementById('emailBody').focus();
+  document.execCommand(btn.dataset.cmd, false, null);
+}));
+$('#rteLinkBtn').addEventListener('click', () => {
+  const url = prompt('Enter URL:');
+  if (url) { document.getElementById('emailBody').focus(); document.execCommand('createLink', false, url); }
+});
+$('#rteImgBtn').addEventListener('click', () => {
+  const url = prompt('Enter image URL:');
+  if (url) { document.getElementById('emailBody').focus(); document.execCommand('insertImage', false, url); }
+});
+$('#rteColorBtn').addEventListener('click', () => {
+  const color = $('#rteColor').value;
+  document.getElementById('emailBody').focus();
+  document.execCommand('foreColor', false, color);
+});
+
+// Attachments
+$('#emailAttachments').addEventListener('change', () => {
+  const files = Array.from($('#emailAttachments').files);
+  for (const f of files) emailAttachments.push(f);
+  renderEmailAttachments();
+  $('#emailAttachments').value = '';
+});
+function renderEmailAttachments() {
+  const el = $('#emailAttachList');
+  if (!emailAttachments.length) { el.innerHTML = '<span class="client" style="font-size:0.82rem;">No attachments.</span>'; return; }
+  el.innerHTML = emailAttachments.map((f, i) => `<span style="display:inline-block;margin:0.2rem 0.6rem 0.2rem 0;">&#x1F4E5; ${esc(f.name)} (${Math.round(f.size/1024)} KB) <a style="color:#c62828;cursor:pointer;" data-rm="${i}">&times;</a></span>`).join('');
+  el.querySelectorAll('[data-rm]').forEach(a => a.addEventListener('click', () => { emailAttachments.splice(Number(a.dataset.rm), 1); renderEmailAttachments(); }));
+}
+
+// Live preview
+$('#emailPreviewBtn').addEventListener('click', () => {
+  const to = $('#emailTo').value.trim();
+  const cc = $('#emailCc').value.trim();
+  const subject = $('#emailSubject').value.trim();
+  const html = $('#emailBody').innerHTML;
+  $('#emailPreviewMeta').innerHTML = `<div><b>To:</b> ${esc(to || '—')}${cc ? ' &nbsp; <b>Cc:</b> ' + esc(cc) : ''}</div><div><b>Subject:</b> ${esc(subject || '—')}</div>`;
+  $('#emailPreviewCard').style.display = 'block';
+  const frame = $('#emailPreviewFrame');
+  frame.srcdoc = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Inter,Arial,sans-serif;color:#1a1a2e;padding:1rem;line-height:1.6;}</style></head><body>' + html + '</body></html>';
+  $('#emailPreviewCard').scrollIntoView({ behavior: 'smooth' });
+});
+
+// Send
+$('#emailComposeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fb = $('#emailFeedback'); fb.style.color = ''; fb.textContent = 'Sending…';
+  const fd = new FormData();
+  fd.append('to', $('#emailTo').value.trim());
+  fd.append('cc', $('#emailCc').value.trim());
+  fd.append('bcc', $('#emailBcc').value.trim());
+  fd.append('subject', $('#emailSubject').value.trim());
+  fd.append('html', $('#emailBody').innerHTML);
+  for (const f of emailAttachments) fd.append('attachments', f);
+  const res = await apiFetch('/api/admin/emails/send', { method:'POST', headers:{}, body: fd });
+  const d = await res.json();
+  if (!res.ok) { fb.textContent = d.error || 'Failed to send.'; fb.style.color = '#c62828'; return; }
+  fb.textContent = 'Sent ✓ (ID: ' + (d.messageId || 'n/a') + ')'; fb.style.color = '#1b7a1b';
+  // Reset composer
+  $('#emailComposeForm').reset();
+  $('#emailBody').innerHTML = '';
+  emailAttachments = [];
+  renderEmailAttachments();
+  $('#emailClientId').value = '';
+  loadEmailHistory();
+});
+
+// History
+async function loadEmailHistory() {
+  try {
+    const q = $('#emailHistSearch').value.trim();
+    const status = $('#emailHistStatus').value;
+    const res = await apiFetch('/api/admin/emails?q=' + encodeURIComponent(q) + '&status=' + encodeURIComponent(status));
+    if (res.status === 401) return;
+    const list = await res.json();
+    const body = $('#emailHistBody');
+    if (!list.length) { body.innerHTML = '<tr><td colspan="7" class="empty">No emails sent yet.</td></tr>'; return; }
+    body.innerHTML = list.map(e => {
+      const att = (e.attachments || []).map(a => esc(a.name)).join(', ') || '—';
+      const st = e.status === 'sent'
+        ? '<span class="badge b-completed">Sent</span>'
+        : '<span class="badge b-rejected">Failed</span>';
+      return `<tr>
+        <td class="client">${new Date(e.sentAt).toLocaleString()}</td>
+        <td>${esc(e.to)}</td>
+        <td class="client">${e.cc ? esc(e.cc) : '—'}</td>
+        <td><strong>${esc(e.subject)}</strong></td>
+        <td class="client">${att}</td>
+        <td>${st}</td>
+        <td class="client" style="font-size:0.75rem;">${esc(e.messageId || '—')}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+$('#emailHistSearch').addEventListener('input', debounce(loadEmailHistory, 350));
+$('#emailHistStatus').addEventListener('change', loadEmailHistory);
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 </script>
 </body>
 </html>

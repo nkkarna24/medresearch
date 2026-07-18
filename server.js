@@ -15,9 +15,11 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 const CHAT_FILE = path.join(DATA_DIR, 'chat.json');
+const EMAILS_FILE = path.join(DATA_DIR, 'emails.json');
 if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, '[]');
 if (!fs.existsSync(ORDERS_FILE)) fs.writeFileSync(ORDERS_FILE, '[]');
 if (!fs.existsSync(CHAT_FILE)) fs.writeFileSync(CHAT_FILE, '{}');
+if (!fs.existsSync(EMAILS_FILE)) fs.writeFileSync(EMAILS_FILE, '[]');
 
 // Reusable email sender
 async function sendEmail({ fromName, replyTo, subject, text }) {
@@ -33,6 +35,23 @@ async function sendEmail({ fromName, replyTo, subject, text }) {
     subject,
     text,
   });
+}
+
+// Reusable HTML email sender — uses the single shared transporter and MAIL_FROM.
+async function sendHtmlEmail({ to, cc, bcc, subject, html, text, replyTo, attachments }) {
+  if (!transporter) throw new Error('SMTP is not configured on the server.');
+  const info = await transporter.sendMail({
+    from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>',
+    to,
+    cc: cc || undefined,
+    bcc: bcc || undefined,
+    replyTo: replyTo || (process.env.CONTACT_EMAIL || 'info@medresearch.me'),
+    subject,
+    text: text || (html ? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : ''),
+    html,
+    attachments: attachments || [],
+  });
+  return info;
 }
 
 const upload = multer({ dest: path.join(__dirname, 'uploads'), limits: { fileSize: 50 * 1024 * 1024 } });
@@ -69,6 +88,11 @@ if (transporter) {
 const PROJECT_UPLOADS = path.join(__dirname, 'project-uploads');
 if (!fs.existsSync(PROJECT_UPLOADS)) fs.mkdirSync(PROJECT_UPLOADS);
 const projectUpload = multer({ dest: PROJECT_UPLOADS, limits: { fileSize: 50 * 1024 * 1024 } });
+
+// Admin email composer attachments (temporary; deleted after send)
+const EMAIL_UPLOADS = path.join(__dirname, 'email-uploads');
+if (!fs.existsSync(EMAIL_UPLOADS)) fs.mkdirSync(EMAIL_UPLOADS);
+const emailUpload = multer({ dest: EMAIL_UPLOADS, limits: { fileSize: 25 * 1024 * 1024, files: 10 } });
 
 // Backups
 const BACKUP_DIR = path.join(DATA_DIR, 'backups');
@@ -559,6 +583,147 @@ app.post('/api/admin/chat/:userId/read', adminAuth, (req, res) => {
   chat[req.params.userId] = msgs;
   writeChat(chat);
   res.json({ ok: true });
+});
+
+// ── Admin Email Center ──
+const EMAIL_TEMPLATES = {
+  'project-started': {
+    subject: 'Your project has started — medresearch.me',
+    html: `<p>Dear {{client}},</p>
+<p>We are pleased to confirm that work on your project <strong>{{title}}</strong> has now started.</p>
+<p>Our team will keep you updated at every milestone. You can review progress, chat with us, and download deliverables any time from your client dashboard.</p>
+<p>If you have any questions or additional materials, simply reply to this email or use the chat in your dashboard.</p>
+<p>Best regards,<br>The medresearch.me Team</p>`
+  },
+  'payment-reminder': {
+    subject: 'Payment reminder — {{title}}',
+    html: `<p>Dear {{client}},</p>
+<p>This is a friendly reminder that payment for your project <strong>{{title}}</strong> is now due so we can begin (or continue) work.</p>
+<p>You can complete payment securely from your client dashboard using the link provided there.</p>
+<p>If you have already paid, please disregard this message. Thank you!</p>
+<p>Best regards,<br>The medresearch.me Team</p>`
+  },
+  'deposit-received': {
+    subject: '50% payment received — thank you!',
+    html: `<p>Dear {{client}},</p>
+<p>Thank you! We have received your 50% deposit for <strong>{{title}}</strong>.</p>
+<p>We will now proceed with the next phase of the work. The remaining 50% will be due upon completion, before final deliverables are released.</p>
+<p>Best regards,<br>The medresearch.me Team</p>`
+  },
+  'remaining-payment-reminder': {
+    subject: 'Remaining payment due — {{title}}',
+    html: `<p>Dear {{client}},</p>
+<p>Your project <strong>{{title}}</strong> is complete and ready for delivery. The remaining 50% payment is now due.</p>
+<p>Once payment is confirmed, your final deliverables and the Right Transfer Agreement will be released to your dashboard.</p>
+<p>Best regards,<br>The medresearch.me Team</p>`
+  },
+  'project-completed': {
+    subject: 'Your project is complete — {{title}}',
+    html: `<p>Dear {{client}},</p>
+<p>Great news! Your project <strong>{{title}}</strong> is now complete.</p>
+<p>Please complete any outstanding payment, after which your final deliverables and the Right Transfer Agreement will be available in your dashboard.</p>
+<p>We hope the work meets your expectations. We would be glad to support any future research needs.</p>
+<p>Best regards,<br>The medresearch.me Team</p>`
+  },
+  'revision-request': {
+    subject: 'Revision request — {{title}}',
+    html: `<p>Dear {{client}},</p>
+<p>We have reviewed your feedback on <strong>{{title}}</strong> and will incorporate the requested revisions.</p>
+<p>We will notify you as soon as the updated deliverables are ready in your dashboard.</p>
+<p>Best regards,<br>The medresearch.me Team</p>`
+  },
+  'invoice-attached': {
+    subject: 'Invoice attached — {{title}}',
+    html: `<p>Dear {{client}},</p>
+<p>Please find attached the invoice for your project <strong>{{title}}</strong>.</p>
+<p>For your records: the total fee is <strong>{{amount}}</strong>. You may pay via the link in your client dashboard.</p>
+<p>Thank you for your business.</p>
+<p>Best regards,<br>The medresearch.me Team</p>`
+  },
+  'agreement-reminder': {
+    subject: 'Please review & sign your agreement — {{title}}',
+    html: `<p>Dear {{client}},</p>
+<p>Before we begin delivery, please review and accept the Right Transfer Agreement for <strong>{{title}}</strong> from your client dashboard.</p>
+<p>Accepting the agreement unlocks your payment link and lets us proceed smoothly.</p>
+<p>Best regards,<br>The medresearch.me Team</p>`
+  }
+};
+
+app.get('/api/admin/emails/templates', adminAuth, (req, res) => {
+  const list = Object.keys(EMAIL_TEMPLATES).map(k => ({ id: k, subject: EMAIL_TEMPLATES[k].subject }));
+  res.json(list);
+});
+
+// Send an email on behalf of the company (HTML, with attachments)
+app.post('/api/admin/emails/send', adminAuth, emailUpload.array('attachments', 10), async (req, res) => {
+  try {
+    const adminToken = req.headers.authorization.split(' ')[1];
+    let adminUser = null;
+    try { adminUser = jwt.verify(adminToken, JWT_SECRET); } catch (e) {}
+    const to = (req.body.to || '').trim();
+    const cc = (req.body.cc || '').trim();
+    const bcc = (req.body.bcc || '').trim();
+    const subject = (req.body.subject || '').trim();
+    const html = (req.body.html || '').trim();
+    if (!to) return res.status(400).json({ error: 'A recipient email is required.' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return res.status(400).json({ error: 'Invalid recipient email address.' });
+    if (!subject) return res.status(400).json({ error: 'A subject is required.' });
+    if (!html) return res.status(400).json({ error: 'Email body cannot be empty.' });
+
+    const attachments = (req.files || []).map(f => ({
+      filename: f.originalname,
+      path: f.path,
+      size: f.size
+    }));
+
+    let info;
+    try {
+      info = await sendHtmlEmail({ to, cc, bcc, subject, html, attachments: attachments.map(a => ({ filename: a.filename, path: a.path })) });
+    } finally {
+      // Clean up temp attachment files regardless of outcome
+      for (const f of (req.files || [])) { try { fs.unlinkSync(f.path); } catch (e) {} }
+    }
+
+    const record = {
+      id: uuidv4(),
+      to,
+      cc: cc || '',
+      bcc: bcc || '',
+      subject,
+      html,
+      attachments: attachments.map(a => ({ name: a.filename, size: a.size })),
+      sentAt: new Date().toISOString(),
+      status: 'sent',
+      messageId: info && info.messageId ? String(info.messageId) : '',
+      admin: adminUser && adminUser.role === 'admin' ? 'admin' : 'admin'
+    };
+    const all = readJSON(EMAILS_FILE);
+    all.unshift(record);
+    writeJSON(EMAILS_FILE, all);
+    res.json({ ok: true, messageId: record.messageId });
+  } catch (e) {
+    for (const f of (req.files || [])) { try { fs.unlinkSync(f.path); } catch (er) {} }
+    console.error('Email send error:', e.message);
+    res.status(500).json({ error: e.message || 'Failed to send email.' });
+  }
+});
+
+// Email history (with optional search + status/recipient filtering)
+app.get('/api/admin/emails', adminAuth, (req, res) => {
+  const all = readJSON(EMAILS_FILE);
+  const q = (req.query.q || '').trim().toLowerCase();
+  const status = (req.query.status || '').trim();
+  let filtered = all;
+  if (q) {
+    filtered = filtered.filter(e =>
+      (e.to || '').toLowerCase().includes(q) ||
+      (e.subject || '').toLowerCase().includes(q) ||
+      (e.cc || '').toLowerCase().includes(q) ||
+      (e.html || '').toLowerCase().includes(q)
+    );
+  }
+  if (status) filtered = filtered.filter(e => (e.status || '') === status);
+  res.json(filtered);
 });
 
 // ── Payment Route (Stripe placeholder) ──

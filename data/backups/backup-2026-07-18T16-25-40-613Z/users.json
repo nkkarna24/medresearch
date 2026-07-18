@@ -1,0 +1,73 @@
+[
+  {
+    "id": "8cf74629-a788-4d18-a846-6a4934935853",
+    "name": "Saurav Lama",
+    "email": "sauravlama@gmail.com",
+    "password": "$2b$10$m2Lcr/N1JP.PoUIIfd0rsOEl5MsaAoUvbV0vlV5LW.7GQU5F08ncW",
+    "createdAt": "2026-07-16T14:06:16.944Z",
+    "disabled": false
+  },
+  {
+    "id": "7300da6c-2e83-4b8c-b88e-8c821f1c65f7",
+    "name": "Nitesh Kumar Karna",
+    "email": "niteshkumarkarna2022@bpkihs.edu.np",
+    "password": "$2b$10$PgD93iuISSBlrVwfMUhzVeFWE.nTdViZLauvJvL2Y6Y0VGLY11YM6",
+    "passwordText": "qwertyuiop",
+    "createdAt": "2026-07-16T18:44:24.238Z",
+    "disabled": false
+  },
+  {
+    "id": "ec0c0d81-837c-4471-9ef8-0c3ed88def03",
+    "name": "Test Client",
+    "email": "client@test.com",
+    "password": "$2b$10$WR1INuztHqeYA9EKoiLGLeUhHgnxR6O45ipw341sfMgDhO.lb22u2",
+    "passwordText": "testpass123",
+    "createdAt": "2026-07-18T08:20:02.835Z",
+    "disabled": false
+  },
+  {
+    "id": "dea713d2-fb3a-44a6-9c7f-7a403dd94e7e",
+    "name": "State Client",
+    "email": "state1784364336528@test.com",
+    "password": "$2b$10$j0R8yDHfNxOc5qfgds.JWuYChiG030/J0.mw6NGhtRHvGL3P28Zea",
+    "passwordText": "testpass123",
+    "createdAt": "2026-07-18T08:45:36.608Z",
+    "disabled": false
+  },
+  {
+    "id": "94ad0d2f-8b74-41d8-b7c0-e10f474352a3",
+    "name": "RTA Cl",
+    "email": "rta1784364381257@test.com",
+    "password": "$2b$10$VuPuaDBVPZqfpEAMWgW2f.xsJEpjemRSnoxlBg51P9YotlJwwkZCa",
+    "passwordText": "testpass123",
+    "createdAt": "2026-07-18T08:46:21.345Z",
+    "disabled": false
+  },
+  {
+    "id": "5ff3b538-cfa8-4a84-ac72-2bc88d509f68",
+    "name": "Acc Cl",
+    "email": "acc1784365376006@test.com",
+    "password": "$2b$10$HZnKDeJ/o09e7VW8vSWc8On.VNdkE8o.6YsxPgU3qERbYeve53biq",
+    "passwordText": "testpass123",
+    "createdAt": "2026-07-18T09:02:56.077Z",
+    "disabled": false
+  },
+  {
+    "id": "9a3ffe3a-a3b1-408a-9a87-6d304333ea6c",
+    "name": "Acc Cl",
+    "email": "acc1784365439579@test.com",
+    "password": "$2b$10$8FtA5XA3iPcKUymFeGggxu9wi6JRl.88BEZrh2lqHThJbHZ/rTlyu",
+    "passwordText": "testpass123",
+    "createdAt": "2026-07-18T09:03:59.653Z",
+    "disabled": false
+  },
+  {
+    "id": "3c895e9f-fdf9-43e9-88e8-1a29b4597c97",
+    "name": "Acc Cl",
+    "email": "acc1784365514290@test.com",
+    "password": "$2b$10$j5DC/nk4gJBEwfQuSK6ng./iEpmbA.2tbuc.LQtnXYpMX0ua98h3y",
+    "passwordText": "testpass123",
+    "createdAt": "2026-07-18T09:05:14.368Z",
+    "disabled": false
+  }
+]
