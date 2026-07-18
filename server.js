@@ -36,9 +36,32 @@ async function sendEmail({ fromName, replyTo, subject, text }) {
   }
 }
 
+// ── Brand email banner ──
+// Public path where the banner is served, plus an inlined data-URI copy so the
+// banner always renders even if a mail client blocks external images.
+const BANNER_PUBLIC_URL = '/brand/email-banner.png';
+const BANNER_FILE = path.join(__dirname, 'public', 'brand', 'email-banner.png');
+let _bannerDataUri = null;
+function getBannerDataUri() {
+  if (_bannerDataUri) return _bannerDataUri;
+  try {
+    const buf = fs.readFileSync(BANNER_FILE);
+    const ext = path.extname(BANNER_FILE).replace('.', '') || 'png';
+    _bannerDataUri = 'data:image/' + ext + ';base64,' + buf.toString('base64');
+  } catch (e) { _bannerDataUri = ''; }
+  return _bannerDataUri;
+}
+function wrapWithBanner(html, brandBanner) {
+  if (!brandBanner) return html;
+  const uri = getBannerDataUri();
+  if (!uri) return html;
+  const banner = `<div style="margin:0 0 18px 0;text-align:center;"><img src="${uri}" alt="medresearch.me" style="max-width:600px;width:100%;height:auto;border:0;display:inline-block;" /></div>`;
+  return banner + (html || '');
+}
+
 // Send via Brevo REST API (HTTPS/443) — works even when outbound SMTP (25/465/587)
 // is blocked by the hosting network. Brevo SMTP credentials are also valid API keys.
-async function sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, attachments }) {
+async function sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, attachments, brandBanner }) {
   const apiKey = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
   if (!apiKey) throw new Error('Brevo API key (SMTP_PASS) is not configured.');
   const fromStr = process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>';
@@ -51,12 +74,13 @@ async function sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, atta
     return String(val).split(',').map(s => s.trim()).filter(Boolean).map(email => ({ email }));
   };
   const replyToVal = (replyTo || process.env.CONTACT_EMAIL || 'info@medresearch.me');
+  const finalHtml = wrapWithBanner(html, brandBanner);
   const plainText = text || (html ? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '') || ' ';
   const msg = {
     sender,
     to: buildRecipients(to),
     subject,
-    htmlContent: html || undefined,
+    htmlContent: finalHtml || undefined,
     textContent: plainText,
     replyTo: { email: String(replyToVal).trim() },
   };
@@ -91,7 +115,8 @@ async function sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, atta
 
 // Reusable HTML email sender — tries the SMTP transporter first, falls back to
 // Brevo's HTTPS API when SMTP is unavailable or times out (Render blocks SMTP egress).
-async function sendHtmlEmail({ to, cc, bcc, subject, html, text, replyTo, attachments }) {
+async function sendHtmlEmail({ to, cc, bcc, subject, html, text, replyTo, attachments, brandBanner }) {
+  const finalHtml = wrapWithBanner(html, brandBanner);
   if (transporter) {
     try {
       const info = await transporter.sendMail({
@@ -102,7 +127,7 @@ async function sendHtmlEmail({ to, cc, bcc, subject, html, text, replyTo, attach
         replyTo: replyTo || (process.env.CONTACT_EMAIL || 'info@medresearch.me'),
         subject,
         text: text || (html ? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : ''),
-        html,
+        html: finalHtml,
         attachments: attachments || [],
       });
       return { messageId: info.messageId, via: 'smtp' };
@@ -110,7 +135,7 @@ async function sendHtmlEmail({ to, cc, bcc, subject, html, text, replyTo, attach
       console.error('SMTP send failed, falling back to Brevo API:', smtpErr.message);
     }
   }
-  return await sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, attachments });
+  return await sendViaBrevoApi({ to, cc, bcc, subject, html: finalHtml, text, replyTo, attachments, brandBanner });
 }
 
 const upload = multer({ dest: path.join(__dirname, 'uploads'), limits: { fileSize: 50 * 1024 * 1024 } });
@@ -372,6 +397,7 @@ app.post('/api/contact', async (req, res) => {
         to: process.env.CONTACT_EMAIL || 'medresearch77@gmail.com',
         replyTo: email,
         subject: `[medresearch.me] New Inquiry — ${String(subjectService).slice(0, 60)}`,
+        brandBanner: true,
         text: body,
       });
       console.log('Contact email sent:', info.messageId);
@@ -719,6 +745,7 @@ app.post('/api/admin/emails/send', adminAuth, emailUpload.array('attachments', 1
     const bcc = (req.body.bcc || '').trim();
     const subject = (req.body.subject || '').trim();
     const html = (req.body.html || '').trim();
+    const brandBanner = req.body.brandBanner === 'true' || req.body.brandBanner === '1' || req.body.brandBanner === true;
     if (!to) return res.status(400).json({ error: 'A recipient email is required.' });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return res.status(400).json({ error: 'Invalid recipient email address.' });
     if (!subject) return res.status(400).json({ error: 'A subject is required.' });
@@ -733,7 +760,7 @@ app.post('/api/admin/emails/send', adminAuth, emailUpload.array('attachments', 1
     let info;
     let sendError = null;
     try {
-      info = await sendHtmlEmail({ to, cc, bcc, subject, html, attachments: attachments.map(a => ({ filename: a.filename, path: a.path })) });
+      info = await sendHtmlEmail({ to, cc, bcc, subject, html, attachments: attachments.map(a => ({ filename: a.filename, path: a.path })), brandBanner });
     } catch (e) {
       sendError = e.message || 'Failed to send email.';
       console.error('Email send error:', sendError);
