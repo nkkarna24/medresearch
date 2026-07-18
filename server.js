@@ -57,6 +57,9 @@ async function sendHtmlEmail({ to, cc, bcc, subject, html, text, replyTo, attach
 const upload = multer({ dest: path.join(__dirname, 'uploads'), limits: { fileSize: 50 * 1024 * 1024 } });
 // Create SMTP transporter once
 const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+const smtpPort = Number(process.env.SMTP_PORT || 587);
+// Implicit TLS on 465, STARTTLS otherwise.
+const smtpSecure = smtpPort === 465;
 
 const transporter =
   process.env.SMTP_HOST &&
@@ -64,13 +67,18 @@ const transporter =
   smtpPass.length > 8
     ? nodemailer.createTransport({
         host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT || 587),
-        secure: false,
-        requireTLS: true,
+        port: smtpPort,
+        secure: smtpSecure,
+        requireTLS: !smtpSecure,
         auth: {
           user: process.env.SMTP_USER,
           pass: smtpPass,
         },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000,
+        tls: { ciphers: 'TLSv1.2', rejectUnauthorized: true },
+        pool: false,
       })
     : null;
 
@@ -299,28 +307,15 @@ app.post('/api/contact', async (req, res) => {
   const subjectService = fields.service || fields.congress_other || fields.congress || fields.topic || 'Inquiry';
   const body = lines.join('\n');
 
-  const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
-  const useSmtp = process.env.SMTP_HOST
-    && process.env.SMTP_USER && !process.env.SMTP_USER.includes('your.email')
-    && pass.length > 8;
-
-  if (useSmtp) {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
-      requireTLS: true,
-      auth: { user: process.env.SMTP_USER, pass },
-    });
-     try {
-       const info = await transporter.sendMail({
-         from: process.env.MAIL_FROM || `"${name}" <info@medresearch.me>`,
-         replyTo: email,
-         to: process.env.CONTACT_EMAIL || 'medresearch77@gmail.com',
-         subject: `[medresearch.me] New Inquiry — ${String(subjectService).slice(0, 60)}`,
-         text: body,
-       });
-      console.log('Email sent:', info.messageId);
+  if (transporter) {
+    try {
+      const info = await sendHtmlEmail({
+        to: process.env.CONTACT_EMAIL || 'medresearch77@gmail.com',
+        replyTo: email,
+        subject: `[medresearch.me] New Inquiry — ${String(subjectService).slice(0, 60)}`,
+        text: body,
+      });
+      console.log('Contact email sent:', info.messageId);
       return res.json({ ok: true });
     } catch (err) {
       console.error('SMTP error:', err.message);
@@ -720,9 +715,12 @@ app.get('/api/admin/smtp/status', adminAuth, (req, res) => {
   if (!transporter) {
     return res.json({ configured: false, reason: 'SMTP environment variables are not set on the server.', host: process.env.SMTP_HOST || null });
   }
+  const done = (payload) => { if (!res.headersSent) res.json(payload); };
+  const timer = setTimeout(() => done({ configured: true, connected: false, error: 'Connection timed out (15s). Check SMTP_PORT / network egress.', host: process.env.SMTP_HOST }), 16000);
   transporter.verify((err) => {
-    if (err) return res.json({ configured: true, connected: false, error: err.message, host: process.env.SMTP_HOST });
-    res.json({ configured: true, connected: true, host: process.env.SMTP_HOST, from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>' });
+    clearTimeout(timer);
+    if (err) return done({ configured: true, connected: false, error: err.message, host: process.env.SMTP_HOST });
+    done({ configured: true, connected: true, host: process.env.SMTP_HOST, from: process.env.MAIL_FROM || 'MedResearch <info@medresearch.me>' });
   });
 });
 
