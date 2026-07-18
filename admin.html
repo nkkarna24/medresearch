@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — medresearch.me</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root { --primary:#0a2540; --accent:#0066cc; --accent-light:#e8f0fe; --text:#1a1a2e; --text-muted:#5a6a7e; --bg:#ffffff; --bg-alt:#f7f9fc; --radius:16px; --shadow:0 4px 24px rgba(10,37,64,0.06); --green:#e6f7e6; --green-text:#1b7a1b; --red:#fde8e8; --red-text:#c62828; --amber:#fff8e1; --amber-text:#b76500; }
+body { font-family:'Inter',-apple-system,sans-serif; color:var(--text); background:var(--bg-alt); line-height:1.6; }
+a { color:var(--accent); text-decoration:none; }
+.container { max-width:1180px; margin:0 auto; padding:2rem; }
+
+/* Login */
+.login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; }
+.login-card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:2.5rem; width:100%; max-width:380px; }
+.login-card h2 { font-size:1.5rem; font-weight:800; color:var(--primary); margin-bottom:0.3rem; }
+.login-card p { color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem; }
+.login-card label { display:block; font-weight:600; font-size:0.85rem; margin-bottom:0.4rem; color:var(--primary); }
+.login-card input { width:100%; padding:0.85rem 1rem; border:1.5px solid #dde3ed; border-radius:12px; font-family:inherit; font-size:0.95rem; margin-bottom:1rem; outline:none; }
+.login-card input:focus { border-color:var(--accent); }
+.btn { display:inline-block; background:var(--accent); color:#fff; font-weight:600; padding:0.7rem 1.3rem; border:none; border-radius:100px; cursor:pointer; font-size:0.9rem; transition:0.2s; font-family:inherit; }
+.btn:hover { background:#0052a3; }
+.btn-block { width:100%; }
+.btn-ghost { background:transparent; border:1.5px solid #dde3ed; color:var(--text-muted); }
+.btn-ghost:hover { border-color:var(--accent); color:var(--accent); background:transparent; }
+.btn-sm { padding:0.45rem 0.9rem; font-size:0.8rem; }
+.btn-green { background:var(--green-text); }
+.btn-green:hover { background:#156515; }
+.err { color:var(--red-text); background:var(--red); padding:0.6rem 0.9rem; border-radius:8px; font-size:0.85rem; margin-bottom:1rem; display:none; }
+
+/* Header */
+.admin-header { background:#fff; box-shadow:0 1px 12px rgba(0,0,0,0.06); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+.admin-header .brand { font-weight:800; font-size:1.2rem; color:var(--primary); }
+.admin-header .brand span { color:var(--accent); }
+.admin-header .right { display:flex; align-items:center; gap:1rem; }
+
+/* Tabs */
+.tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+.tab { padding:0.6rem 1.2rem; border-radius:100px; background:#fff; border:1.5px solid #dde3ed; cursor:pointer; font-weight:600; font-size:0.9rem; color:var(--text-muted); }
+.tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* Stats */
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:2rem; }
+.stat { background:#fff; border-radius:var(--radius); padding:1.2rem 1.4rem; box-shadow:var(--shadow); }
+.stat .num { font-size:1.8rem; font-weight:800; color:var(--primary); }
+.stat .label { font-size:0.85rem; color:var(--text-muted); }
+
+/* Cards / lists */
+.card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:1.5rem; margin-bottom:1.5rem; }
+.card h3 { font-size:1.1rem; font-weight:700; margin-bottom:1rem; color:var(--primary); }
+.form-row { display:flex; gap:1rem; margin-bottom:1rem; flex-wrap:wrap; }
+.form-row > * { flex:1; min-width:180px; }
+.card label { display:block; font-weight:600; font-size:0.82rem; margin-bottom:0.35rem; color:var(--primary); }
+.card input, .card select, .card textarea { width:100%; padding:0.7rem 0.9rem; border:1.5px solid #dde3ed; border-radius:10px; font-family:inherit; font-size:0.9rem; outline:none; background:#fff; }
+.card input:focus, .card select:focus, .card textarea:focus { border-color:var(--accent); }
+.card textarea { resize:vertical; min-height:80px; }
+
+/* Tables */
+.table-wrap { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.orders-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+table { width:100%; border-collapse:collapse; font-size:0.88rem; }
+table.scroll-x { min-width:920px; }
+th, td { text-align:left; padding:0.8rem 0.9rem; border-bottom:1px solid #eef1f6; vertical-align:top; }
+th { background:var(--bg-alt); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.03em; color:var(--text-muted); }
+tr:last-child td { border-bottom:none; }
+.svc { font-weight:600; color:var(--primary); }
+.client { font-size:0.82rem; color:var(--text-muted); }
+.badge { display:inline-block; padding:0.25rem 0.7rem; border-radius:100px; font-size:0.75rem; font-weight:600; }
+.b-pending { background:var(--amber); color:var(--amber-text); }
+.b-active, .b-in-progress { background:var(--accent-light); color:var(--accent); }
+.b-revision { background:#f3e5f5; color:#7b1fa2; }
+.b-completed { background:var(--green); color:var(--green-text); }
+.b-rejected { background:var(--red); color:var(--red-text); }
+.b-disabled { background:#eee; color:#777; }
+.b-amber { background:var(--amber); color:var(--amber-text); }
+select.status-select { padding:0.4rem 0.6rem; border:1.5px solid #dde3ed; border-radius:8px; font-family:inherit; font-size:0.8rem; }
+select.pay-state { font-weight:600; border-color:#c9b88a; background:#fffdf6; min-width:150px; }
+select.pay-state[data-paystate] { }
+.pay-state.opt-unpaid { color:#c62828; }
+.pay-state.opt-deposit { color:#b8860b; }
+.pay-state.opt-paid { color:#1b7a1b; }
+.access-btn { white-space:nowrap; border:1.5px solid #dde3ed; background:#fff; border-radius:8px; padding:0.4rem 0.7rem; font-family:inherit; font-size:0.78rem; font-weight:600; cursor:pointer; transition:0.15s; }
+.access-btn.on { color:#1b7a1b; border-color:#bfe6c8; background:#eafaf0; }
+.access-btn:not(.on) { color:#c62828; border-color:#f0c9c9; background:#fdf2f2; }
+.link-edit { width:100%; padding:0.4rem 0.6rem; border:1.5px solid #dde3ed; border-radius:8px; font-size:0.78rem; font-family:inherit; }
+.toggle-wrap { display:flex; align-items:center; gap:0.5rem; }
+.switch { position:relative; display:inline-block; width:42px; height:24px; }
+.switch input { opacity:0; width:0; height:0; }
+.slider { position:absolute; cursor:pointer; inset:0; background:#ccc; border-radius:100px; transition:0.2s; }
+.slider::before { content:""; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.2s; }
+.switch input:checked + .slider { background:var(--green-text); }
+.switch input:checked + .slider::before { transform:translateX(18px); }
+.del { background:transparent; border:1.5px solid #ffcdd2; color:var(--red-text); padding:0.35rem 0.7rem; border-radius:8px; cursor:pointer; font-size:0.78rem; font-weight:600; }
+.del:hover { background:var(--red); }
+.files a { display:block; font-size:0.8rem; color:var(--accent); margin-top:0.2rem; }
+.files a.inline { display:inline-block; margin-right:0.8rem; }
+.file-up { border:2px dashed #dde3ed; border-radius:10px; padding:1.2rem; text-align:center; cursor:pointer; transition:0.2s; font-size:0.85rem; color:var(--text-muted); }
+.file-up:hover { border-color:var(--accent); background:var(--accent-light); }
+.file-up input { display:none; }
+.empty { padding:3rem; text-align:center; color:var(--text-muted); }
+.muted { color:var(--text-muted); }
+.row-actions { display:flex; gap:0.4rem; flex-wrap:wrap; }
+.modal-back { position:fixed; inset:0; background:rgba(10,37,64,0.4); display:none; align-items:flex-start; justify-content:center; padding:2rem; z-index:50; overflow:auto; }
+.modal { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:2rem; width:100%; max-width:620px; margin:auto; }
+.modal h3 { font-size:1.2rem; font-weight:700; margin-bottom:1rem; color:var(--primary); }
+.modal .close-x { float:right; cursor:pointer; color:var(--text-muted); font-size:1.2rem; border:none; background:none; }
+.activity { list-style:none; max-height:240px; overflow:auto; }
+.activity li { padding:0.5rem 0; border-bottom:1px solid #f0f2f6; font-size:0.85rem; }
+.activity li .when { color:var(--text-muted); font-size:0.78rem; }
+
+/* Chat */
+.chat-layout { display:grid; grid-template-columns:280px 1fr; gap:1.5rem; align-items:start; }
+@media (max-width:768px) { .chat-layout { grid-template-columns:1fr; } }
+.conv-list { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; max-height:560px; overflow-y:auto; }
+.conv-item { padding:0.9rem 1.1rem; border-bottom:1px solid #eef1f6; cursor:pointer; display:flex; justify-content:space-between; gap:0.5rem; align-items:center; }
+.conv-item:hover { background:var(--bg-alt); }
+.conv-item.active { background:var(--accent-light); }
+.conv-item .nm { font-weight:600; font-size:0.9rem; color:var(--primary); }
+.conv-item .em { font-size:0.78rem; color:var(--text-muted); }
+.conv-item .snip { font-size:0.8rem; color:var(--text-muted); margin-top:0.2rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
+.conv-unread { background:var(--red-text); color:#fff; font-size:0.68rem; font-weight:700; min-width:18px; height:18px; border-radius:100px; display:flex; align-items:center; justify-content:center; padding:0 5px; flex-shrink:0; }
+.chat-thread { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); display:flex; flex-direction:column; height:560px; }
+.chat-thread .chead { padding:0.9rem 1.2rem; border-bottom:1px solid #eef1f6; font-weight:700; color:var(--primary); display:flex; justify-content:space-between; align-items:center; }
+.chat-thread .chead .em { font-size:0.8rem; font-weight:500; color:var(--text-muted); }
+.chat-thread .cbody { flex:1; overflow-y:auto; padding:1rem; background:var(--bg-alt); display:flex; flex-direction:column; gap:0.6rem; }
+.cmsg { max-width:78%; padding:0.55rem 0.85rem; border-radius:14px; font-size:0.88rem; line-height:1.4; word-wrap:break-word; }
+.cmsg.client { align-self:flex-start; background:#fff; color:var(--text); border:1px solid #e3e9f2; border-bottom-left-radius:4px; }
+.cmsg.admin { align-self:flex-end; background:var(--accent); color:#fff; border-bottom-right-radius:4px; }
+.cmsg .time { display:block; font-size:0.65rem; opacity:0.7; margin-top:0.25rem; }
+.chat-thread .cfoot { display:flex; gap:0.5rem; padding:0.8rem; border-top:1px solid #eef1f6; }
+.chat-thread .cfoot input { flex:1; padding:0.7rem 0.9rem; border:1.5px solid #dde3ed; border-radius:100px; font-family:inherit; font-size:0.9rem; outline:none; }
+.chat-thread .cfoot input:focus { border-color:var(--accent); }
+.chat-thread .cfoot button { background:var(--accent); color:#fff; border:none; padding:0.7rem 1.4rem; border-radius:100px; cursor:pointer; font-weight:600; font-size:0.9rem; }
+.chat-thread .cfoot button:hover { background:#0052a3; }
+.chat-empty { margin:auto; color:var(--text-muted); font-size:0.9rem; text-align:center; padding:2rem; }
+@media (max-width:768px) { th,td { padding:0.6rem; font-size:0.82rem; } .hide-sm { display:none; } .container { padding:1rem; } }
+</style>
+</head>
+<body>
+
+<!-- Login view -->
+<div id="loginView" class="login-wrap">
+  <form class="login-card" id="loginForm">
+    <h2>Admin Login</h2>
+    <p>Enter your admin credentials to manage clients &amp; projects.</p>
+    <div class="err" id="loginErr"></div>
+    <label for="username">Username</label>
+    <input type="text" id="username" required>
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="••••••••" required>
+    <button class="btn btn-block" type="submit">Sign In</button>
+  </form>
+
+  <form class="login-card" id="twoFactorForm" style="display:none;">
+    <h2>Two-Factor Authentication</h2>
+    <p>Enter the 6-digit code from your authenticator app.</p>
+    <div class="err" id="twoFactorErr"></div>
+    <label for="twoFactorCode">Authentication Code</label>
+    <input type="text" id="twoFactorCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" required>
+    <button class="btn btn-block" type="submit">Verify</button>
+    <button class="btn btn-ghost btn-block" type="button" id="twoFactorBack" style="margin-top:0.6rem;">← Back</button>
+  </form>
+</div>
+
+<!-- Admin view -->
+<div id="adminView" style="display:none;">
+  <div class="admin-header">
+    <div class="brand">med<span>research</span>.me &middot; Admin</div>
+    <div class="right">
+      <a href="index.html" style="font-size:0.85rem;color:var(--text-muted);">&larr; Site</a>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-tab="projects" id="tabProjects">Projects</div>
+      <div class="tab" data-tab="agreements" id="tabAgreements">Agreements</div>
+      <div class="tab" data-tab="chat" id="tabChat">Chat <span class="badge b-pending" id="chatTabBadge" style="display:none;margin-left:0.3rem;">0</span></div>
+      <div class="tab" data-tab="clients" id="tabClients">Clients</div>
+      <div class="tab" data-tab="security" id="tabSecurity">Security</div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div id="pnlProjects">
+      <div class="stats" id="overviewStats"></div>
+      <div class="card">
+        <h3>&#x1F4CA; Overview</h3>
+        <div class="form-row">
+          <div style="flex:2;"><div class="muted" style="font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;">Recent Activity</div><div id="recentActivity" style="font-size:0.82rem;max-height:160px;overflow:auto;"></div></div>
+          <div style="flex:1;"><div class="muted" style="font-size:0.85rem;font-weight:600;margin-bottom:0.4rem;">Messages Needing Reply</div><div id="chatSummary" style="font-size:0.82rem;"></div></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="backupBtn" style="margin-top:1rem;">&#x1F4BE; Backup Data Now</button>
+      </div>
+      <div class="card">
+        <h3>&#x2795; Create Project for Client</h3>
+        <form id="createProjectForm">
+          <div class="form-row">
+            <div><label>Client *</label><select name="userId" id="clientSelect" required><option value="">Select client…</option></select></div>
+            <div><label>Service *</label><select name="service" required><option value="">Select</option><option>Conference Abstract</option><option>Systematic Review</option><option>Meta-Analysis</option><option>Manuscript Writing</option><option>Scoping Review</option><option>Literature Review</option><option>General</option></select></div>
+            <div><label>Plan</label><select name="plan"><option value="">Select</option><option>Basic</option><option>Standard</option><option>Premium</option><option>Express</option></select></div>
+          </div>
+          <div class="form-row">
+            <div><label>Project Title *</label><input type="text" name="title" placeholder="e.g., Association between BMI and heart failure" required></div>
+            <div><label>Deadline</label><input type="date" name="deadline"></div>
+          </div>
+          <div class="form-row">
+            <div style="flex:2;"><label>Description</label><textarea name="description" placeholder="Scope, requirements, notes for the client…"></textarea></div>
+            <div style="flex:1;"><label>Unique Payment Link (Stripe / PayPal / etc.)</label><input type="url" name="paymentLink" placeholder="https://pay…"></div>
+          </div>
+          <div class="form-row">
+            <div style="flex:1;"><label>Amount (USD) — for invoice</label><input type="number" name="amount" min="0" step="0.01" placeholder="0.00"></div>
+          </div>
+          <button class="btn" type="submit">Create Project</button>
+          <span id="createFeedback" class="muted" style="margin-left:0.8rem;font-size:0.85rem;"></span>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <div class="orders-table-wrap">
+        <table class="scroll-x">
+          <thead>
+            <tr>
+              <th>Project</th><th>Client</th><th>Service / Plan</th>
+              <th class="hide-sm">Payment Link</th><th>Payment Status</th><th>Client Access</th>
+              <th>Agreement</th><th>Status</th><th class="hide-sm">Notes</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div id="pnlSecurity" style="display:none;">
+      <div class="card">
+        <h3>&#x1F6E1; Admin Security</h3>
+        <p class="muted" style="font-size:0.85rem;margin-bottom:1rem;">Change the admin username and password used to sign in to this portal.</p>
+        <form id="credForm">
+          <div class="form-row">
+            <div style="flex:1;"><label>Current Password *</label><input type="password" name="currentPassword" required></div>
+            <div style="flex:1;"><label>New Username</label><input type="text" name="newUsername" placeholder="leave blank to keep current"></div>
+          </div>
+          <div class="form-row">
+            <div style="flex:1;"><label>New Password</label><input type="password" name="newPassword" placeholder="min 6 chars, leave blank to keep"></div>
+            <div style="flex:1;"><label>Confirm New Password</label><input type="password" name="confirmPassword" placeholder="retype if changing"></div>
+          </div>
+          <button class="btn" type="submit">Save Changes</button>
+          <span id="credFeedback" class="muted" style="margin-left:0.8rem;font-size:0.85rem;"></span>
+        </form>
+      </div>
+      <div class="card">
+        <h3>&#x1F510; Two-Factor Authentication</h3>
+        <p class="muted" style="font-size:0.85rem;margin-bottom:1rem;">Add a time-based one-time code (Google Authenticator / Authy) to the admin login.</p>
+        <div id="twoFactorStatus"></div>
+        <div id="twoFactorSetup" style="display:none;margin-top:1rem;">
+          <p class="muted" style="font-size:0.85rem;">1. Scan this QR code with your authenticator app:</p>
+          <div style="margin:0.8rem 0;"><img id="twoFactorQr" style="width:200px;height:200px;border:1px solid #eee;border-radius:8px;"></div>
+          <p class="muted" style="font-size:0.85rem;">2. Or enter this secret manually: <code id="twoFactorSecret" style="background:#f0f2f6;padding:0.2rem 0.5rem;border-radius:6px;"></code></p>
+          <div class="form-row">
+            <div style="flex:1;"><label>Verification Code *</label><input type="text" id="twoFactorEnableCode" inputmode="numeric" placeholder="123456"></div>
+          </div>
+          <button class="btn" id="twoFactorEnableBtn" type="button">Enable 2FA</button>
+          <span id="twoFactorSetupFeedback" class="muted" style="margin-left:0.8rem;font-size:0.85rem;"></span>
+          <div id="recoveryOnEnable" style="display:none;margin-top:1rem;padding:0.9rem;background:#fff8f0;border:1px solid #f3d9b0;border-radius:8px;">
+            <strong>&#x1F4BE; Save these backup codes now</strong>
+            <p class="muted" style="font-size:0.8rem;">You will not see them again. Each works once if you lose access to your authenticator.</p>
+            <ol id="recoveryOnEnableList" style="font-family:monospace;font-size:1rem;letter-spacing:1px;"></ol>
+          </div>
+        </div>
+        <div id="twoFactorEnabledActions" style="display:none;margin-top:1rem;">
+          <div id="recoveryCodesBox" style="margin-bottom:1rem;padding:0.9rem;background:#fff8f0;border:1px solid #f3d9b0;border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong>&#x1F4BE; Backup Recovery Codes</strong>
+              <span class="muted" style="font-size:0.8rem;"><span id="recoveryCount">0</span> remaining</span>
+            </div>
+            <p class="muted" style="font-size:0.8rem;margin:0.4rem 0;">Each code can be used once instead of the authenticator code. Store them somewhere safe.</p>
+            <ol id="recoveryList" style="margin:0.4rem 0 0;font-family:monospace;font-size:1rem;letter-spacing:1px;"></ol>
+            <button class="btn btn-ghost" id="recoveryRegenBtn" type="button" style="margin-top:0.6rem;font-size:0.82rem;">Regenerate codes</button>
+          </div>
+          <div class="form-row">
+            <div style="flex:1;"><label>Current Code (to confirm)</label><input type="text" id="twoFactorDisableCode" inputmode="numeric" placeholder="123456"></div>
+          </div>
+          <button class="btn btn-ghost" id="twoFactorDisableBtn" type="button">Disable 2FA</button>
+          <span id="twoFactorDisableFeedback" class="muted" style="margin-left:0.8rem;font-size:0.85rem;"></span>
+        </div>
+        <button class="btn btn-ghost" id="twoFactorBeginBtn" type="button" style="margin-top:0.5rem;">Set up 2FA</button>
+      </div>
+    </div>
+
+    <!-- AGREEMENTS -->
+    <div id="pnlAgreements" style="display:none;">
+      <div class="stats" id="agreeStats"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Project</th><th>Client</th><th>Service</th><th>Agreement</th><th>Paid</th><th>Activity Log</th></tr>
+          </thead>
+          <tbody id="agreeBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="pnlChat" style="display:none;">
+      <div class="chat-layout">
+        <div class="conv-list" id="convList"><div class="chat-empty">No conversations yet.</div></div>
+        <div class="chat-thread">
+          <div class="chead"><span id="chatHeadName">Select a conversation</span><span class="em" id="chatHeadEmail"></span></div>
+          <div class="cbody" id="chatThread"><div class="chat-empty">Choose a client from the left to view the conversation.</div></div>
+          <div class="cfoot">
+            <input type="text" id="adminChatInput" placeholder="Type your reply…" maxlength="2000" autocomplete="off" disabled>
+            <button id="adminChatSend" disabled>Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div id="pnlClients" style="display:none;">
+      <div class="card">
+        <h3>&#x2795; Create Client Account</h3>
+        <form id="createClientForm">
+          <div class="form-row">
+            <div><label>Full Name *</label><input type="text" name="name" placeholder="Jane Doe" required></div>
+            <div><label>Email *</label><input type="email" name="email" placeholder="jane@example.com" required></div>
+            <div><label>Password (min 6) *</label><input type="text" name="password" placeholder="tempPass123" required></div>
+          </div>
+          <button class="btn" type="submit">Create Client</button>
+          <span id="clientFeedback" class="muted" style="margin-left:0.8rem;font-size:0.85rem;"></span>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Password</th><th>Projects</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody id="clientsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-back" id="modalBack">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const API = '';
+function getToken() { return localStorage.getItem('adminToken'); }
+function setToken(t) { localStorage.setItem('adminToken', t); }
+function clearToken() { localStorage.removeItem('adminToken'); }
+const STATUS_BADGE = { 'pending':'b-pending','in-progress':'b-in-progress','active':'b-active','revision':'b-revision','completed':'b-completed','rejected':'b-rejected' };
+const STATUS_OPTIONS = ['pending','active','in-progress','revision','completed','rejected'];
+
+function apiFetch(url, opts) {
+  opts = opts || {};
+  const isForm = opts.body instanceof FormData;
+  const base = isForm ? {} : { 'Content-Type': 'application/json' };
+  opts.headers = Object.assign(base, opts.headers || {});
+  opts.headers['Authorization'] = 'Bearer ' + getToken();
+  return fetch(API + url, opts);
+}
+
+/* ── Login ── */
+let loginKey = '';
+$('#loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = $('#loginErr'); err.style.display = 'none';
+  try {
+    const res = await fetch(API + '/api/admin/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username: $('#username').value, password: $('#password').value }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    if (data.twoFactor) {
+      loginKey = data.loginKey;
+      $('#loginForm').style.display = 'none';
+      $('#twoFactorForm').style.display = 'block';
+      $('#twoFactorCode').focus();
+      return;
+    }
+    setToken(data.token); showAdmin();
+  } catch (e2) { err.textContent = e2.message; err.style.display = 'block'; }
+});
+$('#twoFactorBack').addEventListener('click', () => {
+  loginKey = '';
+  $('#twoFactorForm').style.display = 'none';
+  $('#loginForm').style.display = 'block';
+  $('#twoFactorErr').style.display = 'none';
+});
+$('#twoFactorForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = $('#twoFactorErr'); err.style.display = 'none';
+  try {
+    const res = await fetch(API + '/api/admin/login/verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ loginKey, code: $('#twoFactorCode').value }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Verification failed');
+    setToken(data.token); showAdmin();
+  } catch (e2) { err.textContent = e2.message; err.style.display = 'block'; }
+});
+$('#logoutBtn').addEventListener('click', () => { clearToken(); location.reload(); });
+
+function showAdmin() {
+  $('#loginView').style.display = 'none'; $('#adminView').style.display = 'block';
+  loadAll();
+  loadTwoFactorState();
+}
+
+/* ── Tabs ── */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  $('#pnlProjects').style.display = t.dataset.tab === 'projects' ? 'block' : 'none';
+  $('#pnlAgreements').style.display = t.dataset.tab === 'agreements' ? 'block' : 'none';
+  $('#pnlChat').style.display = t.dataset.tab === 'chat' ? 'block' : 'none';
+  $('#pnlClients').style.display = t.dataset.tab === 'clients' ? 'block' : 'none';
+  $('#pnlSecurity').style.display = t.dataset.tab === 'security' ? 'block' : 'none';
+  if (t.dataset.tab === 'agreements') loadAgreements();
+  if (t.dataset.tab === 'chat') loadConversations();
+  if (t.dataset.tab === 'security') loadTwoFactorState();
+}));
+
+async function loadAll() {
+  await loadClients();
+  await loadProjects();
+}
+
+/* ── Clients ── */
+async function loadClients() {
+  try {
+    const res = await apiFetch('/api/admin/clients');
+    if (res.status === 401) { clearToken(); location.reload(); return; }
+    const clients = await res.json();
+    const sel = $('#clientSelect');
+    sel.innerHTML = '<option value="">Select client…</option>' + clients.map(c => `<option value="${c.id}">${c.name} (${c.email})</option>`).join('');
+    if (!clients.length) {
+        $('#clientsBody').innerHTML = '<tr><td colspan="6" class="empty">No clients yet. Create one above.</td></tr>';
+      return;
+    }
+    $('#clientsBody').innerHTML = clients.map(c => `<tr>
+      <td><strong>${esc(c.name)}</strong></td>
+      <td class="client">${esc(c.email)}</td>
+      <td><code style="background:#f0f2f6;padding:0.2rem 0.5rem;border-radius:6px;font-size:0.85rem;">${esc(c.passwordText || '—')}</code></td>
+      <td>${c.projectCount}</td>
+      <td><span class="badge ${c.disabled ? 'b-disabled' : 'b-completed'}">${c.disabled ? 'Disabled' : 'Active'}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="btn btn-ghost btn-sm" data-reset="${c.id}">Reset PW</button>
+          <button class="btn btn-ghost btn-sm" data-toggle="${c.id}">${c.disabled ? 'Enable' : 'Disable'}</button>
+          <button class="del" data-delc="${c.id}">Delete</button>
+        </div>
+      </td>
+    </tr>`).join('');
+    bindClientActions();
+  } catch(e) { console.error(e); }
+}
+
+function bindClientActions() {
+  document.querySelectorAll('[data-reset]').forEach(b => b.addEventListener('click', async () => {
+    const pw = prompt('New password (min 6 characters):'); if (!pw) return;
+    const res = await apiFetch('/api/admin/clients/' + b.dataset.reset + '/password', { method:'POST', body: JSON.stringify({ password: pw }) });
+    const d = await res.json(); if (!res.ok) return alert(d.error); alert('Password updated.'); loadClients();
+  }));
+  document.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', async () => {
+    await apiFetch('/api/admin/clients/' + b.dataset.toggle + '/toggle', { method:'POST' });
+    loadClients();
+  }));
+  document.querySelectorAll('[data-delc]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('Delete this client and their projects?')) return;
+    await apiFetch('/api/admin/clients/' + b.dataset.delc, { method:'DELETE' });
+    loadClients();
+  }));
+}
+
+$('#createClientForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fb = $('#clientFeedback'); fb.textContent = 'Creating…';
+  const fd = { name: e.target.name.value.trim(), email: e.target.email.value.trim(), password: e.target.password.value };
+  const res = await apiFetch('/api/admin/clients', { method:'POST', body: JSON.stringify(fd) });
+  const d = await res.json();
+  if (!res.ok) { fb.textContent = d.error; fb.style.color = '#c62828'; return; }
+  fb.textContent = 'Client created.'; fb.style.color = '#1b7a1b'; e.target.reset(); loadClients();
+});
+
+/* ── Projects ── */
+async function loadProjects() {
+  try {
+    const res = await apiFetch('/api/admin/orders');
+    if (res.status === 401) { clearToken(); location.reload(); return; }
+    const orders = await res.json();
+    const managed = orders.filter(o => o.adminManaged);
+    renderStats(managed);
+    renderProjects(managed);
+  } catch(e) { console.error(e); }
+}
+
+function renderStats(orders) {
+  const el = $('#stats');
+  if (!el) return;
+  const counts = {}; STATUS_OPTIONS.forEach(s => counts[s] = 0);
+  orders.forEach(o => counts[o.status] = (counts[o.status]||0)+1);
+  el.innerHTML = STATUS_OPTIONS.map(s => `<div class="stat"><div class="num">${counts[s]||0}</div><div class="label" style="text-transform:capitalize;">${s.replace('-',' ')}</div></div>`).join('')
+    + `<div class="stat"><div class="num">${orders.length}</div><div class="label">Total</div></div>`
+    + `<div class="stat"><div class="num">${orders.filter(o=>o.paymentEnabled).length}</div><div class="label">Pay Enabled</div></div>`;
+}
+
+function renderProjects(orders) {
+  const body = $('#ordersBody');
+  if (!orders.length) { body.innerHTML = '<tr><td colspan="10" class="empty">No projects yet. Create one above or via a client order.</td></tr>'; return; }
+  body.innerHTML = orders.map(o => {
+    const d = new Date(o.createdAt); const date = d.toLocaleDateString();
+    const opts = STATUS_OPTIONS.map(s => `<option value="${s}" ${s===o.status?'selected':''}>${s.replace('-',' ')}</option>`).join('');
+    const pstate = o.paid ? 'paid' : (o.depositPaid ? 'deposit' : 'unpaid');
+    const pstateOpts = [
+      { v: 'unpaid', t: 'Not Paid' },
+      { v: 'deposit', t: '50% Payment Done' },
+      { v: 'paid', t: '100% Payment Done' }
+    ].map(s => `<option value="${s.v}" ${s.v===pstate?'selected':''}>${s.t}</option>`).join('');
+    const link = o.paymentLink ? `<a href="${o.paymentLink}" target="_blank" class="client" style="word-break:break-all;">${o.paymentLink.length>28?o.paymentLink.slice(0,28)+'…':o.paymentLink}</a>` : '<span class="client">—</span>';
+    return `<tr>
+      <td><strong>#${o.id}</strong><br><span class="client">${date}</span><br><a href="#" class="client" data-detail="${o.id}">Detail</a></td>
+      <td><span class="client">${o.client || ''}</span><br><span class="client">${o.clientEmail || o.userEmail || ''}</span></td>
+      <td><span class="svc">${o.service}</span><br><span class="client">${o.plan||''}</span>${o.deadline?`<br><span class="client">Due: ${o.deadline}</span>`:''}</td>
+      <td class="hide-sm"><input class="link-edit" data-link="${o.id}" value="${o.paymentLink || ''}" placeholder="paste unique payment link"></td>
+      <td><select class="status-select pay-state" data-paystate="${o.id}">${pstateOpts}</select></td>
+      <td><button class="access-btn ${o.paymentEnabled?'on':''}" data-access="${o.id}">${o.paymentEnabled?'&#x1F513; Enabled':'&#x1F512; Disabled'}</button></td>
+      <td>${o.agreementAccepted ? `<span class="badge b-completed">&#x2713; ${new Date(o.agreementAcceptedAt).toLocaleDateString()}</span>` : `<span class="badge b-pending">Not yet</span>`}</td>
+      <td><span class="badge ${STATUS_BADGE[o.status]}">${o.status.replace('-',' ')}</span><br><select class="status-select" data-status="${o.id}" style="margin-top:0.4rem;">${opts}</select></td>
+      <td class="hide-sm"><input class="link-edit" data-notes="${o.id}" value="${o.notes || ''}" placeholder="note to client…"></td>
+      <td><button class="del" data-delp="${o.id}">Delete</button></td>
+    </tr>`;
+  }).join('');
+  bindProjectActions();
+}
+
+function bindProjectActions() {
+  document.querySelectorAll('[data-link]').forEach(inp => inp.addEventListener('change', () => updateProject(inp.dataset.link, { paymentLink: inp.value.trim() })));
+  document.querySelectorAll('[data-notes]').forEach(inp => inp.addEventListener('change', () => updateProject(inp.dataset.notes, { notes: inp.value })));
+  document.querySelectorAll('[data-paystate]').forEach(sel => {
+    const paint = () => sel.className = 'status-select pay-state opt-' + sel.value;
+    paint();
+    sel.addEventListener('change', () => { paint(); updateProject(sel.dataset.paystate, { paymentState: sel.value }); });
+  });
+  document.querySelectorAll('[data-access]').forEach(btn => btn.addEventListener('click', () => {
+    const id = btn.dataset.access;
+    const nowOn = !btn.classList.contains('on');
+    updateProject(id, { paymentEnabled: nowOn });
+  }));
+  document.querySelectorAll('[data-status]').forEach(sel => sel.addEventListener('change', () => updateProject(sel.dataset.status, { status: sel.value })));
+  document.querySelectorAll('[data-delp]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('Delete project #' + b.dataset.delp + '?')) return;
+    await apiFetch('/api/admin/projects/' + b.dataset.delp, { method:'DELETE' });
+    loadProjects();
+  }));
+  document.querySelectorAll('[data-detail]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); openDetail(a.dataset.detail); }));
+  loadOverview();
+  loadChatSummary();
+}
+
+async function updateProject(id, body) {
+  await apiFetch('/api/admin/projects/' + id, { method:'POST', body: JSON.stringify(body) });
+  loadProjects();
+}
+
+$('#createProjectForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fb = $('#createFeedback'); fb.textContent = 'Creating…'; fb.style.color = '';
+  const fd = { userId: e.target.userId.value, service: e.target.service.value, plan: e.target.plan.value, title: e.target.title.value.trim(), deadline: e.target.deadline.value, description: e.target.description.value, paymentLink: e.target.paymentLink.value.trim(), amount: e.target.amount.value };
+  const res = await apiFetch('/api/admin/projects', { method:'POST', body: JSON.stringify(fd) });
+  const d = await res.json();
+  if (!res.ok) { fb.textContent = d.error; fb.style.color = '#c62828'; return; }
+  fb.textContent = 'Project created.'; fb.style.color = '#1b7a1b'; e.target.reset(); loadProjects();
+});
+
+async function openDetail(id) {
+  const res = await apiFetch('/api/admin/orders');
+  const orders = await res.json();
+  const o = orders.find(x => String(x.id) === String(id));
+  if (!o) return;
+  const activity = (o.activity || []).slice().reverse().map(a => `<li><span class="when">${new Date(a.at).toLocaleString()}</span> — ${a.action} <em class="client">(${a.by})</em></li>`).join('') || '<li class="client">No activity yet.</li>';
+  $('#modalBox').innerHTML = `<button class="close-x" onclick="closeModal()">&times;</button>
+    <h3>Project #${o.id} — ${o.title}</h3>
+    <p class="client">Client: ${o.client || ''} &lt;${o.clientEmail || o.userEmail || ''}&gt;</p>
+    <div class="form-row" style="margin-top:1rem;">
+      <div><label>Service</label><input value="${o.service||''}" data-f="service" data-id="${o.id}"></div>
+      <div><label>Plan</label><input value="${o.plan||''}" data-f="plan" data-id="${o.id}"></div>
+      <div><label>Deadline</label><input type="date" value="${o.deadline||''}" data-f="deadline" data-id="${o.id}"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Title</label><input value="${o.title||''}" data-f="title" data-id="${o.id}"></div>
+    </div>
+    <div style="margin-bottom:1rem;"><label>Description</label><textarea data-f="description" data-id="${o.id}">${o.description||''}</textarea></div>
+    <div style="margin-bottom:1rem;"><label>Unique Payment Link</label><input value="${o.paymentLink||''}" data-f="paymentLink" data-id="${o.id}"></div>
+    <div style="margin-bottom:1rem;"><label>Amount (USD)</label><input type="number" min="0" step="0.01" value="${Number(o.amount)||0}" data-f="amount" data-id="${o.id}"></div>
+    <div style="margin-bottom:1rem;"><label>Payment Status</label>
+      <select data-f="paymentState" data-id="${o.id}" style="font-weight:600;">
+        <option value="unpaid" ${!o.depositPaid && !o.paid?'selected':''}>Not Paid</option>
+        <option value="deposit" ${o.depositPaid && !o.paid?'selected':''}>50% Payment Done</option>
+        <option value="paid" ${o.paid?'selected':''}>100% Payment Done</option>
+      </select>
+    </div>
+    <div style="margin-bottom:1rem;"><label>Payment Plan</label>
+      <select data-f="paymentType" data-id="${o.id}">
+        <option value="full" ${(o.paymentType||'full')==='full'?'selected':''}>Full — 100% upfront</option>
+        <option value="split" ${o.paymentType==='split'?'selected':''}>Split — 50% upfront / 50% on completion</option>
+      </select>
+    </div>
+    <div style="margin-bottom:1rem;"><label>Note to Client</label><textarea data-f="notes" data-id="${o.id}">${o.notes||''}</textarea></div>
+    <div style="margin-bottom:1rem;"><label>Files for Client</label></div>
+    <label class="file-up" for="fileInput${o.id}"><span id="fileUpLabel${o.id}">&#x1F4E5; Click to upload a file for this client</span>
+      <input type="file" id="fileInput${o.id}" style="display:none;" onchange="uploadFile(${o.id}, this)">
+    </label>
+    <div id="fileList${o.id}" class="files" style="margin-bottom:1rem;">${fileListHtml(o)}</div>
+    <div class="row-actions" style="margin-bottom:1rem;">
+      <button class="btn btn-ghost btn-sm" onclick="previewInvoice(${o.id})">&#x1F4C4; Preview Invoice</button>
+      <button class="btn btn-ghost btn-sm" onclick="previewRTA(${o.id})">&#x1F4E1; Preview Right Transfer</button>
+    </div>
+    <div style="margin:0.5rem 0 1rem;padding:0.7rem 0.9rem;background:#eafaf0;border:1px solid #bfe6c8;border-radius:8px;font-size:0.8rem;color:#1b5e20;">Files &amp; the Right Transfer Agreement are released to the client only after <b>100% payment</b> is marked.</div>
+    <div class="muted" style="margin-bottom:1rem;">Agreement accepted: ${o.agreementAccepted ? 'Yes (' + (o.agreementAcceptedAt ? new Date(o.agreementAcceptedAt).toLocaleString() : '') + ')' : 'No'}</div>
+    <h3 style="margin-top:1rem;">Activity</h3>
+    <ul class="activity">${activity}</ul>`;
+  $('#modalBack').style.display = 'flex';
+  document.querySelectorAll('#modalBox [data-f]').forEach(el => {
+    const evt = (el.tagName === 'INPUT' && el.type === 'checkbox') ? 'change' : 'change';
+    el.addEventListener(evt, () => {
+      const v = el.type === 'checkbox' ? el.checked : el.value;
+      updateProject(el.dataset.id, { [el.dataset.f]: v });
+    });
+  });
+}
+function closeModal() { $('#modalBack').style.display = 'none'; }
+$('#modalBack').addEventListener('click', (e) => { if (e.target === $('#modalBack')) closeModal(); });
+
+function fileListHtml(o) {
+  const files = o.files || [];
+  if (!files.length) return '<span class="client" style="font-size:0.82rem;">No files yet.</span>';
+  return files.map(f => `<a class="inline" href="${f.url}" target="_blank" download>&#x1F4E5; ${f.name}</a> <a class="inline" style="color:#c62828;" onclick="deleteFile(${o.id},'${f.name}')">&times; delete</a>`).join('<br>');
+}
+
+async function uploadFile(id, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const label = document.getElementById('fileUpLabel' + id);
+  const prev = label ? label.innerHTML : '';
+  if (label) label.innerHTML = 'Uploading ' + file.name + '…';
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await apiFetch('/api/admin/projects/' + id + '/files', { method:'POST', headers:{}, body: fd });
+  const d = await res.json();
+  if (label) label.innerHTML = prev;
+  input.value = '';
+  if (!res.ok) { alert(d.error || 'Upload failed'); return; }
+  openDetail(id);
+}
+
+async function deleteFile(id, name) {
+  if (!confirm('Delete file ' + name + '?')) return;
+  const res = await apiFetch('/api/admin/projects/' + id + '/files?name=' + encodeURIComponent(name), { method:'DELETE' });
+  const d = await res.json();
+  if (!res.ok) { alert(d.error || 'Delete failed'); return; }
+  openDetail(id);
+}
+
+function previewInvoice(id) { window.open(API + '/api/admin/projects/' + id + '/invoice?token=' + encodeURIComponent(getToken()), '_blank'); }
+function previewRTA(id) { window.open(API + '/api/admin/projects/' + id + '/rta?token=' + encodeURIComponent(getToken()), '_blank'); }
+
+async function loadOverview() {
+  try {
+    const res = await apiFetch('/api/admin/overview');
+    const d = await res.json();
+    const stat = (label, val, color) => `<div class="stat"><div class="num" style="${color?'color:'+color:''}">${val}</div><div class="lbl">${label}</div></div>`;
+    $('#overviewStats').innerHTML =
+      stat('Total Projects', d.projects) +
+      stat('Active', d.active, 'var(--accent)') +
+      stat('Awaiting Payment', d.awaitingPayment, '#e0a200') +
+      stat('Paid', d.paid, '#1b7a1b') +
+      stat('Completed', d.completed, '#1b7a1b') +
+      stat('Revenue (paid)', '$' + d.revenue.toFixed(2), '#1b7a1b') +
+      stat('Outstanding', '$' + d.outstanding.toFixed(2), '#e0a200') +
+      stat('Clients', d.clients);
+    const recent = (d.recentActivity || []).slice(0, 12).map(a => `<div>&bull; <b>${a.client}</b>: ${a.action} <span class="client">${new Date(a.at).toLocaleDateString()}</span></div>`).join('') || '<div class="client">No activity.</div>';
+    $('#recentActivity').innerHTML = recent;
+  } catch(e) { $('#overviewStats').innerHTML = ''; }
+}
+
+async function loadChatSummary() {
+  try {
+    const res = await apiFetch('/api/admin/chat');
+    const list = await res.json();
+    const unread = list.filter(c => c.unread > 0);
+    if (!unread.length) { $('#chatSummary').innerHTML = '<div class="client">All caught up.</div>'; return; }
+    $('#chatSummary').innerHTML = unread.map(c => `<div>&bull; <b>${c.name}</b> <span class="client">(${c.unread} new)</span><br><a href="#" onclick="switchTab('chat');return false;">Open chat</a></div>`).join('<br>');
+  } catch(e) { $('#chatSummary').innerHTML = ''; }
+}
+
+$('#backupBtn').addEventListener('click', async () => {
+  const btn = $('#backupBtn'); btn.disabled = true; const old = btn.textContent; btn.textContent = 'Backing up…';
+  const res = await apiFetch('/api/admin/backup', { method:'POST' });
+  const d = await res.json();
+  btn.disabled = false; btn.textContent = old;
+  if (res.ok) { alert('Backup created: ' + (d.file || '')); } else { alert(d.error || 'Backup failed'); }
+});
+
+$('#credForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fb = $('#credFeedback'); fb.style.color = '';
+  const f = e.target;
+  if (f.newPassword.value && f.newPassword.value !== f.confirmPassword.value) {
+    fb.textContent = 'New passwords do not match.'; fb.style.color = '#c62828'; return;
+  }
+  const res = await apiFetch('/api/admin/credentials', { method:'POST', body: JSON.stringify({
+    currentPassword: f.currentPassword.value,
+    newUsername: f.newUsername.value,
+    newPassword: f.newPassword.value,
+  }) });
+  const d = await res.json();
+  if (!res.ok) { fb.textContent = d.error; fb.style.color = '#c62828'; return; }
+  fb.textContent = 'Credentials updated.'; fb.style.color = '#1b7a1b';
+  f.reset();
+});
+
+/* ── 2FA enrollment ── */
+async function loadTwoFactorState() {
+  const res = await apiFetch('/api/admin/2fa/status');
+  const d = await res.json();
+  const enabled = !!d.enabled;
+  $('#twoFactorStatus').innerHTML = enabled
+    ? '<span class="badge b-completed">&#x2713; 2FA is enabled</span>'
+    : '<span class="badge b-pending">2FA is not enabled</span>';
+  $('#twoFactorEnabledActions').style.display = enabled ? 'block' : 'none';
+  $('#twoFactorBeginBtn').style.display = enabled ? 'none' : 'inline-block';
+  if (enabled) {
+    $('#recoveryCount').textContent = d.recoveryCodesRemaining || 0;
+    const c = await apiFetch('/api/admin/2fa/recovery/count');
+    const cd = await c.json();
+    $('#recoveryCount').textContent = cd.count || 0;
+  }
+}
+$('#twoFactorBeginBtn').addEventListener('click', async () => {
+  const res = await apiFetch('/api/admin/2fa/setup');
+  const d = await res.json();
+  if (!res.ok) { alert(d.error || 'Failed to start 2FA setup'); return; }
+  window._twoFactorSecret = d.secret;
+  $('#twoFactorQr').src = d.qr;
+  $('#twoFactorSecret').textContent = d.secret;
+  $('#twoFactorSetup').style.display = 'block';
+  $('#twoFactorBeginBtn').style.display = 'none';
+});
+$('#twoFactorEnableBtn').addEventListener('click', async () => {
+  const code = $('#twoFactorEnableCode').value.trim();
+  const fb = $('#twoFactorSetupFeedback'); fb.style.color = '';
+  const res = await apiFetch('/api/admin/2fa/enable', { method:'POST', body: JSON.stringify({ secret: window._twoFactorSecret, code }) });
+  const d = await res.json();
+  if (!res.ok) { fb.textContent = d.error; fb.style.color = '#c62828'; return; }
+  fb.textContent = '2FA enabled.'; fb.style.color = '#1b7a1b';
+  $('#twoFactorSetup').style.display = 'none';
+  if (Array.isArray(d.recoveryCodes) && d.recoveryCodes.length) {
+    $('#recoveryOnEnableList').innerHTML = d.recoveryCodes.map(c => '<li>' + c + '</li>').join('');
+    $('#recoveryOnEnable').style.display = 'block';
+  }
+  await loadTwoFactorState();
+});
+$('#twoFactorDisableBtn').addEventListener('click', async () => {
+  const code = $('#twoFactorDisableCode').value.trim();
+  const fb = $('#twoFactorDisableFeedback'); fb.style.color = '';
+  const res = await apiFetch('/api/admin/2fa/disable', { method:'POST', body: JSON.stringify({ code }) });
+  const d = await res.json();
+  if (!res.ok) { fb.textContent = d.error; fb.style.color = '#c62828'; return; }
+  fb.textContent = '2FA disabled.'; fb.style.color = '#1b7a1b';
+  await loadTwoFactorState();
+});
+$('#recoveryRegenBtn').addEventListener('click', async () => {
+  const code = prompt('Enter your current authenticator code to regenerate backup codes:');
+  if (code === null) return;
+  const res = await apiFetch('/api/admin/2fa/recovery/regenerate', { method:'POST', body: JSON.stringify({ code: code.trim() }) });
+  const d = await res.json();
+  if (!res.ok) { alert(d.error || 'Failed to regenerate'); return; }
+  alert('New recovery codes generated. Save them now — old ones are invalid:\n\n' + d.recoveryCodes.join('\n'));
+  await loadTwoFactorState();
+});
+
+/* ── Agreements log ── */
+async function loadAgreements() {
+  try {
+    const res = await apiFetch('/api/admin/agreements');
+    if (res.status === 401) { clearToken(); location.reload(); return; }
+    const list = await res.json();
+    renderAgreeStats(list);
+    renderAgreements(list);
+  } catch(e) { console.error(e); }
+}
+
+function renderAgreeStats(list) {
+  const accepted = list.filter(o => o.agreementAccepted).length;
+  const paid = list.filter(o => o.paid).length;
+  const pending = list.filter(o => o.agreementAccepted && !o.paid).length;
+  $('#agreeStats').innerHTML = `
+    <div class="stat"><div class="num">${list.length}</div><div class="label">Projects</div></div>
+    <div class="stat"><div class="num">${accepted}</div><div class="label">Agreements Accepted</div></div>
+    <div class="stat"><div class="num">${pending}</div><div class="label">Accepted / Unpaid</div></div>
+    <div class="stat"><div class="num">${paid}</div><div class="label">Paid</div></div>`;
+}
+
+function renderAgreements(list) {
+  const body = $('#agreeBody');
+  if (!list.length) { body.innerHTML = '<tr><td colspan="6" class="empty">No projects yet.</td></tr>'; return; }
+  body.innerHTML = list.map(o => {
+    const agr = o.agreementAccepted
+      ? `<span class="badge b-completed">&#x2713; Accepted</span><br><span class="client">${new Date(o.agreementAcceptedAt).toLocaleString()}</span>`
+      : `<span class="badge b-pending">Not yet</span>`;
+    const pay = o.paid
+      ? `<span class="badge b-completed">&#x2713; Paid</span><br><span class="client">${o.paidAt ? new Date(o.paidAt).toLocaleDateString() : ''}</span>`
+      : `<span class="badge ${o.agreementAccepted ? 'b-amber' : 'b-pending'}">${o.agreementAccepted ? 'Awaiting' : '—'}</span>`;
+    const log = (o.activity || []).map(a => `<li><span class="when">${new Date(a.at).toLocaleString()}</span> — ${a.action} <em class="client">(${a.by})</em></li>`).join('') || '<li class="client">No activity.</li>';
+    return `<tr>
+      <td><strong>#${o.id}</strong><br><span class="client">${esc(o.title)}</span></td>
+      <td><span class="client">${esc(o.client)}</span><br><span class="client">${esc(o.clientEmail)}</span></td>
+      <td class="svc">${esc(o.service)}</td>
+      <td>${agr}</td>
+      <td>${pay}</td>
+      <td style="max-width:280px;"><ul class="activity">${log}</ul></td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ── Chat (admin) ── */
+let activeConv = null;
+let chatRefreshTimer = null;
+
+async function loadConversations() {
+  try {
+    const res = await apiFetch('/api/admin/chat');
+    if (res.status === 401) { clearToken(); location.reload(); return; }
+    const convos = await res.json();
+    const totalUnread = convos.reduce((s, c) => s + c.unread, 0);
+    const tabBadge = $('#chatTabBadge');
+    if (totalUnread > 0) { tabBadge.style.display = 'inline-block'; tabBadge.textContent = totalUnread; }
+    else tabBadge.style.display = 'none';
+    const list = $('#convList');
+    if (!convos.length) { list.innerHTML = '<div class="chat-empty">No conversations yet.</div>'; return; }
+    list.innerHTML = convos.map(c => `<div class="conv-item ${activeConv===c.userId?'active':''}" data-uid="${c.userId}">
+      <div style="min-width:0;flex:1;">
+        <div class="nm">${esc(c.name)}</div>
+        <div class="em">${esc(c.email)}</div>
+        <div class="snip">${c.last ? (c.last.from==='admin'?'You: ':'') + esc(c.last.text) : ''}</div>
+      </div>
+      ${c.unread>0?`<span class="conv-unread">${c.unread}</span>`:''}
+    </div>`).join('');
+    list.querySelectorAll('.conv-item').forEach(el => el.addEventListener('click', () => openConversation(el.dataset.uid)));
+    if (activeConv) loadThread(activeConv);
+  } catch(e) { console.error(e); }
+}
+
+async function openConversation(uid) {
+  activeConv = uid;
+  document.querySelectorAll('.conv-item').forEach(el => el.classList.toggle('active', el.dataset.uid === uid));
+  const convos = await (await apiFetch('/api/admin/chat')).json();
+  const c = convos.find(x => x.userId === uid);
+  if (c) { $('#chatHeadName').textContent = c.name; $('#chatHeadEmail').textContent = c.email; }
+  $('#adminChatInput').disabled = false; $('#adminChatSend').disabled = false;
+  await loadThread(uid);
+  // mark read
+  await apiFetch('/api/admin/chat/' + uid + '/read', { method:'POST' });
+  loadConversations();
+}
+
+async function loadThread(uid) {
+  const res = await apiFetch('/api/admin/chat/' + uid);
+  const msgs = await res.json();
+  const body = $('#chatThread');
+  if (!msgs.length) { body.innerHTML = '<div class="chat-empty">No messages yet.</div>'; return; }
+  body.innerHTML = msgs.map(m => `<div class="cmsg ${m.from}">${esc(m.text)}<span class="time">${new Date(m.at).toLocaleString([],{hour:'2-digit',minute:'2-digit',month:'short',day:'numeric'})}</span></div>`).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+async function sendAdminChat() {
+  if (!activeConv) return;
+  const input = $('#adminChatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  const res = await apiFetch('/api/admin/chat/' + activeConv, { method:'POST', body: JSON.stringify({ text }) });
+  if (res.ok) { await loadThread(activeConv); await loadConversations(); }
+}
+$('#adminChatSend').addEventListener('click', sendAdminChat);
+$('#adminChatInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendAdminChat(); });
+
+// Global chat badge refresh (even when not on chat tab)
+chatRefreshTimer = setInterval(() => {
+  if (!getToken()) return;
+  if ($('#pnlChat').style.display !== 'none') loadConversations();
+  else { apiFetch('/api/admin/chat').then(r=>r.json()).then(convos=>{
+    const t = convos.reduce((s,c)=>s+c.unread,0);
+    const b = $('#chatTabBadge'); if (t>0){b.style.display='inline-block';b.textContent=t;}else b.style.display='none';
+  }).catch(()=>{}); }
+}, 5000);
+
+if (getToken()) showAdmin();
+</script>
+</body>
+</html>

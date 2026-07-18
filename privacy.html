@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy & Disclaimer — medresearch.me</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root { --primary:#0a2540; --accent:#0066cc; --accent-light:#e8f0fe; --text:#1a1a2e; --text-muted:#5a6a7e; --bg:#ffffff; --bg-alt:#f7f9fc; --radius:16px; }
+body { font-family:'Inter',-apple-system,sans-serif; color:var(--text); background:var(--bg); line-height:1.7; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between;
+  background:rgba(255,255,255,0.92); backdrop-filter:blur(12px); box-shadow:0 1px 12px rgba(0,0,0,0.06);
+}
+.logo { font-weight:800; font-size:1.3rem; color:var(--primary); text-decoration:none !important; }
+.logo span { color:var(--accent); }
+.nav-links { display:flex; gap:2rem; list-style:none; align-items:center; }
+.nav-links a { text-decoration:none; color:var(--text-muted); font-size:0.9rem; font-weight:500; }
+.nav-links a:hover { color:var(--accent); text-decoration:none; }
+nav.scrolled { background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); box-shadow: 0 1px 12px rgba(0,0,0,0.06); padding: 0.7rem 2rem; }
+.dropdown { position: relative; }
+.dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(10,37,64,0.12); padding: 0.5rem; min-width: 200px; list-style: none; z-index: 200; }
+.dropdown-menu li a { display: block; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem !important; color: var(--text) !important; white-space: nowrap; }
+.dropdown-menu li a:hover { background: var(--accent-light); color: var(--accent) !important; }
+.dropdown:hover .dropdown-menu { display: block; }
+.menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+.menu-toggle span { width: 24px; height: 2px; background: var(--primary); border-radius: 2px; transition: 0.3s; }
+@media (max-width: 768px) {
+  .nav-links { position: absolute; top: 100%; right: 0; left: 0; flex-direction: column; background: #fff; padding: 1rem 2rem; gap: 1rem; box-shadow: 0 8px 32px rgba(10,37,64,0.12); display: none; }
+  .nav-links.open { display: flex; }
+  .menu-toggle { display: flex; }
+  .dropdown-menu { position: static; transform: none; box-shadow: none; padding: 0; display: none; min-width: auto; background: transparent; }
+  .dropdown.open .dropdown-menu { display: block; }
+  .dropdown-menu li a { padding: 0.5rem 1rem; }
+}
+
+.container { max-width:860px; margin:0 auto; padding:7rem 2rem 4rem; }
+h1 { font-size:2.5rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:0.5rem; }
+.updated { color:var(--text-muted); font-size:0.9rem; margin-bottom:2.5rem; }
+
+h2 { font-size:1.4rem; font-weight:700; margin:2.5rem 0 1rem; color:var(--primary); }
+h3 { font-size:1.1rem; font-weight:600; margin:1.5rem 0 0.5rem; }
+p { margin-bottom:1rem; color:var(--text); }
+ul { margin:0.5rem 0 1rem 1.5rem; }
+li { margin-bottom:0.4rem; }
+
+.policy-box { background:var(--bg-alt); border-radius:12px; padding:1.5rem; margin:1.5rem 0; border-left:4px solid var(--accent); }
+.policy-box strong { color:var(--primary); }
+
+footer { text-align:center; padding:2rem; font-size:0.85rem; color:var(--text-muted); border-top:1px solid #eaeef5; }
+@media (max-width:768px) { .nav-links { display:none; } h1 { font-size:1.8rem; } }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html" class="logo" style="text-decoration:none;">med<span>research</span>.me</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li class="dropdown">
+      <a href="javascript:void(0)">Services &#x25BE;</a>
+      <ul class="dropdown-menu">
+        <li><a href="abstract-conference.html">Conference Abstract</a></li>
+        <li><a href="systematic-review.html">Systematic Review</a></li>
+        <li><a href="meta-analysis.html">Meta-Analysis</a></li>
+        <li><a href="manuscript-writing.html">Manuscript Writing</a></li>
+        <li><a href="scoping-review.html">Scoping Review</a></li>
+        <li><a href="literature-review.html">Literature Review</a></li>
+      </ul>
+    </li>
+    <li><a href="index.html#contact">Contact</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+    <li><a href="#contact" class="nav-cta">Get Started</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="container">
+  <h1>Privacy Policy &amp; Disclaimer</h1>
+  <p class="updated">Last updated: July 2026</p>
+
+  <h2>1. Introduction</h2>
+  <p>medresearch.me ("we," "our," "us") provides academic research support services including but not limited to systematic review, meta-analysis, abstract writing, manuscript writing, scoping review, and literature review. This page outlines our privacy practices, service terms, disclaimers, and policies governing the use of our services.</p>
+  <p>By using our website or engaging our services, you agree to the terms outlined in this document.</p>
+
+  <h2>2. Information We Collect</h2>
+  <p>We collect the following information when you use our services:</p>
+  <ul>
+    <li><strong>Personal Information:</strong> Name, email address, institutional affiliation, and other contact details provided through our contact forms or client dashboard.</li>
+    <li><strong>Project Information:</strong> Research topics, abstracts, manuscripts, data, figures, and any materials you submit for our services.</li>
+    <li><strong>Account Information:</strong> If you create a dashboard account, we store your name, email, and a securely hashed password.</li>
+    <li><strong>Usage Data:</strong> Non-personal browsing data collected via standard analytics (pages visited, time spent, etc.).</li>
+  </ul>
+
+  <h2>3. How We Use Your Information</h2>
+  <ul>
+    <li>To provide, deliver, and improve our research support services</li>
+    <li>To communicate with you about your projects, deadlines, and revisions</li>
+    <li>To send service-related emails (order confirmations, status updates, invoices)</li>
+    <li>To maintain and improve our client dashboard experience</li>
+  </ul>
+  <p>We do <strong>not</strong> sell, rent, or share your personal information with third parties for marketing purposes.</p>
+
+  <h2>4. Data Security &amp; Confidentiality</h2>
+  <div class="policy-box">
+    <strong>Confidentiality Commitment:</strong> All materials you share with us — including research data, drafts, manuscripts, abstracts, and personal information — are treated as strictly confidential. We sign NDAs upon request. All file transfers are encrypted. Your work is never shared with third parties or used for purposes other than your project.
+  </div>
+  <p>We implement appropriate technical and organizational measures to protect your data against unauthorized access, alteration, disclosure, or destruction. However, no method of electronic transmission or storage is 100% secure, and we cannot guarantee absolute security.</p>
+
+  <h2>5. Service Terms &amp; Policies</h2>
+
+  <h3>5.1 Revision Policy — Conference Abstracts</h3>
+  <p>Our <strong>unlimited revision policy</strong> applies exclusively to conference abstract writing services. The following terms govern this policy:</p>
+  <ul>
+    <li>Revisions are unlimited in number and are provided at no additional cost.</li>
+    <li>If your abstract is rejected by the target congress, we will rewrite and adapt it for a different congress free of charge.</li>
+    <li><strong>Rejection proof required:</strong> To request a free rewrite following a rejection, you must provide the official rejection notice or correspondence from the congress.</li>
+    <li><strong>Termination upon acceptance:</strong> Once your abstract is accepted by any congress, conference, or journal, the unlimited revision period ends immediately.</li>
+    <li>This policy applies only to conference abstracts and does not extend to other services (systematic reviews, meta-analyses, manuscripts, scoping reviews, or literature reviews).</li>
+  </ul>
+
+  <h3>5.2 Revision Policy — Other Services</h3>
+  <p>For systematic reviews, meta-analyses, manuscript writing, scoping reviews, and literature reviews, we offer reasonable revisions to ensure your satisfaction with the delivered work. The scope of revisions is limited to the original project specifications. Major changes in scope or methodology after delivery may incur additional charges.</p>
+
+  <h3>5.3 Delivery &amp; Turnaround</h3>
+  <ul>
+    <li><strong>Standard delivery:</strong> 5 business days for conference abstracts. Larger projects (reviews, manuscripts) have timelines specified in the project proposal.</li>
+    <li><strong>Express delivery (48 hours):</strong> Available only for conference abstract services. Subject to researcher availability.</li>
+    <li>All delivery timelines begin after we receive full project requirements and any necessary materials from you.</li>
+  </ul>
+
+  <h3>5.4 Originality &amp> Plagiarism</h3>
+  <p>All work delivered by medresearch.me is written from scratch and is original. We do not use AI generation tools to create content. Every abstract, manuscript, and review is manually researched and written by our team of experienced researchers. We do not pre-sell, resell, or repurpose client work.</p>
+
+  <h2>6. Disclaimer</h2>
+  <div class="policy-box">
+    <strong>Important Disclaimer:</strong> medresearch.me provides research support and writing assistance services. While we strive for the highest quality and accuracy, we do not guarantee:
+    <ul style="margin-top:0.5rem;">
+      <li>Acceptance by any specific congress, journal, or funding body</li>
+      <li>Publication in any specific venue or within any specific timeframe</li>
+      <li>Specific grades, scores, or review outcomes</li>
+      <li>That the work will meet all requirements of any specific institution, ethics board, or regulatory body</li>
+    </ul>
+  </div>
+  <p>Our services are designed to support researchers in preparing and submitting their work. The final responsibility for submission, compliance with author guidelines, ethical approval, and adherence to journal or congress policies rests with the client.</p>
+
+  <h2>7. Payment Terms</h2>
+  <ul>
+    <li>Pricing is quoted in USD unless otherwise specified.</li>
+    <li>Payment is due as per the agreed schedule (typically 50% upfront, 50% upon completion for larger projects; full payment upfront for smaller projects).</li>
+    <li>All invoices are sent via email. Receipts are provided for all transactions.</li>
+    <li>Refund requests are handled on a case-by-case basis depending on the stage of project completion.</li>
+  </ul>
+
+  <h2>8. Intellectual Property</h2>
+  <p>Upon full payment, you retain full intellectual property rights to the work delivered by medresearch.me. We do not claim any ownership over your research data, ideas, or the final deliverables. We reserve the right to list anonymized project outcomes and acceptance records in our portfolio (e.g., "Accepted at ESC 2026") unless you explicitly opt out.</p>
+
+  <h2>9. Third-Party Services</h2>
+  <p>Our website uses the following third-party services:</p>
+  <ul>
+    <li><strong>Formspree:</strong> Contact form submission handling (optional fallback)</li>
+    <li><strong>Stripe / PayPal:</strong> Payment processing (when activated)</li>
+    <li><strong>Google Fonts:</strong> Typography</li>
+  </ul>
+  <p>Each third-party service operates under its own privacy policy. We encourage you to review their policies for more information.</p>
+
+  <h2>10. Cookies</h2>
+  <p>Our website uses minimal cookies necessary for basic functionality. We do not use tracking cookies or advertising cookies. The client dashboard uses a localStorage token for session management, which is not a cookie and is stored locally on your device.</p>
+
+  <h2>11. Data Retention</h2>
+  <p>We retain your personal information and project materials for the duration of your active projects plus 12 months for record-keeping purposes. After this period, data is securely deleted or anonymized. You may request earlier deletion of your data by contacting us.</p>
+
+  <h2>12. Your Rights</h2>
+  <p>You have the right to:</p>
+  <ul>
+    <li>Access the personal data we hold about you</li>
+    <li>Request correction or deletion of your data</li>
+    <li>Withdraw consent for data processing at any time</li>
+    <li>Request a copy of your data in a portable format</li>
+  </ul>
+  <p>To exercise any of these rights, contact us at <a href="mailto:contact@medresearch.me">contact@medresearch.me</a>.</p>
+
+  <h2>13. Changes to This Policy</h2>
+  <p>We reserve the right to update this Privacy Policy & Disclaimer at any time. Changes will be posted on this page with an updated "Last updated" date. We encourage you to review this page periodically.</p>
+
+  <h2>14. Contact</h2>
+  <p>If you have questions about this policy or our practices, please contact us at:</p>
+  <p style="font-weight:600;">Email: <a href="mailto:contact@medresearch.me">contact@medresearch.me</a></p>
+</div>
+
+<footer>
+  &copy; 2026 medresearch.me &nbsp;|&nbsp; <a href="index.html">Home</a> &nbsp;|&nbsp; <a href="privacy.html">Privacy Policy</a> &nbsp;|&nbsp; contact@medresearch.me
+  &nbsp;|&nbsp; <a href="admin.html" style="color:var(--accent);text-decoration:none;">Admin</a>
+</footer>
+
+<script>
+// Mobile menu
+const navEl = document.getElementById('nav');
+window.addEventListener('scroll', () => navEl.classList.toggle('scrolled', window.scrollY > 40));
+const toggle = document.getElementById('menuToggle');
+const links = document.getElementById('navLinks');
+if (toggle) { toggle.addEventListener('click', () => links.classList.toggle('open')); }
+document.querySelectorAll('.nav-links a:not(.dropdown > a)').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+document.querySelectorAll('.dropdown > a').forEach(a => a.addEventListener('click', function(e) { if (window.innerWidth <= 768) { e.preventDefault(); this.parentElement.classList.toggle('open'); } }));
+</script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+[
+  {
+    "id": "36fc64e8",
+    "userId": "f7319751-86d3-4af1-b167-10cc2d876ab3",
+    "service": "Conference Abstract",
+    "plan": "Premium",
+    "title": "no idea",
+    "description": "no idea",
+    "deadline": "2026-07-24",
+    "files": [],
+    "status": "completed",
+    "createdAt": "2026-07-15T09:21:12.515Z"
+  },
+  {
+    "id": 1,
+    "userId": "8cf74629-a788-4d18-a846-6a4934935853",
+    "client": "Saurav Lama",
+    "clientEmail": "sauravlama@gmail.com",
+    "service": "Conference Abstract",
+    "plan": "Premium",
+    "title": "Comparative Effectiveness of Artificial Intelligence–Based Insulin Titration Systems in Adults with Type 2 Diabetes A Systematic Review and Network Meta-analysis",
+    "deadline": "2026-07-20",
+    "description": "Please agree to the Terms and Conditions and proceed to Payment. As per our policy, half payment is to be done beforehand and half after the completion of the project. Please note that only after full payment, you will receive the handling certificate.",
+    "paymentLink": "https://esewa.com.np/",
+    "paymentEnabled": false,
+    "status": "in-progress",
+    "notes": "Due amount: USD 50",
+    "agreementAccepted": true,
+    "agreementAcceptedAt": "2026-07-16T14:16:44.957Z",
+    "files": [],
+    "adminManaged": true,
+    "createdAt": "2026-07-16T14:09:16.243Z",
+    "activity": [
+      {
+        "at": "2026-07-16T14:09:16.243Z",
+        "by": "admin",
+        "action": "Project created"
+      },
+      {
+        "at": "2026-07-16T14:09:33.255Z",
+        "by": "admin",
+        "action": "Updated notes"
+      },
+      {
+        "at": "2026-07-16T14:09:49.792Z",
+        "by": "admin",
+        "action": "Updated status → active"
+      },
+      {
+        "at": "2026-07-16T14:10:14.339Z",
+        "by": "admin",
+        "action": "Updated payment enabled"
+      },
+      {
+        "at": "2026-07-16T14:11:00.916Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:11:11.622Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:11:46.883Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:12:15.557Z",
+        "by": "admin",
+        "action": "Updated status → completed"
+      },
+      {
+        "at": "2026-07-16T14:12:16.566Z",
+        "by": "admin",
+        "action": "Updated payment disabled"
+      },
+      {
+        "at": "2026-07-16T14:14:12.557Z",
+        "by": "admin",
+        "action": "Updated status → active"
+      },
+      {
+        "at": "2026-07-16T14:14:24.083Z",
+        "by": "admin",
+        "action": "Updated payment enabled"
+      },
+      {
+        "at": "2026-07-16T14:16:37.324Z",
+        "by": "admin",
+        "action": "Updated payment received"
+      },
+      {
+        "at": "2026-07-16T14:16:40.375Z",
+        "by": "admin",
+        "action": "Updated status → completed"
+      },
+      {
+        "at": "2026-07-16T14:16:44.957Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:17:01.135Z",
+        "by": "admin",
+        "action": "Updated payment disabled"
+      },
+      {
+        "at": "2026-07-16T15:09:01.005Z",
+        "by": "admin",
+        "action": "Updated status → in-progress"
+      },
+      {
+        "at": "2026-07-16T18:43:32.143Z",
+        "by": "admin",
+        "action": "Updated payment marked unpaid"
+      },
+      {
+        "at": "2026-07-16T18:43:32.654Z",
+        "by": "admin",
+        "action": "Updated payment received"
+      }
+    ],
+    "paid": true,
+    "paidAt": "2026-07-16T18:43:32.654Z"
+  },
+  {
+    "id": 3,
+    "userId": "8cf74629-a788-4d18-a846-6a4934935853",
+    "client": "Saurav Lama",
+    "clientEmail": "sauravlama@gmail.com",
+    "service": "Conference Abstract",
+    "plan": "Premium",
+    "title": "Comparative Effectiveness of Artificial Intelligence–Based Insulin Titration Systems in Adults with Type 2 Diabetes A Systematic Review and Network Meta-analysis",
+    "deadline": "2026-07-16",
+    "description": "Please agree to the Terms and Conditions and proceed to Payment. As per our policy, half payment is to be done beforehand and half after the completion of the project. Please note that only after full payment, you will receive the handling certificate.",
+    "paymentLink": "https://esewa.com.np/",
+    "paymentEnabled": false,
+    "paid": true,
+    "status": "in-progress",
+    "notes": "Second Installment (USD 50)",
+    "agreementAccepted": true,
+    "agreementAcceptedAt": "2026-07-16T14:28:25.690Z",
+    "files": [],
+    "adminManaged": true,
+    "createdAt": "2026-07-16T14:26:49.736Z",
+    "activity": [
+      {
+        "at": "2026-07-16T14:26:49.736Z",
+        "by": "admin",
+        "action": "Project created"
+      },
+      {
+        "at": "2026-07-16T14:27:49.917Z",
+        "by": "admin",
+        "action": "Updated notes"
+      },
+      {
+        "at": "2026-07-16T14:27:59.762Z",
+        "by": "admin",
+        "action": "Updated notes"
+      },
+      {
+        "at": "2026-07-16T14:28:17.759Z",
+        "by": "admin",
+        "action": "Updated payment enabled"
+      },
+      {
+        "at": "2026-07-16T14:28:25.690Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:28:40.473Z",
+        "by": "admin",
+        "action": "Updated payment received"
+      },
+      {
+        "at": "2026-07-16T14:28:46.953Z",
+        "by": "admin",
+        "action": "Updated status → completed"
+      },
+      {
+        "at": "2026-07-16T14:28:50.914Z",
+        "by": "admin",
+        "action": "Updated payment disabled"
+      },
+      {
+        "at": "2026-07-16T15:08:56.301Z",
+        "by": "admin",
+        "action": "Updated status → in-progress"
+      },
+      {
+        "at": "2026-07-16T18:43:30.154Z",
+        "by": "admin",
+        "action": "Updated payment marked unpaid"
+      },
+      {
+        "at": "2026-07-16T18:43:30.647Z",
+        "by": "admin",
+        "action": "Updated payment received"
+      },
+      {
+        "at": "2026-07-18T08:25:36.180Z",
+        "by": "admin",
+        "action": "Updated deposit paid"
+      },
+      {
+        "at": "2026-07-18T08:25:36.779Z",
+        "by": "admin",
+        "action": "Updated deposit reversed"
+      },
+      {
+        "at": "2026-07-18T08:25:37.367Z",
+        "by": "admin",
+        "action": "Updated deposit paid"
+      },
+      {
+        "at": "2026-07-18T08:25:37.906Z",
+        "by": "admin",
+        "action": "Updated deposit reversed"
+      }
+    ],
+    "paidAt": "2026-07-16T18:43:30.647Z",
+    "depositPaid": false,
+    "depositPaidAt": null
+  },
+  {
+    "id": 4,
+    "userId": "7300da6c-2e83-4b8c-b88e-8c821f1c65f7",
+    "client": "Nitesh Kumar Karna",
+    "clientEmail": "niteshkumarkarna2022@bpkihs.edu.np",
+    "service": "Conference Abstract",
+    "plan": "Express",
+    "title": "Artificial Intelligence-Powered Telemedicine Interventions for Diabetes Management A Systematic Review and Meta-analysis",
+    "deadline": "2026-07-20",
+    "description": "Please agree to the Terms and Conditions and proceed to Payment. As per our policy, half payment is to be made beforehand and half after the completion of the project. Please note that only after full payment, you will receive rights holding certificate.\n",
+    "paymentLink": "https://web.khalti.com/",
+    "paymentEnabled": false,
+    "paid": true,
+    "amount": 200,
+    "status": "completed",
+    "notes": "",
+    "agreementAccepted": true,
+    "agreementAcceptedAt": "2026-07-16T18:47:14.726Z",
+    "files": [
+      {
+        "name": "med-research-logo.pdf",
+        "url": "/project-files/34eab31949775f34bbf8a67dacc07c63",
+        "size": 18875,
+        "at": "2026-07-16T19:03:00.834Z"
+      },
+      {
+        "name": "0136_Additional.png",
+        "url": "/project-files/1c90bece26ea05d2110f50c7799860db",
+        "size": 1461472,
+        "at": "2026-07-16T19:03:11.693Z"
+      }
+    ],
+    "adminManaged": true,
+    "createdAt": "2026-07-16T18:46:19.640Z",
+    "activity": [
+      {
+        "at": "2026-07-16T18:46:19.640Z",
+        "by": "admin",
+        "action": "Project created"
+      },
+      {
+        "at": "2026-07-16T18:46:55.367Z",
+        "by": "admin",
+        "action": "Updated payment received"
+      },
+      {
+        "at": "2026-07-16T18:46:58.742Z",
+        "by": "admin",
+        "action": "Updated payment marked unpaid"
+      },
+      {
+        "at": "2026-07-16T18:47:04.765Z",
+        "by": "admin",
+        "action": "Updated payment enabled"
+      },
+      {
+        "at": "2026-07-16T18:47:14.726Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T18:47:39.844Z",
+        "by": "admin",
+        "action": "Updated payment received"
+      },
+      {
+        "at": "2026-07-16T18:47:40.569Z",
+        "by": "admin",
+        "action": "Updated payment disabled"
+      },
+      {
+        "at": "2026-07-16T18:47:51.025Z",
+        "by": "admin",
+        "action": "Updated status → in-progress"
+      },
+      {
+        "at": "2026-07-16T18:48:28.368Z",
+        "by": "admin",
+        "action": "Updated status → completed"
+      },
+      {
+        "at": "2026-07-16T18:55:33.259Z",
+        "by": "admin",
+        "action": "Invoice emailed to client"
+      },
+      {
+        "at": "2026-07-16T18:56:47.103Z",
+        "by": "admin",
+        "action": "Updated payment marked unpaid"
+      },
+      {
+        "at": "2026-07-16T18:56:52.846Z",
+        "by": "admin",
+        "action": "Updated payment received"
+      },
+      {
+        "at": "2026-07-16T19:01:29.289Z",
+        "by": "admin",
+        "action": "Uploaded 1 file(s)"
+      },
+      {
+        "at": "2026-07-16T19:03:00.834Z",
+        "by": "admin",
+        "action": "Uploaded 1 file(s)"
+      },
+      {
+        "at": "2026-07-16T19:03:05.616Z",
+        "by": "admin",
+        "action": "Uploaded 1 file(s)"
+      },
+      {
+        "at": "2026-07-16T19:03:11.693Z",
+        "by": "admin",
+        "action": "Uploaded 1 file(s)"
+      },
+      {
+        "at": "2026-07-16T19:03:43.181Z",
+        "by": "admin",
+        "action": "Invoice emailed to client"
+      },
+      {
+        "at": "2026-07-16T19:09:21.145Z",
+        "by": "admin",
+        "action": "Invoice emailed to client"
+      },
+      {
+        "at": "2026-07-16T19:12:22.313Z",
+        "by": "admin",
+        "action": "Invoice emailed to client"
+      },
+      {
+        "at": "2026-07-16T19:32:06.200Z",
+        "by": "admin",
+        "action": "Invoice emailed to client"
+      },
+      {
+        "at": "2026-07-16T19:33:31.118Z",
+        "by": "admin",
+        "action": "Invoice emailed to client"
+      }
+    ],
+    "paidAt": "2026-07-16T18:56:52.846Z"
+  },
+  {
+    "id": 5,
+    "userId": "7300da6c-2e83-4b8c-b88e-8c821f1c65f7",
+    "client": "Nitesh Kumar Karna",
+    "clientEmail": "niteshkumarkarna2022@bpkihs.edu.np",
+    "service": "Conference Abstract",
+    "plan": "Standard",
+    "title": "Prevalence and associated risk factors for childhood asthma in South-East Asia: a systematic review and meta-analysis",
+    "deadline": "2026-07-20",
+    "description": "acdvsvd",
+    "paymentLink": "https://www.youtube.com/watch?v=dhY8jRNELUc&list=RDcAX_nMkunAM&index=2",
+    "paymentEnabled": true,
+    "paid": true,
+    "depositPaid": true,
+    "paymentType": "split",
+    "amount": 100,
+    "status": "completed",
+    "notes": "",
+    "agreementAccepted": true,
+    "agreementAcceptedAt": "2026-07-18T08:28:00.488Z",
+    "files": [
+      {
+        "name": "right-transfer-5.pdf",
+        "url": "/project-files/4a5bded6cfe9354ef0d2e2869d3a88de",
+        "size": 5403,
+        "at": "2026-07-18T08:54:46.089Z"
+      },
+      {
+        "name": "invoice-5.pdf",
+        "url": "/project-files/9c686f619c9c63c69d5fcedbee84c1bd",
+        "size": 2740,
+        "at": "2026-07-18T08:54:49.756Z"
+      }
+    ],
+    "adminManaged": true,
+    "createdAt": "2026-07-18T08:27:20.027Z",
+    "activity": [
+      {
+        "at": "2026-07-18T08:27:20.027Z",
+        "by": "admin",
+        "action": "Project created"
+      },
+      {
+        "at": "2026-07-18T08:27:34.365Z",
+        "by": "admin",
+        "action": "Updated payment enabled"
+      },
+      {
+        "at": "2026-07-18T08:28:00.488Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-18T08:28:32.995Z",
+        "by": "admin",
+        "action": "Updated deposit paid"
+      },
+      {
+        "at": "2026-07-18T08:28:46.855Z",
+        "by": "admin",
+        "action": "Updated payment received (full)"
+      },
+      {
+        "at": "2026-07-18T08:30:56.077Z",
+        "by": "admin",
+        "action": "Updated payment disabled"
+      },
+      {
+        "at": "2026-07-18T08:31:03.601Z",
+        "by": "admin",
+        "action": "Updated status → revision"
+      },
+      {
+        "at": "2026-07-18T08:31:09.695Z",
+        "by": "admin",
+        "action": "Updated status → in-progress"
+      },
+      {
+        "at": "2026-07-18T08:31:17.988Z",
+        "by": "admin",
+        "action": "Updated status → completed"
+      },
+      {
+        "at": "2026-07-18T08:32:46.107Z",
+        "by": "admin",
+        "action": "Invoice emailed to client"
+      },
+      {
+        "at": "2026-07-18T08:36:44.668Z",
+        "by": "admin",
+        "action": "Updated payment type → split"
+      },
+      {
+        "at": "2026-07-18T08:51:12.351Z",
+        "by": "admin",
+        "action": "Updated payment status → not paid"
+      },
+      {
+        "at": "2026-07-18T08:51:12.351Z",
+        "by": "admin",
+        "action": "Updated payment marked unpaid"
+      },
+      {
+        "at": "2026-07-18T08:51:12.351Z",
+        "by": "admin",
+        "action": "Updated payment enabled"
+      },
+      {
+        "at": "2026-07-18T08:51:25.703Z",
+        "by": "admin",
+        "action": "Updated payment status → 50% paid"
+      },
+      {
+        "at": "2026-07-18T08:51:33.718Z",
+        "by": "admin",
+        "action": "Updated payment received (full)"
+      },
+      {
+        "at": "2026-07-18T08:54:46.089Z",
+        "by": "admin",
+        "action": "Uploaded 1 file(s)"
+      },
+      {
+        "at": "2026-07-18T08:54:49.756Z",
+        "by": "admin",
+        "action": "Uploaded 1 file(s)"
+      }
+    ],
+    "depositPaidAt": "2026-07-18T08:51:25.703Z",
+    "paidAt": "2026-07-18T08:51:33.718Z"
+  },
+  {
+    "id": 6,
+    "userId": "7300da6c-2e83-4b8c-b88e-8c821f1c65f7",
+    "client": "Nitesh Kumar Karna",
+    "clientEmail": "niteshkumarkarna2022@bpkihs.edu.np",
+    "service": "Systematic Review",
+    "plan": "Standard",
+    "title": "qwertyuiop",
+    "deadline": "2026-02-01",
+    "description": "kgbkb jkb",
+    "paymentLink": "https://fb.com",
+    "paymentEnabled": false,
+    "paid": true,
+    "depositPaid": true,
+    "paymentType": "full",
+    "amount": 200,
+    "status": "completed",
+    "notes": "",
+    "agreementAccepted": true,
+    "agreementAcceptedAt": "2026-07-18T09:06:34.491Z",
+    "files": [],
+    "adminManaged": true,
+    "createdAt": "2026-07-18T08:59:05.521Z",
+    "activity": [
+      {
+        "at": "2026-07-18T08:59:05.521Z",
+        "by": "admin",
+        "action": "Project created"
+      },
+      {
+        "at": "2026-07-18T09:06:20.804Z",
+        "by": "admin",
+        "action": "Updated client access enabled"
+      },
+      {
+        "at": "2026-07-18T09:06:34.491Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-18T09:06:51.841Z",
+        "by": "admin",
+        "action": "Updated payment status → 50% paid"
+      },
+      {
+        "at": "2026-07-18T09:06:58.453Z",
+        "by": "admin",
+        "action": "Updated payment received (full)"
+      },
+      {
+        "at": "2026-07-18T09:07:06.517Z",
+        "by": "admin",
+        "action": "Updated status → revision"
+      },
+      {
+        "at": "2026-07-18T09:07:16.709Z",
+        "by": "admin",
+        "action": "Updated status → completed"
+      },
+      {
+        "at": "2026-07-18T09:07:39.024Z",
+        "by": "admin",
+        "action": "Updated client access disabled"
+      },
+      {
+        "at": "2026-07-18T09:07:54.649Z",
+        "by": "admin",
+        "action": "Updated client access enabled"
+      },
+      {
+        "at": "2026-07-18T09:07:55.440Z",
+        "by": "admin",
+        "action": "Updated client access disabled"
+      },
+      {
+        "at": "2026-07-18T09:14:59.199Z",
+        "by": "admin",
+        "action": "Updated payment status → not paid"
+      },
+      {
+        "at": "2026-07-18T09:14:59.199Z",
+        "by": "admin",
+        "action": "Updated payment marked unpaid"
+      },
+      {
+        "at": "2026-07-18T09:18:58.365Z",
+        "by": "admin",
+        "action": "Updated payment status → 100% paid"
+      },
+      {
+        "at": "2026-07-18T09:18:58.365Z",
+        "by": "admin",
+        "action": "Updated payment received (full)"
+      }
+    ],
+    "depositPaidAt": "2026-07-18T09:18:58.365Z",
+    "paidAt": "2026-07-18T09:18:58.365Z"
+  }
+]

@@ -1,0 +1,187 @@
+[
+  {
+    "id": "36fc64e8",
+    "userId": "f7319751-86d3-4af1-b167-10cc2d876ab3",
+    "service": "Conference Abstract",
+    "plan": "Premium",
+    "title": "no idea",
+    "description": "no idea",
+    "deadline": "2026-07-24",
+    "files": [],
+    "status": "completed",
+    "createdAt": "2026-07-15T09:21:12.515Z"
+  },
+  {
+    "id": 1,
+    "userId": "8cf74629-a788-4d18-a846-6a4934935853",
+    "client": "Saurav Lama",
+    "clientEmail": "sauravlama@gmail.com",
+    "service": "Conference Abstract",
+    "plan": "Premium",
+    "title": "Comparative Effectiveness of Artificial Intelligence–Based Insulin Titration Systems in Adults with Type 2 Diabetes A Systematic Review and Network Meta-analysis",
+    "deadline": "2026-07-20",
+    "description": "Please agree to the Terms and Conditions and proceed to Payment. As per our policy, half payment is to be done beforehand and half after the completion of the project. Please note that only after full payment, you will receive the handling certificate.",
+    "paymentLink": "https://esewa.com.np/",
+    "paymentEnabled": false,
+    "status": "in-progress",
+    "notes": "Due amount: USD 50",
+    "agreementAccepted": true,
+    "agreementAcceptedAt": "2026-07-16T14:16:44.957Z",
+    "files": [],
+    "adminManaged": true,
+    "createdAt": "2026-07-16T14:09:16.243Z",
+    "activity": [
+      {
+        "at": "2026-07-16T14:09:16.243Z",
+        "by": "admin",
+        "action": "Project created"
+      },
+      {
+        "at": "2026-07-16T14:09:33.255Z",
+        "by": "admin",
+        "action": "Updated notes"
+      },
+      {
+        "at": "2026-07-16T14:09:49.792Z",
+        "by": "admin",
+        "action": "Updated status → active"
+      },
+      {
+        "at": "2026-07-16T14:10:14.339Z",
+        "by": "admin",
+        "action": "Updated payment enabled"
+      },
+      {
+        "at": "2026-07-16T14:11:00.916Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:11:11.622Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:11:46.883Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:12:15.557Z",
+        "by": "admin",
+        "action": "Updated status → completed"
+      },
+      {
+        "at": "2026-07-16T14:12:16.566Z",
+        "by": "admin",
+        "action": "Updated payment disabled"
+      },
+      {
+        "at": "2026-07-16T14:14:12.557Z",
+        "by": "admin",
+        "action": "Updated status → active"
+      },
+      {
+        "at": "2026-07-16T14:14:24.083Z",
+        "by": "admin",
+        "action": "Updated payment enabled"
+      },
+      {
+        "at": "2026-07-16T14:16:37.324Z",
+        "by": "admin",
+        "action": "Updated payment received"
+      },
+      {
+        "at": "2026-07-16T14:16:40.375Z",
+        "by": "admin",
+        "action": "Updated status → completed"
+      },
+      {
+        "at": "2026-07-16T14:16:44.957Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:17:01.135Z",
+        "by": "admin",
+        "action": "Updated payment disabled"
+      },
+      {
+        "at": "2026-07-16T15:09:01.005Z",
+        "by": "admin",
+        "action": "Updated status → in-progress"
+      }
+    ],
+    "paid": true,
+    "paidAt": "2026-07-16T14:16:37.324Z"
+  },
+  {
+    "id": 3,
+    "userId": "8cf74629-a788-4d18-a846-6a4934935853",
+    "client": "Saurav Lama",
+    "clientEmail": "sauravlama@gmail.com",
+    "service": "Conference Abstract",
+    "plan": "Premium",
+    "title": "Comparative Effectiveness of Artificial Intelligence–Based Insulin Titration Systems in Adults with Type 2 Diabetes A Systematic Review and Network Meta-analysis",
+    "deadline": "2026-07-16",
+    "description": "Please agree to the Terms and Conditions and proceed to Payment. As per our policy, half payment is to be done beforehand and half after the completion of the project. Please note that only after full payment, you will receive the handling certificate.",
+    "paymentLink": "https://esewa.com.np/",
+    "paymentEnabled": false,
+    "paid": true,
+    "status": "in-progress",
+    "notes": "Second Installment (USD 50)",
+    "agreementAccepted": true,
+    "agreementAcceptedAt": "2026-07-16T14:28:25.690Z",
+    "files": [],
+    "adminManaged": true,
+    "createdAt": "2026-07-16T14:26:49.736Z",
+    "activity": [
+      {
+        "at": "2026-07-16T14:26:49.736Z",
+        "by": "admin",
+        "action": "Project created"
+      },
+      {
+        "at": "2026-07-16T14:27:49.917Z",
+        "by": "admin",
+        "action": "Updated notes"
+      },
+      {
+        "at": "2026-07-16T14:27:59.762Z",
+        "by": "admin",
+        "action": "Updated notes"
+      },
+      {
+        "at": "2026-07-16T14:28:17.759Z",
+        "by": "admin",
+        "action": "Updated payment enabled"
+      },
+      {
+        "at": "2026-07-16T14:28:25.690Z",
+        "by": "client",
+        "action": "Agreement accepted"
+      },
+      {
+        "at": "2026-07-16T14:28:40.473Z",
+        "by": "admin",
+        "action": "Updated payment received"
+      },
+      {
+        "at": "2026-07-16T14:28:46.953Z",
+        "by": "admin",
+        "action": "Updated status → completed"
+      },
+      {
+        "at": "2026-07-16T14:28:50.914Z",
+        "by": "admin",
+        "action": "Updated payment disabled"
+      },
+      {
+        "at": "2026-07-16T15:08:56.301Z",
+        "by": "admin",
+        "action": "Updated status → in-progress"
+      }
+    ],
+    "paidAt": "2026-07-16T14:28:40.473Z"
+  }
+]

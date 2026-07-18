@@ -1,0 +1,19 @@
+[
+  {
+    "id": "8cf74629-a788-4d18-a846-6a4934935853",
+    "name": "Saurav Lama",
+    "email": "sauravlama@gmail.com",
+    "password": "$2b$10$m2Lcr/N1JP.PoUIIfd0rsOEl5MsaAoUvbV0vlV5LW.7GQU5F08ncW",
+    "createdAt": "2026-07-16T14:06:16.944Z",
+    "disabled": false
+  },
+  {
+    "id": "7300da6c-2e83-4b8c-b88e-8c821f1c65f7",
+    "name": "Nitesh Kumar Karna",
+    "email": "niteshkumarkarna2022@bpkihs.edu.np",
+    "password": "$2b$10$PgD93iuISSBlrVwfMUhzVeFWE.nTdViZLauvJvL2Y6Y0VGLY11YM6",
+    "passwordText": "qwertyuiop",
+    "createdAt": "2026-07-16T18:44:24.238Z",
+    "disabled": false
+  }
+]

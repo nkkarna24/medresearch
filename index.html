@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>medresearch.me — Medical Research Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+:root {
+  --primary: #0a2540;
+  --accent: #0066cc;
+  --accent-light: #e8f0fe;
+  --text: #1a1a2e;
+  --text-muted: #5a6a7e;
+  --bg: #ffffff;
+  --bg-alt: #f7f9fc;
+  --radius: 16px;
+  --shadow: 0 4px 24px rgba(10,37,64,0.06);
+  --shadow-hover: 0 12px 40px rgba(10,37,64,0.12);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ───────────── NAV ───────────── */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  padding: 1rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: all 0.3s ease;
+}
+nav.scrolled {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+  padding: 0.7rem 2rem;
+}
+.logo { font-weight: 800; font-size: 1.3rem; color: var(--primary); }
+.logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+.nav-links a {
+  text-decoration: none; color: var(--text-muted); font-size: 0.9rem; font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+.nav-cta {
+  background: var(--accent); color: #fff !important; padding: 0.5rem 1.2rem;
+  border-radius: 100px; font-weight: 600; font-size: 0.85rem !important;
+}
+.nav-cta:hover { background: #0052a3; }
+.menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+.menu-toggle span { width: 24px; height: 2px; background: var(--primary); border-radius: 2px; transition: 0.3s; }
+
+/* ─── DROPDOWN ─── */
+.dropdown { position: relative; }
+.dropdown-menu {
+  display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(10,37,64,0.12);
+  padding: 0.5rem; min-width: 200px; list-style: none; z-index:200;
+}
+.dropdown-menu li a {
+  display: block; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem !important;
+  color: var(--text) !important; white-space: nowrap;
+}
+.dropdown-menu li a:hover { background: var(--accent-light); color: var(--accent) !important; }
+.dropdown:hover .dropdown-menu { display: block; }
+@media (max-width:768px) {
+  .dropdown-menu { position: static; transform: none; box-shadow: none; padding:0; display:none; min-width:auto; background:transparent; }
+  .dropdown.open .dropdown-menu { display:block; }
+  .dropdown-menu li a { padding:0.5rem 1rem; }
+}
+
+/* ───────────── HERO ───────────── */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 6rem 2rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #f0f6ff 0%, #e8f0fe 40%, #fff 100%);
+  z-index: -2;
+}
+.hero-grid {
+  position: absolute; inset: 0; z-index: -1;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(0,102,204,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0,102,204,0.04) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(0,102,204,0.05) 0%, transparent 50%);
+}
+.hero-content { max-width: 1120px; margin: 0 auto; width: 100%; }
+.hero-badge {
+  display: inline-block;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 0.8rem; font-weight: 600;
+  padding: 0.35rem 1rem; border-radius: 100px;
+  margin-bottom: 1.5rem;
+  opacity:0; animation: fadeUp 0.6s 0.2s forwards;
+}
+.hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  max-width: 860px;
+  opacity:0; animation: fadeUp 0.6s 0.3s forwards;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin-top: 1.5rem;
+  opacity:0; animation: fadeUp 0.6s 0.4s forwards;
+}
+.hero-actions {
+  display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap;
+  opacity:0; animation: fadeUp 0.6s 0.5s forwards;
+}
+.btn {
+  text-decoration: none;
+  padding: 0.85rem 2rem;
+  border-radius: 100px;
+  font-weight: 600; font-size: 0.95rem;
+  transition: all 0.25s ease;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+}
+.btn-primary {
+  background: var(--accent); color: #fff;
+  box-shadow: 0 4px 16px rgba(0,102,204,0.3);
+}
+.btn-primary:hover {
+  background: #0052a3;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,102,204,0.35);
+}
+.btn-outline {
+  border: 1.5px solid var(--primary); color: var(--primary);
+}
+.btn-outline:hover {
+  background: var(--primary); color: #fff; transform: translateY(-2px);
+}
+
+.hero-stats {
+  display: flex; gap: 3rem; margin-top: 4rem; flex-wrap: wrap;
+  opacity:0; animation: fadeUp 0.6s 0.6s forwards;
+}
+.stat { text-align: left; }
+.stat-number {
+  font-size: 2rem; font-weight: 800; color: var(--primary); letter-spacing: -0.02em;
+}
+.stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+/* ───────────── SECTIONS ───────────── */
+section { padding: 5rem 2rem; }
+.section-inner { max-width: 1120px; margin: 0 auto; }
+
+.section-label {
+  font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.75rem;
+}
+.section-title {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+.section-sub {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin-bottom: 3rem;
+}
+
+/* ───────────── SERVICES ───────────── */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+.service-card {
+  background: var(--bg);
+  border: 1px solid #eaeef5;
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  transition: all 0.3s ease;
+  cursor: default;
+  opacity:0; transform: translateY(20px);
+}
+.service-card.visible { opacity:1; transform: translateY(0); }
+.service-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+.service-icon {
+  width: 44px; height: 44px;
+  background: var(--accent-light);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+.service-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+.service-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ───────────── PROCESS ───────────── */
+.process-timeline { position: relative; padding-left: 2.5rem; }
+.process-timeline::before {
+  content: ''; position: absolute; left: 9px; top: 12px; bottom: 12px;
+  width: 2px; background: #dde3ed;
+}
+.process-step {
+  position: relative; margin-bottom: 2.5rem;
+  opacity:0; transform: translateX(-20px);
+}
+.process-step.visible { opacity:1; transform: translateX(0); }
+.process-step:last-child { margin-bottom: 0; }
+.step-dot {
+  position: absolute; left: -2.5rem; top: 4px;
+  width: 20px; height: 20px;
+  background: var(--accent); border-radius: 50%;
+  border: 4px solid var(--bg); box-shadow: 0 0 0 2px var(--accent);
+  z-index: 1;
+}
+.step-num { font-size: 0.75rem; font-weight: 700; color: var(--accent); margin-bottom: 0.25rem; }
+.step-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.3rem; }
+.step-desc { font-size: 0.9rem; color: var(--text-muted); max-width: 550px; }
+
+/* ───────────── WHY ───────────── */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+.why-item {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius);
+  background: var(--bg);
+  border: 1px solid #eaeef5;
+  transition: all 0.3s ease;
+  opacity:0; transform: translateY(20px);
+}
+.why-item.visible { opacity:1; transform: translateY(0); }
+.why-item:hover { box-shadow: var(--shadow-hover); }
+.why-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+.why-item h4 { font-weight: 600; font-size: 1rem; margin-bottom: 0.4rem; }
+.why-item p { font-size: 0.85rem; color: var(--text-muted); }
+
+/* ───────────── CONTACT ───────────── */
+.contact-section {
+  background: var(--bg-alt);
+}
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+.contact-info h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+.contact-info p { color: var(--text-muted); margin-bottom: 1.5rem; }
+.contact-detail { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; font-size: 0.95rem; }
+.contact-detail .icon { font-size: 1.2rem; }
+
+.contact-form { display: flex; flex-direction: column; gap: 1rem; }
+.form-row { display: flex; gap: 1rem; }
+.form-row > * { flex: 1; }
+input, textarea, select {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid #dde3ed;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  background: #fff;
+  outline: none;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+textarea { resize: vertical; min-height: 120px; }
+.contact-form .btn { align-self: flex-start; border: none; cursor: pointer; }
+.form-label { display:block; font-weight:600; font-size:0.85rem; margin-bottom:0.4rem; color:var(--primary); }
+.form-label .req { color:#e02424; margin-left:2px; }
+.form-label .opt { color:var(--text-muted); font-weight:400; font-size:0.8rem; margin-left:4px; }
+
+/* ───────────── FOOTER ───────────── */
+footer {
+  text-align: center;
+  padding: 2.5rem 2rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  border-top: 1px solid #eaeef5;
+}
+
+/* ───────────── ANIMATIONS ───────────── */
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { opacity:0; transform: translateY(20px); transition: all 0.6s ease-out; }
+.fade-up.visible { opacity:1; transform: translateY(0); }
+
+/* ───────────── RESPONSIVE ───────────── */
+@media (max-width: 768px) {
+  .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0;
+    background: rgba(255,255,255,0.98); backdrop-filter: blur(12px);
+    flex-direction: column; padding: 1.5rem 2rem; gap: 1.2rem;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  }
+  .nav-links.open { display: flex; }
+  .menu-toggle { display: flex; }
+  .hero-stats { gap: 2rem; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .form-row { flex-direction: column; }
+  .services-grid { grid-template-columns: 1fr; }
+  section { padding: 3rem 1.5rem; }
+  .process-timeline { padding-left: 2rem; }
+  .step-dot { left: -2rem; width: 16px; height: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav id="nav">
+  <a href="index.html" class="logo" style="text-decoration:none;">med<span>research</span>.me</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li class="dropdown">
+      <a href="javascript:void(0)">Services &#x25BE;</a>
+      <ul class="dropdown-menu">
+        <li><a href="abstract-conference.html">Conference Abstract</a></li>
+        <li><a href="systematic-review.html">Systematic Review</a></li>
+        <li><a href="meta-analysis.html">Meta-Analysis</a></li>
+        <li><a href="manuscript-writing.html">Manuscript Writing</a></li>
+        <li><a href="scoping-review.html">Scoping Review</a></li>
+        <li><a href="literature-review.html">Literature Review</a></li>
+      </ul>
+    </li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+    <li><a href="#contact" class="nav-cta">Get Started</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Expert Medical Research Support</div>
+    <h1>Systematic Reviews &amp;<br>Meta-Analysis, <em>Done Right</em></h1>
+    <p>We help researchers, clinicians, and institutions produce publication-ready systematic reviews, meta-analyses, and medical manuscripts — with rigorous methodology, clear writing, and on-time delivery.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn btn-primary">Request a Quote &rarr;</a>
+      <a href="#services" class="btn btn-outline">View Services</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-number" data-count="87">0+</div><div class="stat-label">Projects Delivered</div></div>
+      <div class="stat"><div class="stat-number" data-count="32">0+</div><div class="stat-label">Peer-Reviewed Papers</div></div>
+      <div class="stat"><div class="stat-number" data-count="12">0+</div><div class="stat-label">Cochrane Reviews</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SERVICES ─── -->
+<section id="services">
+  <div class="section-inner">
+    <div class="section-label">What We Offer</div>
+    <h2 class="section-title">Comprehensive Research Services</h2>
+    <p class="section-sub">End-to-end support across the entire research publication lifecycle — from protocol to manuscript.</p>
+    <div class="services-grid">
+      <a href="systematic-review.html" class="service-card fade-up" style="text-decoration:none;color:inherit;display:block;">
+        <div class="service-icon">&#x1F50D;</div>
+        <h3>Systematic Review</h3>
+        <p>Protocol development, comprehensive search strategy, dual screening, data extraction, risk of bias assessment, and PRISMA-compliant reporting.</p>
+        <div style="margin-top:0.75rem;font-size:0.8rem;color:var(--accent);font-weight:600;">Learn more &rarr;</div>
+      </a>
+      <a href="meta-analysis.html" class="service-card fade-up" style="text-decoration:none;color:inherit;display:block;">
+        <div class="service-icon">&#x1F4CA;</div>
+        <h3>Meta-Analysis</h3>
+        <p>Frequentist and Bayesian models, heterogeneity exploration, subgroup and sensitivity analyses, forest and funnel plots, GRADE certainty assessment.</p>
+        <div style="margin-top:0.75rem;font-size:0.8rem;color:var(--accent);font-weight:600;">Learn more &rarr;</div>
+      </a>
+      <a href="meta-analysis.html" class="service-card fade-up" style="text-decoration:none;color:inherit;display:block;">
+        <div class="service-icon">&#x1F3AF;</div>
+        <h3>Network Meta-Analysis</h3>
+        <p>Multi-treatment comparisons, league tables, SUCRA rankings, inconsistency assessment, node-splitting, and network geometry visualization.</p>
+        <div style="margin-top:0.75rem;font-size:0.8rem;color:var(--accent);font-weight:600;">Learn more &rarr;</div>
+      </a>
+      <a href="manuscript-writing.html" class="service-card fade-up" style="text-decoration:none;color:inherit;display:block;">
+        <div class="service-icon">&#x1F4DD;</div>
+        <h3>Manuscript Writing</h3>
+        <p>Full manuscript drafting from your data, targeted journal selection, author guidelines compliance, responsive revisions, and cover letter preparation.</p>
+        <div style="margin-top:0.75rem;font-size:0.8rem;color:var(--accent);font-weight:600;">Learn more &rarr;</div>
+      </a>
+      <a href="abstract-conference.html" class="service-card fade-up" style="text-decoration:none;color:inherit;display:block;">
+        <div class="service-icon">&#x1F4D1;</div>
+        <h3>Abstract Writing</h3>
+        <p>Structured conference and journal abstracts, graphical abstracts, plain-language summaries — tailored to specific submission guidelines and word limits.</p>
+        <div style="margin-top:0.75rem;font-size:0.8rem;color:var(--accent);font-weight:600;">Learn more about Conference Abstracts &rarr;</div>
+      </a>
+      <a href="scoping-review.html" class="service-card fade-up" style="text-decoration:none;color:inherit;display:block;">
+        <div class="service-icon">&#x1F4DA;</div>
+        <h3>Scoping Review</h3>
+        <p>JBI- and PRISMA-ScR-compliant scoping reviews, evidence mapping, stakeholder consultation, and gap analysis for emerging research fields.</p>
+        <div style="margin-top:0.75rem;font-size:0.8rem;color:var(--accent);font-weight:600;">Learn more &rarr;</div>
+      </a>
+      <a href="meta-analysis.html" class="service-card fade-up" style="text-decoration:none;color:inherit;display:block;">
+        <div class="service-icon">&#x1F4C8;</div>
+        <h3>Bayesian Meta-Analysis</h3>
+        <p>Prior specification, model comparison (WAIC/LOO), MCMC diagnostics, posterior summaries, and informative prior incorporation for sparse data settings.</p>
+        <div style="margin-top:0.75rem;font-size:0.8rem;color:var(--accent);font-weight:600;">Learn more &rarr;</div>
+      </a>
+      <a href="literature-review.html" class="service-card fade-up" style="text-decoration:none;color:inherit;display:block;">
+        <div class="service-icon">&#x1F4F0;</div>
+        <h3>Literature Review</h3>
+        <p>Narrative and systematic literature syntheses, rapid reviews, evidence gap maps, and living reviews with periodic updates.</p>
+        <div style="margin-top:0.75rem;font-size:0.8rem;color:var(--accent);font-weight:600;">Learn more &rarr;</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABSTRACTS ─── -->
+<section id="abstracts">
+  <div class="section-inner">
+    <div class="section-label">Abstract Writing</div>
+    <h2 class="section-title">Your Research Deserves a Strong First Impression</h2>
+    <p class="section-sub">An abstract is the most-read part of any paper — and often the only part that determines acceptance. We craft compelling, structured abstracts that meet strict word limits while maximizing impact.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin-bottom:3rem;">
+      <a href="abstract-conference.html" style="text-decoration:none;color:inherit;display:block;">
+        <div class="why-item fade-up" style="text-align:left;padding:1.75rem;">
+          <div style="font-size:1.8rem;margin-bottom:0.75rem;">&#x1F3C6;</div>
+          <h4 style="font-weight:600;font-size:1rem;margin-bottom:0.4rem;">Conference Abstracts</h4>
+          <p style="font-size:0.85rem;color:var(--text-muted);">Structured submissions for ESC, AHA, ASCO, RSNA, IDF, and 50+ international congresses — tailored to specific word limits, section requirements, and scoring rubrics.</p>
+          <div style="margin-top:0.5rem;font-size:0.8rem;color:var(--accent);font-weight:600;">From scratch &middot; 5-day delivery &middot; 95% acceptance &rarr;</div>
+        </div>
+      </a>
+      <div class="why-item fade-up" style="text-align:left;padding:1.75rem;">
+        <div style="font-size:1.8rem;margin-bottom:0.75rem;">&#x1F4C4;</div>
+        <h4 style="font-weight:600;font-size:1rem;margin-bottom:0.4rem;">Journal Abstracts</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);">IMRAD-structured, unstructured, and graphical abstracts for BMJ, JAMA, The Lancet, Nature, NEJM, and specialty journals — with keyword optimization for searchability.</p>
+      </div>
+      <div class="why-item fade-up" style="text-align:left;padding:1.75rem;">
+        <div style="font-size:1.8rem;margin-bottom:0.75rem;">&#x1F5BC;</div>
+        <h4 style="font-weight:600;font-size:1rem;margin-bottom:0.4rem;">Graphical Abstracts</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);">Publication-ready visual abstracts and graphical table of contents (TOC) figures — designed to journal specifications in full color.</p>
+      </div>
+      <div class="why-item fade-up" style="text-align:left;padding:1.75rem;">
+        <div style="font-size:1.8rem;margin-bottom:0.75rem;">&#x1F4AC;</div>
+        <h4 style="font-weight:600;font-size:1rem;margin-bottom:0.4rem;">Plain-Language Summaries</h4>
+        <p style="font-size:0.85rem;color:var(--text-muted);">Accessible abstracts for public dissemination, patient engagement, funder reports, and media outreach — written at appropriate readability levels.</p>
+      </div>
+    </div>
+
+    <div style="background:var(--bg-alt);border-radius:var(--radius);padding:2.5rem 2rem;border:1px solid #eaeef5;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.5rem;text-align:center;">
+        <div class="fade-up">
+          <div style="font-size:1.5rem;font-weight:700;color:var(--accent);">100+</div>
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.25rem;">Abstracts Written</div>
+        </div>
+        <div class="fade-up">
+          <div style="font-size:1.5rem;font-weight:700;color:var(--accent);">95%</div>
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.25rem;">Conference Acceptance</div>
+        </div>
+        <div class="fade-up">
+          <div style="font-size:1.5rem;font-weight:700;color:var(--accent);">250&ndash;3,000</div>
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.25rem;">Word Range Covered</div>
+        </div>
+        <div class="fade-up">
+          <div style="font-size:1.5rem;font-weight:700;color:var(--accent);">48h</div>
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-top:0.25rem;">Express Turnaround</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:2.5rem;text-align:center;" class="fade-up">
+      <a href="#contact" class="btn btn-primary">Submit Your Abstract Request &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROCESS ─── -->
+<section id="process" style="background:var(--bg-alt);">
+  <div class="section-inner">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">A Proven, Transparent Process</h2>
+    <p class="section-sub">Every project follows a structured pipeline to ensure quality, reproducibility, and timely delivery.</p>
+    <div class="process-timeline">
+      <div class="process-step fade-up">
+        <div class="step-dot"></div>
+        <div class="step-num">Step 01</div>
+        <div class="step-title">Scoping &amp; Proposal</div>
+        <div class="step-desc">We discuss your research question, objectives, timeline, and deliverables. You receive a detailed proposal with fixed pricing.</div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-dot"></div>
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Protocol &amp; Registration</div>
+        <div class="step-desc">We draft a protocol (PROSPERO, OSF, or your preferred registry), define eligibility criteria, search strategy, and analysis plan.</div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-dot"></div>
+        <div class="step-num">Step 03</div>
+        <div class="step-title">Search &amp; Screening</div>
+        <div class="step-desc">Comprehensive database searches (PubMed, Embase, Cochrane, Scopus, Web of Science) with dual independent screening in Covidence/Rayyan.</div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-dot"></div>
+        <div class="step-num">Step 04</div>
+        <div class="step-title">Data Extraction &amp; Analysis</div>
+        <div class="step-desc">Structured data extraction, risk of bias assessment, and statistical analysis in RevMan, R, Stata, or JAGS — fully reproducible.</div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-dot"></div>
+        <div class="step-num">Step 05</div>
+        <div class="step-title">Writing &amp; Revision</div>
+        <div class="step-desc">Manuscript drafting with unlimited revision rounds. PRISMA flow diagrams, forest plots, and tables included.</div>
+      </div>
+      <div class="process-step fade-up">
+        <div class="step-dot"></div>
+        <div class="step-num">Step 06</div>
+        <div class="step-title">Submission Support</div>
+        <div class="step-desc">Journal formatting, cover letter, responses to reviewers, and post-acceptance proofing — we stay with you through publication.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FAQ ─── -->
+<section id="faq">
+  <div class="section-inner">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <p class="section-sub">Everything you need to know before getting started.</p>
+    <div style="max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:0.75rem;">
+      <div class="faq-item fade-up" style="background:var(--bg);border:1px solid #eaeef5;border-radius:12px;overflow:hidden;">
+        <button class="faq-q" style="width:100%;padding:1.25rem 1.5rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:1rem;text-align:left;font-family:inherit;color:var(--primary);">How do I pay?<span class="faq-arrow" style="transition:transform 0.3s;font-size:1.2rem;">&#x25BC;</span></button>
+        <div class="faq-a" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;padding:0 1.5rem;">
+          <p style="font-size:0.9rem;color:var(--text-muted);padding-bottom:1.25rem;line-height:1.7;">We accept payments via bank transfer, PayPal, and Stripe (credit/debit card). For larger projects, we offer a 50% upfront / 50% on completion model. Invoices are provided for all transactions.</p>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="background:var(--bg);border:1px solid #eaeef5;border-radius:12px;overflow:hidden;">
+        <button class="faq-q" style="width:100%;padding:1.25rem 1.5rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:1rem;text-align:left;font-family:inherit;color:var(--primary);">What if my abstract or paper gets rejected?<span class="faq-arrow" style="transition:transform 0.3s;font-size:1.2rem;">&#x25BC;</span></button>
+        <div class="faq-a" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;padding:0 1.5rem;">
+          <p style="font-size:0.9rem;color:var(--text-muted);padding-bottom:1.25rem;line-height:1.7;">We revise and resubmit for free. If your abstract is rejected by one congress, our team rewrites and adapts it for a different congress within 30 days — no additional charge. For manuscripts, we support revisions for target journal resubmission at no extra cost.</p>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="background:var(--bg);border:1px solid #eaeef5;border-radius:12px;overflow:hidden;">
+        <button class="faq-q" style="width:100%;padding:1.25rem 1.5rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:1rem;text-align:left;font-family:inherit;color:var(--primary);">Can you work with my existing data or draft?<span class="faq-arrow" style="transition:transform 0.3s;font-size:1.2rem;">&#x25BC;</span></button>
+        <div class="faq-a" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;padding:0 1.5rem;">
+          <p style="font-size:0.9rem;color:var(--text-muted);padding-bottom:1.25rem;line-height:1.7;">Absolutely. You can send us raw data, tables, figures, a rough draft, or just an idea — we adapt our workflow to whatever you have. Our team of 20+ researchers is experienced at building from any starting point.</p>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="background:var(--bg);border:1px solid #eaeef5;border-radius:12px;overflow:hidden;">
+        <button class="faq-q" style="width:100%;padding:1.25rem 1.5rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:1rem;text-align:left;font-family:inherit;color:var(--primary);">Do you sign NDAs?<span class="faq-arrow" style="transition:transform 0.3s;font-size:1.2rem;">&#x25BC;</span></button>
+        <div class="faq-a" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;padding:0 1.5rem;">
+          <p style="font-size:0.9rem;color:var(--text-muted);padding-bottom:1.25rem;line-height:1.7;">Yes. We sign NDAs for all projects. Your data, ideas, and manuscripts remain strictly confidential. We use encrypted file transfer and never share your work with third parties.</p>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="background:var(--bg);border:1px solid #eaeef5;border-radius:12px;overflow:hidden;">
+        <button class="faq-q" style="width:100%;padding:1.25rem 1.5rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:1rem;text-align:left;font-family:inherit;color:var(--primary);">What countries do you serve?<span class="faq-arrow" style="transition:transform 0.3s;font-size:1.2rem;">&#x25BC;</span></button>
+        <div class="faq-a" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;padding:0 1.5rem;">
+          <p style="font-size:0.9rem;color:var(--text-muted);padding-bottom:1.25rem;line-height:1.7;">Worldwide. Our clients come from North America, Europe, Asia, Australia, the Middle East, and Africa. We communicate 100% remotely via email and work across all time zones. English is our primary language, but our team covers multiple languages.</p>
+        </div>
+      </div>
+      <div class="faq-item fade-up" style="background:var(--bg);border:1px solid #eaeef5;border-radius:12px;overflow:hidden;">
+        <button class="faq-q" style="width:100%;padding:1.25rem 1.5rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:1rem;text-align:left;font-family:inherit;color:var(--primary);">How long does a typical project take?<span class="faq-arrow" style="transition:transform 0.3s;font-size:1.2rem;">&#x25BC;</span></button>
+        <div class="faq-a" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;padding:0 1.5rem;">
+          <p style="font-size:0.9rem;color:var(--text-muted);padding-bottom:1.25rem;line-height:1.7;">Conference abstracts: 5 business days (express 48h). Systematic reviews: 2–4 weeks depending on scope. Meta-analyses: 3–6 weeks. Manuscripts: 4–8 weeks. We provide a precise timeline in your project proposal before starting.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WHY US ─── -->
+<section id="why">
+  <div class="section-inner">
+    <div class="section-label">Why Choose Us</div>
+    <h2 class="section-title">Rigor. Clarity. Reliability.</h2>
+    <p class="section-sub">We bring methodological expertise, statistical depth, and a commitment to reproducible research.</p>
+    <div class="why-grid">
+      <div class="why-item fade-up">
+        <div class="why-icon">&#x1F4CB;</div>
+        <h4>Methodology-First</h4>
+        <p>Cochrane, JBI, PRISMA, AMSTAR-2, and GRADE standards applied to every project.</p>
+      </div>
+      <div class="why-item fade-up">
+        <div class="why-icon">&#x1F52C;</div>
+        <h4>Statistical Rigor</h4>
+        <p>Advanced techniques: NMA, Bayesian models, meta-regression, dose-response, diagnostic test accuracy, and individual patient data.</p>
+      </div>
+      <div class="why-item fade-up">
+        <div class="why-icon">&#x1F4AC;</div>
+        <h4>Clear Communication</h4>
+        <p>Plain-language updates, transparent workflows, and responsive support throughout the project.</p>
+      </div>
+      <div class="why-item fade-up">
+        <div class="why-icon">&#x1F3C3;</div>
+        <h4>Reliable Delivery</h4>
+        <p>Structured timelines with milestones. We deliver on time, every time — or we tell you well in advance.</p>
+      </div>
+      <div class="why-item fade-up">
+        <div class="why-icon">&#x1F4F1;</div>
+        <h4>End-to-End Service</h4>
+        <p>From protocol to publication and post-acceptance revisions — we handle the entire lifecycle.</p>
+      </div>
+      <div class="why-item fade-up">
+        <div class="why-icon">&#x1F512;</div>
+        <h4>Confidentiality</h4>
+        <p>Strict NDAs, secure file transfer, and data handling compliant with institutional ethics policies.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ─── -->
+<section id="contact" class="contact-section">
+  <div class="section-inner">
+    <div class="section-label">Get In Touch</div>
+    <h2 class="section-title">Start Your Project</h2>
+    <p class="section-sub">Tell us about your research question, and we&rsquo;ll get back to you within 24 hours with a tailored proposal.</p>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Let&rsquo;s Talk</h3>
+        <p>Whether you need a full systematic review, help with a meta-analysis, or manuscript editing, we&rsquo;re here to help.</p>
+        <div class="contact-detail"><span class="icon">&#x2709;</span> contact@medresearch.me</div>
+        <div class="contact-detail"><span class="icon">&#x1F4C5;</span> Typical response: within 24 hours</div>
+        <div class="contact-detail"><span class="icon">&#x1F310;</span> Worldwide — remote collaboration</div>
+      </div>
+      <form class="contact-form" id="contactForm">
+        <div class="form-row">
+          <div style="flex:1;">
+            <label class="form-label" for="ix_name">Full Name <span class="req">*</span></label>
+            <input type="text" id="ix_name" name="name" placeholder="Your Name" required>
+          </div>
+          <div style="flex:1;">
+            <label class="form-label" for="ix_email">Email Address <span class="req">*</span></label>
+            <input type="email" id="ix_email" name="email" placeholder="Email Address" required>
+          </div>
+        </div>
+        <div>
+          <label class="form-label" for="ix_whatsapp">WhatsApp <span class="opt">(optional — include country code or username)</span></label>
+          <input type="text" id="ix_whatsapp" name="whatsapp" placeholder="WhatsApp (with country code, e.g. +1 555 123 4567) or username — optional">
+        </div>
+        <div>
+          <label class="form-label" for="ix_country">Country <span class="req">*</span></label>
+          <input type="text" id="ix_country" name="country" list="ix_countrylist" placeholder="Type to search your country..." required>
+          <datalist id="ix_countrylist">
+            <option value="Afghanistan">
+            <option value="Albania">
+            <option value="Algeria">
+            <option value="Andorra">
+            <option value="Angola">
+            <option value="Antigua and Barbuda">
+            <option value="Argentina">
+            <option value="Armenia">
+            <option value="Australia">
+            <option value="Austria">
+            <option value="Azerbaijan">
+            <option value="Bahamas">
+            <option value="Bahrain">
+            <option value="Bangladesh">
+            <option value="Barbados">
+            <option value="Belarus">
+            <option value="Belgium">
+            <option value="Belize">
+            <option value="Benin">
+            <option value="Bhutan">
+            <option value="Bolivia">
+            <option value="Bosnia and Herzegovina">
+            <option value="Botswana">
+            <option value="Brazil">
+            <option value="Brunei">
+            <option value="Bulgaria">
+            <option value="Burkina Faso">
+            <option value="Burundi">
+            <option value="Cabo Verde">
+            <option value="Cambodia">
+            <option value="Cameroon">
+            <option value="Canada">
+            <option value="Central African Republic">
+            <option value="Chad">
+            <option value="Chile">
+            <option value="China">
+            <option value="Colombia">
+            <option value="Comoros">
+            <option value="Congo (Brazzaville)">
+            <option value="Congo (Kinshasa)">
+            <option value="Costa Rica">
+            <option value="Côte d'Ivoire">
+            <option value="Croatia">
+            <option value="Cuba">
+            <option value="Cyprus">
+            <option value="Czech Republic">
+            <option value="Denmark">
+            <option value="Djibouti">
+            <option value="Dominica">
+            <option value="Dominican Republic">
+            <option value="Ecuador">
+            <option value="Egypt">
+            <option value="El Salvador">
+            <option value="Equatorial Guinea">
+            <option value="Eritrea">
+            <option value="Estonia">
+            <option value="Eswatini">
+            <option value="Ethiopia">
+            <option value="Fiji">
+            <option value="Finland">
+            <option value="France">
+            <option value="Gabon">
+            <option value="Gambia">
+            <option value="Georgia">
+            <option value="Germany">
+            <option value="Ghana">
+            <option value="Greece">
+            <option value="Grenada">
+            <option value="Guatemala">
+            <option value="Guinea">
+            <option value="Guinea-Bissau">
+            <option value="Guyana">
+            <option value="Haiti">
+            <option value="Honduras">
+            <option value="Hungary">
+            <option value="Iceland">
+            <option value="India">
+            <option value="Indonesia">
+            <option value="Iran">
+            <option value="Iraq">
+            <option value="Ireland">
+            <option value="Israel">
+            <option value="Italy">
+            <option value="Jamaica">
+            <option value="Japan">
+            <option value="Jordan">
+            <option value="Kazakhstan">
+            <option value="Kenya">
+            <option value="Kiribati">
+            <option value="Kosovo">
+            <option value="Kuwait">
+            <option value="Kyrgyzstan">
+            <option value="Laos">
+            <option value="Latvia">
+            <option value="Lebanon">
+            <option value="Lesotho">
+            <option value="Liberia">
+            <option value="Libya">
+            <option value="Liechtenstein">
+            <option value="Lithuania">
+            <option value="Luxembourg">
+            <option value="Madagascar">
+            <option value="Malawi">
+            <option value="Malaysia">
+            <option value="Maldives">
+            <option value="Mali">
+            <option value="Malta">
+            <option value="Marshall Islands">
+            <option value="Mauritania">
+            <option value="Mauritius">
+            <option value="Mexico">
+            <option value="Micronesia">
+            <option value="Moldova">
+            <option value="Monaco">
+            <option value="Mongolia">
+            <option value="Montenegro">
+            <option value="Morocco">
+            <option value="Mozambique">
+            <option value="Myanmar">
+            <option value="Namibia">
+            <option value="Nauru">
+            <option value="Nepal">
+            <option value="Netherlands">
+            <option value="New Zealand">
+            <option value="Nicaragua">
+            <option value="Niger">
+            <option value="Nigeria">
+            <option value="North Korea">
+            <option value="North Macedonia">
+            <option value="Norway">
+            <option value="Oman">
+            <option value="Pakistan">
+            <option value="Palau">
+            <option value="Panama">
+            <option value="Papua New Guinea">
+            <option value="Paraguay">
+            <option value="Peru">
+            <option value="Philippines">
+            <option value="Poland">
+            <option value="Portugal">
+            <option value="Qatar">
+            <option value="Romania">
+            <option value="Russia">
+            <option value="Rwanda">
+            <option value="Saint Kitts and Nevis">
+            <option value="Saint Lucia">
+            <option value="Saint Vincent and the Grenadines">
+            <option value="Samoa">
+            <option value="San Marino">
+            <option value="Sao Tome and Principe">
+            <option value="Saudi Arabia">
+            <option value="Senegal">
+            <option value="Serbia">
+            <option value="Seychelles">
+            <option value="Sierra Leone">
+            <option value="Singapore">
+            <option value="Slovakia">
+            <option value="Slovenia">
+            <option value="Solomon Islands">
+            <option value="Somalia">
+            <option value="South Africa">
+            <option value="South Korea">
+            <option value="South Sudan">
+            <option value="Spain">
+            <option value="Sri Lanka">
+            <option value="Sudan">
+            <option value="Suriname">
+            <option value="Sweden">
+            <option value="Switzerland">
+            <option value="Syria">
+            <option value="Taiwan">
+            <option value="Tajikistan">
+            <option value="Tanzania">
+            <option value="Thailand">
+            <option value="Timor-Leste">
+            <option value="Togo">
+            <option value="Tonga">
+            <option value="Trinidad and Tobago">
+            <option value="Tunisia">
+            <option value="Turkey">
+            <option value="Turkmenistan">
+            <option value="Tuvalu">
+            <option value="Uganda">
+            <option value="Ukraine">
+            <option value="United Arab Emirates">
+            <option value="United Kingdom">
+            <option value="United States">
+            <option value="Uruguay">
+            <option value="Uzbekistan">
+            <option value="Vanuatu">
+            <option value="Vatican City">
+            <option value="Venezuela">
+            <option value="Vietnam">
+            <option value="Yemen">
+            <option value="Zambia">
+            <option value="Zimbabwe">
+          </datalist>
+        </div>
+        <div>
+          <label class="form-label" for="ix_service">Service <span class="req">*</span></label>
+          <select id="ix_service" name="service" required>
+            <option value="">Select Service</option>
+            <option>Systematic Review</option>
+            <option>Meta-Analysis</option>
+            <option>Network Meta-Analysis</option>
+            <option>Manuscript Writing</option>
+            <option>Abstract Writing</option>
+            <option>Scoping Review</option>
+            <option>Bayesian Meta-Analysis</option>
+            <option>Literature Review</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" for="ix_message">Message <span class="opt">(optional)</span></label>
+          <textarea id="ix_message" name="message" placeholder="Describe your project, research question, deadline, and any specific requirements..."></textarea>
+        </div>
+        <input type="text" name="honeypot" style="display:none" tabindex="-1" autocomplete="off">
+        <input type="hidden" name="_formspree_id" value="xeeyodgg">
+        <button type="submit" class="btn btn-primary">Send Message &rarr;</button>
+        <div id="formFeedback" style="font-size:0.9rem;margin-top:0.5rem;"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  &copy; 2026 medresearch.me. All rights reserved. &nbsp;|&nbsp; <a href="privacy.html" style="color:var(--accent);text-decoration:none;">Privacy Policy</a> &nbsp;|&nbsp; contact@medresearch.me
+  &nbsp;|&nbsp; <a href="admin.html" style="color:var(--accent);text-decoration:none;">Admin</a>
+</footer>
+
+<script>
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
+
+// Mobile menu
+const toggle = document.getElementById('menuToggle');
+const links = document.getElementById('navLinks');
+toggle.addEventListener('click', () => links.classList.toggle('open'));
+
+// Close mobile menu on link click
+document.querySelectorAll('.nav-links a:not(.dropdown > a)').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+
+// Mobile dropdown toggle
+document.querySelectorAll('.dropdown > a').forEach(a => a.addEventListener('click', function(e) {
+  if (window.innerWidth <= 768) { e.preventDefault(); this.parentElement.classList.toggle('open'); }
+}));
+
+// Scroll-triggered animations
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Animated counters
+const counterObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const target = parseInt(el.dataset.count);
+      if (isNaN(target)) return;
+      let current = 0;
+      const step = Math.ceil(target / 40);
+      const interval = setInterval(() => {
+        current += step;
+        if (current >= target) { current = target; clearInterval(interval); }
+        el.textContent = current + '+';
+      }, 30);
+      counterObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+// FAQ accordion
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const answer = btn.nextElementSibling;
+    const arrow = btn.querySelector('.faq-arrow');
+    const isOpen = answer.style.maxHeight && answer.style.maxHeight !== '0px';
+    document.querySelectorAll('.faq-a').forEach(a => { a.style.maxHeight = '0'; a.style.padding = '0 1.5rem'; });
+    document.querySelectorAll('.faq-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+    if (!isOpen) {
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+      answer.style.padding = '0 1.5rem';
+      arrow.style.transform = 'rotate(180deg)';
+    }
+  });
+});
+
+// ── Config ────────────────────────────
+const FORMSPREE_ID = document.querySelector('input[name="_formspree_id"]')?.value;
+const FORMSPREE_URL = FORMSPREE_ID && FORMSPREE_ID !== 'YOUR_FORMSPREE_ID'
+  ? `https://formspree.io/f/${FORMSPREE_ID}` : null;
+// ──────────────────────────────────────
+
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = this.querySelector('button');
+  const feedback = document.getElementById('formFeedback');
+  const original = btn.textContent;
+  const data = new URLSearchParams(new FormData(this));
+
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  feedback.textContent = ''; feedback.style.color = '';
+
+  const ok = (msg) => {
+    feedback.innerHTML = '✓ ' + msg;
+    feedback.style.color = '#2e7d32'; this.reset();
+  };
+  const fallback = () => {
+    feedback.innerHTML = '&#x2717; Could not send. Email us at <a href="mailto:contact@medresearch.me" style="color:var(--accent);font-weight:600">contact@medresearch.me</a>';
+    feedback.style.color = '#c62828';
+  };
+
+  try {
+    let res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: data
+    });
+    let json = await res.json();
+    if (json.ok) { ok('Message sent! We\'ll respond within 24 hours.'); return; }
+    throw new Error(json.error || 'Server error');
+  } catch (_) {
+    if (FORMSPREE_URL) {
+      try {
+        let res = await fetch(FORMSPREE_URL, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: data
+        });
+        if (res.ok) { ok('Message sent! We\'ll respond within 24 hours.'); return; }
+      } catch (_) {}
+    }
+    fallback();
+  } finally {
+    btn.textContent = original; btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

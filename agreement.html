@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agreement &amp; Payment — medresearch.me</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root { --primary:#0a2540; --accent:#0066cc; --accent-light:#e8f0fe; --text:#1a1a2e; --text-muted:#5a6a7e; --bg:#ffffff; --bg-alt:#f7f9fc; --radius:16px; --shadow:0 4px 24px rgba(10,37,64,0.06); --green:#1b7a1b; --red:#c62828; }
+body { font-family:'Inter',-apple-system,sans-serif; color:var(--text); background:var(--bg-alt); line-height:1.7; min-height:100vh; }
+a { color:var(--accent); text-decoration:none; }
+.wrap { max-width:760px; margin:0 auto; padding:2.5rem 1.5rem; }
+.topbar { background:var(--primary); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+.topbar .logo { font-weight:800; color:#fff; font-size:1.1rem; }
+.topbar .logo span { color:#7bbaff; }
+.topbar a { color:#cfe3ff; font-size:0.85rem; }
+.card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:2.2rem; margin-top:1.5rem; }
+.card h1 { font-size:1.6rem; font-weight:800; color:var(--primary); margin-bottom:0.3rem; }
+.card .sub { color:var(--text-muted); margin-bottom:1.5rem; }
+.project-box { background:var(--bg-alt); border-radius:12px; padding:1.2rem 1.4rem; margin-bottom:1.5rem; }
+.project-box .row { display:flex; justify-content:space-between; gap:1rem; padding:0.35rem 0; font-size:0.92rem; border-bottom:1px solid #eef1f6; }
+.project-box .row:last-child { border-bottom:none; }
+.project-box .row .k { color:var(--text-muted); }
+.project-box .row .v { font-weight:600; text-align:right; }
+.terms { background:var(--bg-alt); border-radius:12px; padding:1.4rem 1.6rem; max-height:300px; overflow:auto; font-size:0.9rem; border:1px solid #e6ebf3; }
+.terms h4 { color:var(--primary); margin:1rem 0 0.4rem; font-size:0.95rem; }
+.terms h4:first-child { margin-top:0; }
+.terms p { margin-bottom:0.6rem; color:#33405a; }
+.agree-row { display:flex; align-items:flex-start; gap:0.7rem; margin:1.5rem 0 1rem; padding:1rem; background:#f0f7ff; border-radius:12px; border:1px solid #d6e6ff; }
+.agree-row input { margin-top:0.25rem; width:18px; height:18px; }
+.agree-row label { font-size:0.92rem; font-weight:500; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; background:var(--accent); color:#fff; border:none; padding:0.95rem 2rem; border-radius:10px; font-weight:600; font-size:1rem; cursor:pointer; font-family:inherit; transition:0.2s; width:100%; }
+.btn:hover { background:#0052a3; }
+.btn:disabled { background:#cdd5e0; cursor:not-allowed; }
+.err { color:var(--red); font-size:0.88rem; margin-top:0.8rem; text-align:center; }
+.loading { text-align:center; padding:4rem 2rem; color:var(--text-muted); }
+.note { font-size:0.82rem; color:var(--text-muted); margin-top:1rem; text-align:center; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo"><a href="index.html" style="color:inherit;text-decoration:none;">med<span style="color:#7bbaff;">research</span>.me</a></div>
+  <a href="dashboard.html">← Dashboard</a>
+</div>
+<div class="wrap">
+  <div class="card" id="mainCard">
+    <div class="loading" id="loading">Loading your agreement…</div>
+    <div id="content" style="display:none;">
+      <h1>Service Agreement &amp; Payment</h1>
+      <div class="sub">Please review the project summary and terms below, then accept to proceed to your secure payment link.</div>
+
+      <div class="project-box" id="projectBox"></div>
+
+      <div class="project-box" id="paymentSummary" style="background:#eef6ff;border:1px solid #cfe2ff;"></div>
+
+      <div class="terms">
+        <h4>1. Scope of Services</h4>
+        <p>The service described above (the "Project") will be performed by medresearch.me ("Provider") in accordance with the specifications agreed between the Provider and the client ("Client"). Any work beyond the stated scope may require a separate agreement and additional fees.</p>
+        <h4>2. Payment</h4>
+        <p>By proceeding to payment, the Client agrees to pay for this Project via the unique payment link assigned to it. Payment is structured as chosen by the Provider for this Project:</p>
+        <p><b>Full payment:</b> 100% of the total amount is paid upfront before work begins.</p>
+        <p><b>Split payment (50 / 50):</b> 50% of the total is paid upfront to commence the Project; the remaining 50% is paid after the Project is completed. Project files and the Right Transfer Agreement are released to the Client only once the full amount has been paid.</p>
+        <p>Prices are exclusive of any taxes unless stated otherwise.</p>
+        <h4>3. Revisions &amp; Deliverables</h4>
+        <p>Where a plan includes revisions, these are limited to the scope defined in the service description. Turnaround times are estimates and begin after all required materials and information are received from the Client.</p>
+        <h4>4. Confidentiality</h4>
+        <p>All Client data, manuscripts, and identifiers shared with the Provider will be treated as confidential and used solely for the fulfillment of the Project, in line with our Privacy Policy.</p>
+        <h4>5. Right Transfer Agreement</h4>
+        <p>Upon receipt of <b>full payment</b> for this Project (the single full payment, or both halves of a split plan), medresearch.me transfers to the Client all rights, title, and interest in the final deliverables. The deliverables become the Client's property and may be used, published, submitted, modified, or transferred by the Client without further restriction. medresearch.me retains no rights to republish Client-specific content without permission. This transfer takes legal effect automatically once full payment is recorded.</p>
+        <h4>6. Cancellation &amp; Refunds</h4>
+        <p>Refund eligibility is assessed on a case-by-case basis and communicated by the Provider. For split plans, the deposit (first 50%) is non-refundable once work has commenced. Work delivered is non-refundable.</p>
+        <h4>7. Acceptance</h4>
+        <p>By accepting this agreement, the Client confirms the Project details are correct and authorizes payment through the assigned link.</p>
+      </div>
+
+      <div class="agree-row">
+        <input type="checkbox" id="agreeChk">
+        <label for="agreeChk">I have read and accept the service agreement above (including the Right Transfer Agreement), and authorize payment for this Project via my unique payment link.</label>
+      </div>
+
+      <button class="btn" id="acceptBtn" disabled>✓ Accept &amp; Continue to Payment</button>
+      <div class="err" id="errMsg"></div>
+      <div class="note">You will be redirected to your unique payment link after accepting. This action is recorded for your records.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+let token = localStorage.getItem('token');
+let user = JSON.parse(localStorage.getItem('user') || 'null');
+let projectId = new URLSearchParams(location.search).get('project');
+
+const agreeChk = document.getElementById('agreeChk');
+const acceptBtn = document.getElementById('acceptBtn');
+agreeChk.addEventListener('change', () => { acceptBtn.disabled = !agreeChk.checked; document.getElementById('errMsg').textContent=''; });
+
+acceptBtn.addEventListener('click', async () => {
+  if (!agreeChk.checked) return;
+  acceptBtn.disabled = true; acceptBtn.textContent = 'Processing…';
+  try {
+    const res = await fetch(API + '/api/orders/' + projectId + '/agreement', { method:'POST', headers:{ Authorization:'Bearer ' + token } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Could not process agreement');
+    // Redirect to the unique payment link
+    window.location.href = data.paymentLink;
+  } catch(e) {
+    document.getElementById('errMsg').textContent = e.message;
+    acceptBtn.disabled = false; acceptBtn.textContent = '✓ Accept & Continue to Payment';
+  }
+});
+
+async function load() {
+  if (!token || !user) { location.href = 'dashboard.html'; return; }
+  if (!projectId) { document.getElementById('loading').textContent = 'No project specified.'; return; }
+  try {
+    const res = await fetch(API + '/api/orders/' + projectId, { headers:{ Authorization:'Bearer ' + token } });
+    const o = await res.json();
+    if (!res.ok) throw new Error(o.error || 'Project not found');
+    document.getElementById('projectBox').innerHTML = `
+      <div class="row"><span class="k">Project</span><span class="v">#${o.id}</span></div>
+      <div class="row"><span class="k">Title</span><span class="v">${esc(o.title)}</span></div>
+      <div class="row"><span class="k">Service</span><span class="v">${esc(o.service)}${o.plan?` · ${esc(o.plan)}`:''}</span></div>
+      ${o.deadline?`<div class="row"><span class="k">Deadline</span><span class="v">${esc(o.deadline)}</span></div>`:''}
+      ${o.notes?`<div class="row"><span class="k">Note</span><span class="v">${esc(o.notes)}</span></div>`:''}
+    `;
+    const total = Number(o.amount) || 0;
+    const isSplit = (o.paymentType || 'full') === 'split';
+    const half = Math.round(total / 2 * 100) / 100;
+    let ps = `<div class="row"><span class="k">Payment plan</span><span class="v">${isSplit ? 'Split — 50% / 50%' : 'Full — 100% upfront'}</span></div>`;
+    ps += `<div class="row"><span class="k">Total amount</span><span class="v">$${total.toFixed(2)}</span></div>`;
+    if (isSplit) {
+      ps += `<div class="row"><span class="k">Due now (deposit)</span><span class="v">$${half.toFixed(2)}</span></div>`;
+      ps += `<div class="row"><span class="k">Due on completion</span><span class="v">$${half.toFixed(2)}</span></div>`;
+    } else {
+      ps += `<div class="row"><span class="k">Due now</span><span class="v">$${total.toFixed(2)}</span></div>`;
+    }
+    if (o.depositPaid && isSplit && !o.paid) ps += `<div class="row"><span class="k">Deposit status</span><span class="v" style="color:#b8860b;">Paid — balance due on completion</span></div>`;
+    ps += `<div class="row"><span class="k">Files &amp; Rights released</span><span class="v">${o.paid ? '✓ After full payment' : 'After full payment'}</span></div>`;
+    document.getElementById('paymentSummary').innerHTML = ps;
+
+    if (o.agreementAccepted) {
+      document.getElementById('loading').style.display='none';
+      document.getElementById('content').style.display='block';
+      document.querySelector('.terms').insertAdjacentHTML('beforebegin','<div class="note" style="color:#1b7a1b;text-align:left;">✓ Agreement already accepted. You may proceed to payment again.</div>');
+    }
+    if (o.paid) {
+      document.getElementById('loading').style.display='none';
+      document.getElementById('content').style.display='block';
+      document.querySelector('.terms').insertAdjacentHTML('beforebegin','<div class="note" style="color:#1b7a1b;text-align:left;">✓ Full payment received. The Right Transfer Agreement is now in effect and your project files are available in your dashboard.</div>');
+      acceptBtn.disabled = true; agreeChk.disabled = true; acceptBtn.textContent = 'Payment complete';
+    }
+    if (!o.paymentEnabled) {
+      acceptBtn.disabled = true; acceptBtn.textContent = 'Payment not enabled yet';
+      agreeChk.disabled = true;
+      document.getElementById('errMsg').textContent = 'Your administrator has not enabled payment for this project yet.';
+    } else if (isSplit && o.depositPaid && !o.paid) {
+      acceptBtn.textContent = 'Pay Remaining 50%';
+    }
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  } catch(e) {
+    document.getElementById('loading').textContent = e.message;
+  }
+}
+function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+load();
+</script>
+</body>
+</html>

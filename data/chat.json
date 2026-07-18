@@ -1,0 +1,48 @@
+{
+  "b2e331a1-9e45-47b3-a638-f89e374011a5": [
+    {
+      "id": "3d21a5e8-603a-447d-bb05-224ec6c0923c",
+      "from": "client",
+      "text": "Hello, I have a question about my abstract",
+      "at": "2026-07-16T14:46:15.659Z",
+      "read": true
+    },
+    {
+      "id": "e6767a14-f14a-4af4-8fed-1077d894ea1a",
+      "from": "admin",
+      "text": "Hi! Sure, what would you like to know?",
+      "at": "2026-07-16T14:46:20.616Z"
+    },
+    {
+      "id": "e017d185-be01-48d4-83f0-fda0f7c7a037",
+      "from": "admin",
+      "text": "Your payment has been confirmed. Thank you.",
+      "at": "2026-07-16T14:49:42.831Z"
+    }
+  ],
+  "8cf74629-a788-4d18-a846-6a4934935853": [
+    {
+      "id": "b8e2724b-a77e-4c9d-aa2a-3ff9ab3f52a0",
+      "from": "client",
+      "text": "Hello, I've already done the payment but here this is not showing",
+      "at": "2026-07-16T14:49:03.428Z",
+      "read": true
+    },
+    {
+      "id": "a8a1433b-2242-4d31-8dbf-8866ca8bb95e",
+      "from": "admin",
+      "text": "Your payment has been confirmed. Thank you.",
+      "at": "2026-07-16T14:50:09.021Z",
+      "read": true
+    }
+  ],
+  "7300da6c-2e83-4b8c-b88e-8c821f1c65f7": [
+    {
+      "id": "ab2701a3-ea7f-47bf-a0de-c683f0361db8",
+      "from": "client",
+      "text": "hi",
+      "at": "2026-07-18T06:11:04.238Z",
+      "read": true
+    }
+  ]
+}

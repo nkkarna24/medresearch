@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Dashboard — medresearch.me</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root { --primary:#0a2540; --accent:#0066cc; --accent-light:#e8f0fe; --text:#1a1a2e; --text-muted:#5a6a7e; --bg:#ffffff; --bg-alt:#f7f9fc; --radius:16px; --shadow:0 4px 24px rgba(10,37,64,0.06); --green:#e6f7e6; --green-text:#1b7a1b; --amber:#fff8e1; --amber-text:#b76500; --red:#fde8e8; --red-text:#c62828; }
+body { font-family:'Inter',-apple-system,sans-serif; color:var(--text); background:var(--bg-alt); line-height:1.6; min-height:100vh; display:flex; flex-direction:column; }
+a { color:var(--accent); text-decoration:none; }
+
+/* NAV */
+.dash-nav { background:var(--primary); color:#fff; padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+.dash-nav .logo { font-weight:800; font-size:1.2rem; }
+.dash-nav .logo span { color:#7bbaff; }
+.dash-nav .user-info { display:flex; align-items:center; gap:1rem; font-size:0.9rem; }
+.dash-nav .avatar { width:36px; height:36px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; }
+.dash-nav a.site-link { color:#cfe3ff; font-size:0.9rem; font-weight:500; }
+#logoutBtn { background:rgba(255,255,255,0.15); border:none; color:#fff; padding:0.4rem 1rem; border-radius:8px; cursor:pointer; font-family:inherit; font-size:0.85rem; }
+#logoutBtn:hover { background:rgba(255,255,255,0.25); }
+.dash-footer { text-align:center; padding:1.25rem; background:var(--primary); }
+.dash-footer a { color:#bcd4f5; font-size:0.85rem; font-weight:500; }
+
+.dash-container { flex:1; padding:2rem; max-width:1120px; margin:0 auto; width:100%; }
+.tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+.tab { padding:0.6rem 1.2rem; border-radius:100px; background:#fff; border:1.5px solid #dde3ed; cursor:pointer; font-weight:600; font-size:0.9rem; color:var(--text-muted); }
+.tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.dash-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; margin-bottom:2.5rem; }
+.stat-card { background:var(--bg); border-radius:12px; padding:1.3rem; border:1px solid #eaeef5; }
+.stat-card .num { font-size:1.7rem; font-weight:800; color:var(--primary); }
+.stat-card .label { font-size:0.82rem; color:var(--text-muted); margin-top:0.2rem; }
+
+/* Project cards */
+.projects { display:flex; flex-direction:column; gap:1rem; }
+.pcard { background:var(--bg); border-radius:var(--radius); padding:1.25rem 1.5rem; border:1px solid #eaeef5; display:flex; flex-direction:row; align-items:center; gap:1.25rem; }
+.pcard .pcard-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:0.5rem; }
+.pcard h3 { font-size:1.1rem; font-weight:700; color:var(--primary); }
+.pcard .meta { font-size:0.85rem; color:var(--text-muted); }
+.pcard .status { display:inline-block; font-size:0.72rem; font-weight:600; padding:0.25rem 0.7rem; border-radius:100px; align-self:flex-start; }
+.status-pending { background:var(--amber); color:var(--amber-text); }
+.status-active, .status-in-progress { background:var(--accent-light); color:var(--accent); }
+.status-completed { background:var(--green); color:var(--green-text); }
+.status-revision { background:#f3e5f5; color:#7b1fa2; }
+.status-rejected { background:var(--red); color:var(--red-text); }
+.pcard .notes { background:var(--bg-alt); border-radius:10px; padding:0.6rem 0.8rem; font-size:0.82rem; }
+.pcard .notes b { color:var(--primary); }
+.pcard .tags { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; }
+.pcard .pcard-action { flex-shrink:0; width:220px; display:flex; align-items:center; justify-content:flex-end; }
+.pay-btn { display:flex; align-items:center; justify-content:center; gap:0.5rem; background:var(--accent); color:#fff; border:none; padding:0.85rem 1.4rem; border-radius:10px; font-weight:600; font-size:0.92rem; cursor:pointer; font-family:inherit; transition:0.2s; text-decoration:none; white-space:nowrap; }
+.pay-btn:hover { background:#0052a3; }
+.pay-btn:disabled { background:#cdd5e0; color:#fff; cursor:not-allowed; }
+.pay-disabled-note { font-size:0.8rem; color:var(--text-muted); text-align:center; padding:0.6rem 0.9rem; background:var(--bg-alt); border-radius:10px; }
+.accepted-tag { font-size:0.78rem; color:var(--green-text); font-weight:600; }
+/* Stepper */
+.stepper { display:flex; align-items:center; gap:0; margin:0.2rem 0 0.3rem; flex-wrap:wrap; }
+.step { display:flex; align-items:center; gap:0.35rem; font-size:0.72rem; color:var(--text-muted); }
+.step .dot { width:18px; height:18px; border-radius:50%; background:#e3e9f2; color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700; flex-shrink:0; }
+.step.done .dot { background:var(--green-text); }
+.step.current .dot { background:var(--accent); }
+.step.current { color:var(--accent); font-weight:600; }
+.step-line { width:18px; height:2px; background:#e3e9f2; margin:0 0.1rem; }
+.step-line.done { background:var(--green-text); }
+.files-box { background:var(--bg-alt); border-radius:10px; padding:0.6rem 0.8rem; font-size:0.82rem; }
+.files-box b { color:var(--primary); }
+.files-box a { display:inline-block; margin:0.2rem 0.6rem 0.2rem 0; }
+@media (max-width:768px) { .pcard { flex-direction:column; align-items:stretch; } .pcard .pcard-action { width:auto; justify-content:stretch; } .pay-btn, .pay-disabled-note { width:100%; } }
+
+/* Auth */
+.auth-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:2rem; }
+.auth-box { background:var(--bg); border-radius:var(--radius); padding:2.5rem; max-width:420px; width:100%; box-shadow:var(--shadow); }
+.auth-box h2 { font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; color:var(--primary); }
+.auth-box p { color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem; }
+.auth-box input { width:100%; padding:0.85rem 1rem; border:1.5px solid #dde3ed; border-radius:10px; margin-bottom:1rem; font-family:inherit; font-size:0.9rem; outline:none; }
+.auth-box input:focus { border-color:var(--accent); }
+.auth-box .btn-primary { width:100%; background:var(--accent); color:#fff; border:none; padding:0.85rem; border-radius:10px; font-weight:600; font-size:0.95rem; cursor:pointer; font-family:inherit; }
+.auth-box .btn-primary:hover { background:#0052a3; }
+.auth-error { background:var(--red); color:var(--red-text); padding:0.75rem 1rem; border-radius:8px; font-size:0.85rem; margin-bottom:1rem; display:none; }
+.login-divider { display:flex; align-items:center; gap:0.8rem; margin:1.5rem 0 0.9rem; color:var(--text-muted); font-size:0.8rem; }
+.login-divider::before, .login-divider::after { content:''; flex:1; height:1px; background:#e3e9f2; }
+.login-services-label { font-size:0.82rem; color:var(--text-muted); margin-bottom:0.6rem; font-weight:600; }
+.login-services { display:flex; flex-wrap:wrap; gap:0.5rem; }
+.svc-btn { flex:1 1 calc(50% - 0.5rem); text-align:center; padding:0.6rem 0.5rem; border:1.5px solid #dde3ed; border-radius:10px; font-size:0.8rem; font-weight:600; color:var(--primary); background:#fff; transition:0.15s; }
+.svc-btn:hover { border-color:var(--accent); background:var(--accent-light); color:var(--accent); }
+.login-contact-mail { display:block; text-align:center; margin-top:0.9rem; font-size:0.82rem; color:var(--text-muted); }
+.section-title { font-size:1.25rem; font-weight:700; color:var(--primary); margin-bottom:1.25rem; }
+.empty { background:#fff; border:1px solid #eaeef5; border-radius:var(--radius); padding:3rem; text-align:center; color:var(--text-muted); }
+.banner { background:#eef5ff; border:1px solid #d6e6ff; color:#0a2540; border-radius:12px; padding:0.9rem 1.2rem; font-size:0.9rem; margin-bottom:2rem; }
+.note-box { background:#f1f7f1; border:1px solid #cfe6cf; color:#1b5b1b; border-radius:12px; padding:0.9rem 1.2rem; font-size:0.88rem; margin-top:2rem; }
+.card { background:#fff; border-radius:var(--radius); padding:1.5rem; border:1px solid #eaeef5; }
+
+/* Chat (mirrors admin panel layout) */
+.chat-layout { display:grid; grid-template-columns:280px 1fr; gap:1.5rem; align-items:start; }
+@media (max-width:768px) { .chat-layout { grid-template-columns:1fr; } }
+.conv-list { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; max-height:560px; overflow-y:auto; }
+.conv-item { padding:0.9rem 1.1rem; border-bottom:1px solid #eef1f6; cursor:default; display:flex; justify-content:space-between; gap:0.5rem; align-items:center; }
+.conv-item.active { background:var(--accent-light); }
+.conv-item .nm { font-weight:600; font-size:0.9rem; color:var(--primary); }
+.conv-item .em { font-size:0.78rem; color:var(--text-muted); }
+.conv-item .snip { font-size:0.8rem; color:var(--text-muted); margin-top:0.2rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px; }
+.chat-thread { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); display:flex; flex-direction:column; height:560px; }
+.chat-thread .chead { padding:0.9rem 1.2rem; border-bottom:1px solid #eef1f6; font-weight:700; color:var(--primary); display:flex; justify-content:space-between; align-items:center; }
+.chat-thread .chead .em { font-size:0.8rem; font-weight:500; color:var(--text-muted); }
+.chat-thread .cbody { flex:1; overflow-y:auto; padding:1rem; background:var(--bg-alt); display:flex; flex-direction:column; gap:0.6rem; }
+.cmsg { max-width:78%; padding:0.55rem 0.85rem; border-radius:14px; font-size:0.88rem; line-height:1.4; word-wrap:break-word; }
+.cmsg.client { align-self:flex-start; background:#fff; color:var(--text); border:1px solid #e3e9f2; border-bottom-left-radius:4px; }
+.cmsg.admin { align-self:flex-end; background:var(--accent); color:#fff; border-bottom-right-radius:4px; }
+.cmsg .time { display:block; font-size:0.65rem; opacity:0.7; margin-top:0.25rem; }
+.chat-thread .cfoot { display:flex; gap:0.5rem; padding:0.8rem; border-top:1px solid #eef1f6; }
+.chat-thread .cfoot input { flex:1; padding:0.7rem 0.9rem; border:1.5px solid #dde3ed; border-radius:100px; font-family:inherit; font-size:0.9rem; outline:none; }
+.chat-thread .cfoot input:focus { border-color:var(--accent); }
+.chat-thread .cfoot button { background:var(--accent); color:#fff; border:none; padding:0.7rem 1.4rem; border-radius:100px; cursor:pointer; font-weight:600; font-size:0.9rem; }
+.chat-thread .cfoot button:hover { background:#0052a3; }
+.chat-empty { margin:auto; color:var(--text-muted); font-size:0.9rem; text-align:center; padding:2rem; }
+
+/* Chat widget */
+.chat-fab { position:fixed; bottom:1.5rem; right:1.5rem; width:58px; height:58px; border-radius:50%; background:var(--accent); color:#fff; border:none; cursor:pointer; box-shadow:0 6px 20px rgba(0,102,204,0.4); font-size:1.5rem; z-index:60; display:flex; align-items:center; justify-content:center; }
+.chat-fab:hover { background:#0052a3; }
+.chat-badge { position:absolute; top:-4px; right:-4px; background:var(--red-text); color:#fff; font-size:0.7rem; font-weight:700; min-width:20px; height:20px; border-radius:100px; display:flex; align-items:center; justify-content:center; padding:0 5px; }
+.chat-panel { position:fixed; bottom:1.5rem; right:1.5rem; width:360px; max-width:calc(100vw - 2rem); height:480px; max-height:calc(100vh - 3rem); background:#fff; border-radius:16px; box-shadow:0 12px 40px rgba(10,37,64,0.25); z-index:61; display:none; flex-direction:column; overflow:hidden; }
+.chat-head { background:var(--primary); color:#fff; padding:0.9rem 1.1rem; display:flex; align-items:center; justify-content:space-between; }
+.chat-head .title { font-weight:700; font-size:0.95rem; }
+.chat-head .sub { font-size:0.75rem; color:#bcd4f5; }
+.chat-head .close { background:rgba(255,255,255,0.15); border:none; color:#fff; width:28px; height:28px; border-radius:8px; cursor:pointer; font-size:1rem; }
+.chat-body { flex:1; overflow-y:auto; padding:1rem; background:var(--bg-alt); display:flex; flex-direction:column; gap:0.6rem; }
+.msg { max-width:80%; padding:0.55rem 0.8rem; border-radius:14px; font-size:0.86rem; line-height:1.4; word-wrap:break-word; }
+.msg.client { align-self:flex-end; background:var(--accent); color:#fff; border-bottom-right-radius:4px; }
+.msg.admin { align-self:flex-start; background:#fff; color:var(--text); border:1px solid #e3e9f2; border-bottom-left-radius:4px; }
+.msg .time { display:block; font-size:0.65rem; opacity:0.7; margin-top:0.25rem; }
+.chat-empty { margin:auto; color:var(--text-muted); font-size:0.85rem; text-align:center; }
+.chat-foot { display:flex; gap:0.5rem; padding:0.7rem; border-top:1px solid #eef1f6; background:#fff; }
+.chat-foot input { flex:1; padding:0.7rem 0.9rem; border:1.5px solid #dde3ed; border-radius:100px; font-family:inherit; font-size:0.88rem; outline:none; }
+.chat-foot input:focus { border-color:var(--accent); }
+.chat-foot button { background:var(--accent); color:#fff; border:none; width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.1rem; flex-shrink:0; }
+.chat-foot button:hover { background:#0052a3; }
+@media (max-width:768px) { .dash-container { padding:1rem; } .chat-panel { height:70vh; } }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="auth-screen">
+  <div class="auth-box">
+    <h2>Client Sign In</h2>
+    <p>Your account is created by the medresearch.me administrator — client accounts cannot be self-registered. If you already have credentials, sign in below. New to us? Request access for your service using the buttons underneath.</p>
+    <div id="loginError" class="auth-error"></div>
+    <input type="email" id="loginEmail" placeholder="Email Address" required>
+    <input type="password" id="loginPassword" placeholder="Password" required>
+    <button class="btn-primary" onclick="login()">Sign In</button>
+
+    <div class="login-divider"><span>Don't have an account yet?</span></div>
+    <div class="login-services-label">Request access for your service:</div>
+    <div class="login-services">
+      <a class="svc-btn" href="systematic-review.html#contact">Systematic Review</a>
+      <a class="svc-btn" href="meta-analysis.html#contact">Meta-Analysis</a>
+      <a class="svc-btn" href="manuscript-writing.html#contact">Manuscript Writing</a>
+      <a class="svc-btn" href="abstract-conference.html#contact">Abstract / Conference</a>
+      <a class="svc-btn" href="scoping-review.html#contact">Scoping Review</a>
+      <a class="svc-btn" href="literature-review.html#contact">Literature Review</a>
+    </div>
+    <a class="login-contact-mail" href="mailto:medresearch77@gmail.com">Or email us at medresearch77@gmail.com</a>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardView" style="display:none;flex-direction:column;min-height:100vh;">
+  <nav class="dash-nav">
+    <div class="logo"><a href="index.html" style="color:inherit;text-decoration:none;">med<span style="color:#7bbaff;">research</span>.me</a></div>
+    <div class="user-info">
+      <span id="dashUserName">User</span>
+      <div class="avatar" id="dashAvatar">U</div>
+      <button id="logoutBtn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="dash-container">
+    <div class="tabs">
+      <div class="tab active" data-tab="projects" id="tabProjects">Projects</div>
+      <div class="tab" data-tab="chat" id="tabChat">Support Chat <span class="badge b-pending" id="chatTabBadge" style="display:none;margin-left:0.3rem;">0</span></div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div id="pnlProjects">
+      <div class="dash-grid">
+        <div class="stat-card"><div class="num" id="statTotal">0</div><div class="label">Projects</div></div>
+        <div class="stat-card"><div class="num" id="statActive">0</div><div class="label">Active</div></div>
+        <div class="stat-card"><div class="num" id="statCompleted">0</div><div class="label">Completed</div></div>
+        <div class="stat-card"><div class="num" id="statReady">0</div><div class="label">Ready to Pay</div></div>
+        <div class="stat-card"><div class="num" id="statPaid">0</div><div class="label">Paid</div></div>
+      </div>
+
+      <div class="banner">&#x1F514; Once your administrator enables <b>Agreement &amp; Payment</b> for a project, you can review the agreement and pay via your unique link. Payment is either <b>100% upfront</b> or <b>50% now / 50% on completion</b> (your admin's choice). Your project files and the <b>Right Transfer Agreement</b> are released only after full payment is complete. Need help? Email <a href="mailto:medresearch77@gmail.com">medresearch77@gmail.com</a>.</div>
+
+      <div class="section-title">&#x1F4CB; Your Projects</div>
+      <div id="projectsWrap"><div class="empty">Loading your projects…</div></div>
+
+      <div class="note-box">&#x1F4B3; If you have already completed the payment process, don't worry — your status will be updated within 24 hours. For a quicker response, send us a message through the <b>Support Chat</b> tab above.</div>
+    </div>
+
+    <!-- SUPPORT CHAT -->
+    <div id="pnlChat" style="display:none;">
+      <div class="chat-layout">
+        <div class="conv-list" id="convList">
+          <div class="conv-item active">
+            <div style="min-width:0;flex:1;">
+              <div class="nm" id="chatConvName">Support Team</div>
+              <div class="em">medresearch.me</div>
+              <div class="snip" id="chatConvSnip">We usually reply within a few hours</div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-thread">
+          <div class="chead"><span id="chatHeadName">Support Chat</span><span class="em" id="chatHeadEmail">medresearch77@gmail.com</span></div>
+          <div class="cbody" id="chatSectionBody"><div class="chat-empty">No messages yet. Say hello!</div></div>
+          <div class="cfoot">
+            <input type="text" id="chatSectionInput" placeholder="Type a message…" maxlength="2000" autocomplete="off">
+            <button id="chatSectionSend">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="dash-footer"><a href="privacy.html">Privacy Policy</a></footer>
+</div>
+
+<!-- Chat widget -->
+<button class="chat-fab" id="chatFab" title="Chat with support">&#x1F4AC;<span class="chat-badge" id="chatBadge" style="display:none;">0</span></button>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div><div class="title">Support Chat</div><div class="sub">We usually reply within a few hours</div></div>
+    <button class="close" id="chatClose">&times;</button>
+  </div>
+  <div class="chat-body" id="chatBody"><div class="chat-empty">No messages yet. Say hello!</div></div>
+  <div class="chat-foot">
+    <input type="text" id="chatInput" placeholder="Type a message…" maxlength="2000" autocomplete="off">
+    <button id="chatSend" title="Send">&#x27A4;</button>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+let token = localStorage.getItem('token');
+let user = JSON.parse(localStorage.getItem('user') || 'null');
+
+async function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  if (!email || !password) { errEl.textContent = 'Email and password required'; errEl.style.display = 'block'; return; }
+  try {
+    const res = await fetch(API + '/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ email, password }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    token = data.token; user = data.user;
+    localStorage.setItem('token', token); localStorage.setItem('user', JSON.stringify(user));
+    loadDashboard();
+  } catch(e) { errEl.textContent = e.message; errEl.style.display = 'block'; }
+}
+
+function logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); token = null; user = null; location.reload(); }
+
+async function loadDashboard() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboardView').style.display = 'flex';
+  document.getElementById('dashUserName').textContent = user.name;
+  document.getElementById('dashAvatar').textContent = user.name.charAt(0).toUpperCase();
+  await loadProjects();
+}
+
+async function loadProjects() {
+  const wrap = document.getElementById('projectsWrap');
+  try {
+    const res = await fetch(API + '/api/orders', { headers:{ Authorization:'Bearer ' + token } });
+    if (!res.ok) throw new Error();
+    const orders = await res.json();
+    if (orders.length === 0) { wrap.innerHTML = '<div class="empty">You have no projects yet. Your administrator will create them for you.</div>'; }
+    else {
+      document.getElementById('statTotal').textContent = orders.length;
+      document.getElementById('statActive').textContent = orders.filter(o => ['active','in-progress'].includes(o.status)).length;
+      document.getElementById('statCompleted').textContent = orders.filter(o => o.status === 'completed').length;
+      document.getElementById('statReady').textContent = orders.filter(o => o.paymentEnabled && !o.paid).length;
+      document.getElementById('statPaid').textContent = orders.filter(o => o.paid).length;
+      wrap.innerHTML = '<div class="projects">' + orders.map(cardHtml).join('') + '</div>';
+      bindPayButtons();
+    }
+  } catch(e) { wrap.innerHTML = '<div class="empty">Could not load projects.</div>'; }
+}
+
+function cardHtml(o) {
+  const cls = 'status-' + o.status;
+  const notes = o.notes ? `<div class="notes"><b>Note:</b><br>${escapeHtml(o.notes)}</div>` : '';
+  const desc = o.description ? `<div class="notes"><b>Description:</b><br>${escapeHtml(o.description)}</div>` : '';
+  const accepted = o.agreementAccepted ? `<div class="accepted-tag">&#x2713; Agreement accepted${o.agreementAcceptedAt ? ' ' + new Date(o.agreementAcceptedAt).toLocaleDateString() : ''}</div>` : '';
+  const isSplit = (o.paymentType || 'full') === 'split';
+  const payStatus = o.paid ? { t: '100% Payment Done', c: '#1b7a1b' }
+    : (o.depositPaid ? { t: '50% Payment Done — balance due', c: '#b8860b' }
+    : { t: 'Payment Pending', c: '#c62828' });
+  const planNote = o.paymentEnabled ? `<div class="meta"><b>Payment plan:</b> ${isSplit ? '50% upfront / 50% on completion' : '100% upfront'}${o.amount ? ` &middot; Total $${Number(o.amount).toFixed(2)}` : ''}</div>` : '';
+  const payTag = `<div class="accepted-tag" style="color:${payStatus.c};">&#x1F4B3; ${payStatus.t}</div>`;
+  let action;
+  if (o.paymentEnabled) {
+    const label = o.paid ? 'View Agreement &amp; Payment' : (isSplit && o.depositPaid ? 'Pay Remaining 50%' : 'Agreement &amp; Payment');
+    action = `<a class="pay-btn" href="agreement.html?project=${o.id}" data-pay="${o.id}">&#x1F4B3; ${label}</a>`;
+  } else {
+    action = `<div class="pay-disabled-note">Agreement &amp; Payment will be enabled by your administrator.</div>`;
+  }
+   const files = o.filesReleased && o.files && o.files.length
+     ? `<div class="files-box"><b>Download project files:</b><br>${o.files.map(f => `<a href="${f.url}?token=${encodeURIComponent(token)}" download="${escapeHtml(f.name)}">&#x1F4E5; ${escapeHtml(f.name)}</a>`).join('')}</div>`
+     : (!o.paid && o.paymentEnabled ? `<div class="files-box" style="background:#fff8f0;border-color:#f3d9b0;"><b>Project files &amp; Right Transfer Agreement</b><br><span class="muted" style="font-size:0.82rem;">Will be available here after full payment is complete.</span></div>` : '');
+  return `<div class="pcard">
+    <div class="pcard-main">
+      <span class="status ${cls}">${o.status.replace('-',' ').replace(/\b\w/g,c=>c.toUpperCase())}</span>
+      <h3>${escapeHtml(o.title)}</h3>
+      ${stepperHtml(o.status)}
+      <div class="meta"><b>Service:</b> ${o.service}${o.plan?` &middot; ${o.plan}`:''}</div>
+      ${o.deadline?`<div class="meta"><b>Deadline:</b> ${o.deadline}</div>`:''}
+      ${desc}
+      ${notes}
+      ${planNote}
+      ${payTag}
+      ${files}
+      <div class="tags">${accepted}</div>
+    </div>
+    <div class="pcard-action">${action}</div>
+  </div>`;
+}
+
+// Stepper: statuses map to stages. Completed means all done.
+function stepperHtml(status) {
+  const stages = ['received','in-progress','draft','revision','completed'];
+  const labels = ['Received','In Progress','Draft','Revision','Completed'];
+  let currentIdx;
+  switch (status) {
+    case 'pending': currentIdx = 0; break;
+    case 'active': case 'in-progress': currentIdx = 1; break;
+    case 'revision': currentIdx = 3; break;
+    case 'completed': currentIdx = 4; break;
+    default: currentIdx = 0;
+  }
+  let html = '';
+  for (let i = 0; i < stages.length; i++) {
+    const state = i < currentIdx ? 'done' : (i === currentIdx ? 'current' : '');
+    const mark = i < currentIdx ? '✓' : (i + 1);
+    html += `<div class="step ${state}"><span class="dot">${mark}</span>${labels[i]}</div>`;
+    if (i < stages.length - 1) html += `<div class="step-line ${i < currentIdx ? 'done' : ''}"></div>`;
+  }
+  return `<div class="stepper">${html}</div>`;
+}
+
+function bindPayButtons() {
+  document.querySelectorAll('[data-pay]').forEach(a => a.addEventListener('click', async (e) => {
+    // agreement page handles acceptance + redirect; nothing to do here
+  }));
+}
+
+function escapeHtml(s) { return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ── Chat widget ──
+let chatOpen = false;
+let chatTimer = null;
+
+function fmtTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+function renderChat(msgs) {
+  const html = !msgs.length
+    ? '<div class="chat-empty">No messages yet. Say hello!</div>'
+    : msgs.map(m => `<div class="msg cmsg ${m.from}">${escapeHtml(m.text)}<span class="time">${fmtTime(m.at)}${m.from === 'admin' ? ' · Support' : ''}</span></div>`).join('');
+  const panelBody = document.getElementById('chatBody');
+  const sectionBody = document.getElementById('chatSectionBody');
+  if (panelBody) { panelBody.innerHTML = html; panelBody.scrollTop = panelBody.scrollHeight; }
+  if (sectionBody) { sectionBody.innerHTML = html; sectionBody.scrollTop = sectionBody.scrollHeight; }
+  const last = msgs[msgs.length - 1];
+  const snip = document.getElementById('chatConvSnip');
+  if (snip && last) snip.textContent = (last.from === 'admin' ? 'Support: ' : 'You: ') + last.text;
+}
+async function loadChat() {
+  if (!token) return;
+  try {
+    const res = await fetch(API + '/api/chat', { headers: { Authorization: 'Bearer ' + token } });
+    if (!res.ok) return;
+    const msgs = await res.json();
+    renderChat(msgs);
+    const unread = msgs.filter(m => m.from === 'admin' && !m.read).length;
+    const fabBadge = document.getElementById('chatBadge');
+    const tabBadge = document.getElementById('chatTabBadge');
+    if (unread > 0 && !chatOpen) { if (fabBadge){fabBadge.style.display='flex';fabBadge.textContent=unread;} }
+    else if (fabBadge) { fabBadge.style.display = 'none'; }
+    if (tabBadge) { if (unread > 0 && document.getElementById('pnlChat').style.display === 'none') { tabBadge.style.display='inline-block'; tabBadge.textContent=unread; } else { tabBadge.style.display='none'; } }
+  } catch(e) {}
+}
+async function sendChat(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  try {
+    const res = await fetch(API + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ text }) });
+    if (res.ok) { const d = await res.json(); renderChatAfterSend(d.message); }
+  } catch(e) {}
+}
+function renderChatAfterSend(msg) {
+  loadChat();
+}
+function openChat() {
+  chatOpen = true;
+  document.getElementById('chatPanel').style.display = 'flex';
+  document.getElementById('chatBadge').style.display = 'none';
+  loadChat();
+  fetch(API + '/api/chat/read', { method: 'POST', headers: { Authorization: 'Bearer ' + token } }).catch(() => {});
+  document.getElementById('chatInput').focus();
+}
+function closeChat() { chatOpen = false; document.getElementById('chatPanel').style.display = 'none'; }
+
+document.getElementById('chatFab').addEventListener('click', () => { chatOpen ? closeChat() : openChat(); });
+document.getElementById('chatClose').addEventListener('click', closeChat);
+document.getElementById('chatSend').addEventListener('click', () => sendChat('chatInput'));
+document.getElementById('chatInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat('chatInput'); });
+document.getElementById('chatSectionSend').addEventListener('click', () => sendChat('chatSectionInput'));
+document.getElementById('chatSectionInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChat('chatSectionInput'); });
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById('pnlProjects').style.display = t.dataset.tab === 'projects' ? 'block' : 'none';
+  document.getElementById('pnlChat').style.display = t.dataset.tab === 'chat' ? 'block' : 'none';
+  if (t.dataset.tab === 'chat') { loadChat(); fetch(API + '/api/chat/read', { method:'POST', headers:{ Authorization:'Bearer ' + token } }).catch(()=>{}); }
+}));
+
+// Auto-refresh chat + badge
+chatTimer = setInterval(() => { if (token) loadChat(); }, 5000);
+if (token && user) { loadDashboard(); loadChat(); }
+
+</script>
+</body>
+</html>

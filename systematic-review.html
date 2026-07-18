@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Systematic Review Service — medresearch.me</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+:root {
+  --primary: #0a2540;
+  --accent: #0066cc;
+  --accent-light: #e8f0fe;
+  --accent-glow: rgba(0,102,204,0.15);
+  --text: #1a1a2e;
+  --text-muted: #5a6a7e;
+  --bg: #ffffff;
+  --bg-alt: #f7f9fc;
+  --radius: 16px;
+  --shadow: 0 4px 24px rgba(10,37,64,0.06);
+  --shadow-hover: 0 12px 40px rgba(10,37,64,0.12);
+}
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  padding: 1rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+}
+.logo { font-weight: 800; font-size: 1.3rem; color: var(--primary); text-decoration: none; }
+.logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+.nav-links a {
+  text-decoration: none; color: var(--text-muted); font-size: 0.9rem; font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--accent); }
+.nav-cta {
+  background: var(--accent); color: #fff !important; padding: 0.5rem 1.3rem;
+  border-radius: 100px; font-weight: 600; font-size: 0.85rem !important;
+}
+.nav-cta:hover { background: #0052a3 !important; }
+nav.scrolled { background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); box-shadow: 0 1px 12px rgba(0,0,0,0.06); padding: 0.7rem 2rem; }
+.dropdown { position: relative; }
+.dropdown-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(10,37,64,0.12); padding: 0.5rem; min-width: 200px; list-style: none; z-index: 200; }
+.dropdown-menu li a { display: block; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem !important; color: var(--text) !important; white-space: nowrap; }
+.dropdown-menu li a:hover { background: var(--accent-light); color: var(--accent) !important; }
+.dropdown:hover .dropdown-menu { display: block; }
+.menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+.menu-toggle span { width: 24px; height: 2px; background: var(--primary); border-radius: 2px; transition: 0.3s; }
+@media (max-width: 768px) {
+  .nav-links { position: absolute; top: 100%; right: 0; left: 0; flex-direction: column; background: #fff; padding: 1rem 2rem; gap: 1rem; box-shadow: 0 8px 32px rgba(10,37,64,0.12); display: none; }
+  .nav-links.open { display: flex; }
+  .menu-toggle { display: flex; }
+  .dropdown-menu { position: static; transform: none; box-shadow: none; padding: 0; display: none; min-width: auto; background: transparent; }
+  .dropdown.open .dropdown-menu { display: block; }
+  .dropdown-menu li a { padding: 0.5rem 1rem; }
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 92vh;
+  display: flex; align-items: center;
+  padding: 8rem 2rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset:0;
+  background: linear-gradient(135deg, #f0f6ff 0%, #e8f0fe 40%, #fff 100%);
+  z-index:-2;
+}
+.hero-grid {
+  position: absolute; inset:0; z-index:-1;
+  background-image:
+    radial-gradient(circle at 15% 60%, rgba(0,102,204,0.07) 0%, transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(0,102,204,0.05) 0%, transparent 50%);
+}
+.hero-content { max-width: 1120px; margin: 0 auto; width: 100%; }
+.breadcrumb {
+  font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;
+  opacity:0; animation: fadeUp 0.5s 0.1s forwards;
+}
+.breadcrumb a { color: var(--accent); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: #e6f7e6; color: #1b7a1b;
+  font-size: 0.8rem; font-weight: 600;
+  padding: 0.35rem 1rem; border-radius: 100px;
+  margin-bottom: 1.5rem;
+  opacity:0; animation: fadeUp 0.5s 0.2s forwards;
+}
+.hero h1 {
+  font-size: clamp(2.8rem, 6vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  max-width: 800px;
+  opacity:0; animation: fadeUp 0.5s 0.3s forwards;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  max-width: 640px;
+  margin-top: 1.5rem;
+  opacity:0; animation: fadeUp 0.5s 0.4s forwards;
+}
+.hero-tags {
+  display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 2rem;
+  opacity:0; animation: fadeUp 0.5s 0.5s forwards;
+}
+.tag {
+  background: var(--accent-light); color: var(--accent);
+  padding: 0.4rem 1rem; border-radius: 100px;
+  font-size: 0.8rem; font-weight: 600;
+}
+.hero-actions {
+  display: flex; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap;
+  opacity:0; animation: fadeUp 0.5s 0.6s forwards;
+}
+.btn {
+  text-decoration: none;
+  padding: 0.9rem 2.2rem;
+  border-radius: 100px;
+  font-weight: 600; font-size: 0.95rem;
+  transition: all 0.25s ease;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+}
+.btn-primary {
+  background: var(--accent); color: #fff;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+.btn-primary:hover {
+  background: #0052a3; transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--accent-glow);
+}
+.btn-outline {
+  border: 1.5px solid var(--primary); color: var(--primary);
+}
+.btn-outline:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
+
+/* ─── SECTIONS ─── */
+section { padding: 5rem 2rem; }
+.section-inner { max-width: 1120px; margin: 0 auto; }
+.section-label {
+  font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.75rem;
+}
+.section-title {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700; letter-spacing: -0.02em; line-height: 1.2;
+  margin-bottom: 1rem;
+}
+.section-sub {
+  font-size: 1.05rem; color: var(--text-muted);
+  max-width: 650px; margin-bottom: 3rem;
+}
+
+/* ─── FEATURES GRID ─── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.25rem;
+}
+.feature-card {
+  background: var(--bg);
+  border: 1px solid #eaeef5;
+  border-radius: var(--radius);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.feature-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+.feature-icon { font-size: 2.2rem; margin-bottom: 1rem; }
+.feature-card h4 { font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; }
+.feature-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ─── PROCESS TIMELINE ─── */
+.process-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  counter-reset: step;
+}
+.process-card {
+  counter-increment: step;
+  background: var(--bg);
+  border: 1px solid #eaeef5;
+  border-radius: var(--radius);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.process-card:hover { border-color: var(--accent); box-shadow: var(--shadow-hover); }
+.process-card::before {
+  content: counter(step);
+  position: absolute; top: -0.75rem; left: 50%;
+  transform: translateX(-50%);
+  width: 2rem; height: 2rem;
+  background: var(--accent); color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+}
+.process-card .icon { font-size: 2rem; margin: 0.75rem 0 0.75rem; }
+.process-card h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+.process-card p { font-size: 0.82rem; color: var(--text-muted); }
+
+/* ─── PRICING ─── */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+.pricing-card {
+  background: var(--bg);
+  border: 1px solid #eaeef5;
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.pricing-card.featured {
+  border-color: var(--accent);
+  box-shadow: 0 8px 32px var(--accent-glow);
+  transform: scale(1.03);
+}
+.pricing-card.featured .badge {
+  position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #fff;
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  padding: 0.3rem 1rem; border-radius: 100px;
+  letter-spacing: 0.05em;
+}
+.pricing-card h4 { font-size: 1rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; }
+.price { font-size: 2.8rem; font-weight: 800; color: var(--primary); letter-spacing: -0.03em; }
+.price span { font-size: 1rem; font-weight: 400; color: var(--text-muted); }
+.pricing-desc { font-size: 0.9rem; color: var(--text-muted); margin: 1rem 0 1.5rem; }
+.pricing-features { list-style: none; text-align: left; margin-bottom: 2rem; }
+.pricing-features li {
+  padding: 0.5rem 0; font-size: 0.9rem;
+  display: flex; align-items: center; gap: 0.6rem;
+  border-bottom: 1px solid #f0f3f8;
+}
+.pricing-features li::before { content: '✓'; color: var(--accent); font-weight: 700; }
+.pricing-card .btn { display: inline-block; }
+
+/* ─── GUARANTEE BANNER ─── */
+.guarantee-banner {
+  background: linear-gradient(135deg, #e8f0fe, #f0f6ff);
+  border-radius: var(--radius);
+  padding: 3rem 2rem;
+  text-align: center;
+  border: 1px solid #d0e2f5;
+  margin-top: 3rem;
+}
+.guarantee-banner .big { font-size: 3rem; margin-bottom: 0.5rem; }
+.guarantee-banner h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+.guarantee-banner p { color: var(--text-muted); max-width: 600px; margin: 0 auto 1.5rem; }
+
+/* ─── CTA BANNER ─── */
+.cta-banner {
+  background: var(--primary);
+  border-radius: var(--radius);
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #fff;
+}
+.cta-banner h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 700; margin-bottom: 0.75rem; }
+.cta-banner p { opacity: 0.8; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+.cta-banner .btn-primary { background: #fff; color: var(--primary); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.cta-banner .btn-primary:hover { background: #f0f6ff; }
+
+/* ─── FORM ─── */
+.contact-grid { display:grid; grid-template-columns:1fr 1.3fr; gap:3rem; align-items:start; }
+@media (max-width:768px) { .contact-grid { grid-template-columns:1fr; } }
+.contact-info h3 { font-size:1.5rem; font-weight:700; margin-bottom:0.75rem; }
+.contact-info p { color:var(--text-muted); margin-bottom:0.5rem; font-size:0.95rem; }
+.contact-form { display:flex; flex-direction:column; gap:1rem; }
+.contact-form input, .contact-form select, .contact-form textarea {
+  width:100%; padding:0.85rem 1rem;
+  border:1.5px solid #dde3ed; border-radius:12px;
+  font-family:inherit; font-size:0.9rem;
+  transition:border-color 0.2s; background:#fff; outline:none;
+}
+.contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color:var(--accent); }
+.contact-form textarea { resize:vertical; min-height:120px; }
+.form-row { display:flex; gap:1rem; }
+.form-row > * { flex:1; }
+@media (max-width:600px) { .form-row { flex-direction:column; } }
+.contact-form .btn { align-self:flex-start; border:none; cursor:pointer; }
+.form-label { display:block; font-weight:600; font-size:0.85rem; margin-bottom:0.4rem; color:var(--primary); }
+.form-label .req { color:#e02424; margin-left:2px; }
+.form-label .opt { color:var(--text-muted); font-weight:400; font-size:0.8rem; margin-left:4px; }
+
+/* ─── FOOTER ─── */
+footer {
+  text-align: center; padding: 2.5rem 2rem;
+  font-size: 0.85rem; color: var(--text-muted);
+  border-top: 1px solid #eaeef5;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { opacity:0; transform: translateY(20px); transition: all 0.6s ease-out; }
+.fade-up.visible { opacity:1; transform: translateY(0); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .pricing-card.featured { transform: none; }
+  .process-steps { grid-template-columns: 1fr; }
+  section { padding: 3rem 1.5rem; }
+  .hero h1 { font-size: clamp(2rem, 8vw, 3rem); }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav id="nav">
+  <a href="index.html" class="logo" style="text-decoration:none;">med<span>research</span>.me</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li class="dropdown">
+      <a href="javascript:void(0)">Services &#x25BE;</a>
+      <ul class="dropdown-menu">
+        <li><a href="abstract-conference.html">Conference Abstract</a></li>
+        <li><a href="systematic-review.html">Systematic Review</a></li>
+        <li><a href="meta-analysis.html">Meta-Analysis</a></li>
+        <li><a href="manuscript-writing.html">Manuscript Writing</a></li>
+        <li><a href="scoping-review.html">Scoping Review</a></li>
+        <li><a href="literature-review.html">Literature Review</a></li>
+      </ul>
+    </li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="dashboard.html">Dashboard</a></li>
+    <li><a href="privacy.html">Privacy</a></li>
+    <li><a href="#contact" class="nav-cta">Get Started</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Systematic Review</div>
+    <div class="hero-badge">&#x1F4CB; Systematic Review &amp; Meta-Analysis</div>
+    <h1>Systematic Review Service — <em>From Protocol to PRISMA</em></h1>
+    <p>We have a team of <strong>20+ experienced researchers</strong> who conduct every systematic review entirely by hand — from protocol registration to PRISMA flow diagram. No automation shortcuts, no AI-generated screening: rigorous, transparent, and reproducible from scratch.</p>
+    <div class="hero-tags">
+      <span class="tag">&#x1F465; 20+ Researchers</span>
+      <span class="tag">&#x1F4DC; PRISMA 2020</span>
+      <span class="tag">&#x1F9E9; PROSPERO / OSF</span>
+      <span class="tag">&#x2716;&#xFE0F; No AI Screening</span>
+      <span class="tag">&#x1F4CA; GRADE + Meta-Analysis</span>
+    </div>
+    <div class="hero-actions">
+      <a href="#pricing" class="btn btn-primary">See Pricing &rarr;</a>
+      <a href="#process" class="btn btn-outline">How It Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ─── -->
+<section style="background:var(--bg-alt);">
+  <div class="section-inner">
+    <div class="section-label">What We Deliver</div>
+    <h2 class="section-title">Built on Cochrane &amp; PRISMA Standards</h2>
+    <p class="section-sub">Every systematic review we produce is grounded in full transparency at each stage. Our team of 20+ experienced researchers does the work manually — protocol, search, screening, extraction, and synthesis — with no automation or AI shortcuts.</p>
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon">&#x1F4D1;</div>
+        <h4>Protocol Registration</h4>
+        <p>We draft and register your review protocol on PROSPERO or Open Science Framework before any screening begins, ensuring methodological accountability.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">&#x1F50D;</div>
+        <h4>Comprehensive Search</h4>
+        <p>Boolean search strategies across PubMed, Scopus, Web of Science, Embase, Cochrane Library, and grey literature — fully documented and transparent.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">&#x1F465;</div>
+        <h4>Dual Screening</h4>
+        <p>Title/abstract and full-text screening performed independently by two reviewers, with conflict resolution and a documented PRISMA flow diagram.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">&#x1F4CA;</div>
+        <h4>Data Extraction</h4>
+        <p>Pilot-tested extraction forms capture study characteristics and effect sizes. All data are double-extracted to minimise error and bias.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">&#x26A0;&#xFE0F;</div>
+        <h4>Risk of Bias</h4>
+        <p>Study-level quality assessed with Cochrane RoB 2 (RCTs), ROBINS-I (non-randomised), QUADAS-2 (diagnostic), or a tool tailored to your design.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">&#x1F4C8;</div>
+        <h4>PRISMA Flow Diagram</h4>
+        <p>Publication-ready PRISMA 2020 flow diagram documenting every record from identification to inclusion, with reasons for exclusion.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">&#x1F3C6;</div>
+        <h4>GRADE Assessment</h4>
+        <p>Certainty of evidence evaluated with the GRADE framework across all outcomes, delivered as Summary of Findings (SoF) tables.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">&#x1F504;</div>
+        <h4>Meta-Analysis Integration</h4>
+        <p>Statistical pooling with random/fixed-effects models, heterogeneity (I²), subgroup and sensitivity analyses, funnel plots, and forest plots.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NO QUESTION BANNER 1 ─── -->
+<section>
+  <div class="section-inner">
+    <p style="background:#e6f7e6;border-radius:12px;padding:1.5rem 1.75rem;margin-bottom:0;font-size:0.98rem;border:1px solid #b8e6b8;text-align:center;" class="fade-up">
+      &#x1F4A1; <strong>Don't have a research question?</strong> Tell us your field of interest and our experts will help you formulate a focused, answerable question — free with any plan.
+    </p>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section id="process">
+  <div class="section-inner">
+    <div class="section-label">The Process</div>
+    <h2 class="section-title">Our 5-Step Process</h2>
+    <p class="section-sub">A transparent, fully documented workflow — from research question to publishable manuscript. Every step is manual, auditable, and reproducible.</p>
+    <div class="process-steps">
+      <div class="process-card fade-up">
+        <div class="icon">&#x1F4D1;</div>
+        <h4>Protocol</h4>
+        <p>Formulate the research question, define eligibility criteria, and register the protocol on PROSPERO or OSF.</p>
+      </div>
+      <div class="process-card fade-up">
+        <div class="icon">&#x1F50D;</div>
+        <h4>Search</h4>
+        <p>Develop and execute Boolean search strategies across 5+ databases plus grey literature sources.</p>
+      </div>
+      <div class="process-card fade-up">
+        <div class="icon">&#x1F465;</div>
+        <h4>Screening</h4>
+        <p>Dual independent title/abstract and full-text screening with conflict resolution by a third reviewer.</p>
+      </div>
+      <div class="process-card fade-up">
+        <div class="icon">&#x1F4CA;</div>
+        <h4>Extraction</h4>
+        <p>Double data extraction, risk of bias assessment, and GRADE certainty evaluation across outcomes.</p>
+      </div>
+      <div class="process-card fade-up">
+        <div class="icon">&#x1F4DD;</div>
+        <h4>Report</h4>
+        <p>PRISMA flow diagram, narrative synthesis, meta-analysis, and a manuscript-ready output.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRICING ─── -->
+<section id="pricing" style="background:var(--bg-alt);">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Simple, Transparent Pricing</h2>
+    <p class="section-sub">One flat rate per review. No hidden fees. Every plan includes protocol registration, dual screening, and PRISMA reporting — done entirely by hand.</p>
+    <div style="background:var(--accent-light);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem;text-align:center;border:1px solid #d0e2f5;" class="fade-up">
+      <p style="font-size:1rem;font-weight:600;color:var(--primary);margin:0;">
+        &#x1F465; <strong>We have a team of more than 20 experienced researchers</strong> working manually on every systematic review — no templates, no AI, just expert human craftsmanship. This allows us to deliver high-quality, reproducible work within every deadline.
+      </p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card fade-up">
+        <h4>Basic</h4>
+        <div class="price">$200 <span>/ review</span></div>
+        <p class="pricing-desc">Focused question · up to 500 records</p>
+        <ul class="pricing-features">
+          <li>Protocol registration (OSF)</li>
+          <li>Single-database search</li>
+          <li>Dual screening</li>
+          <li>Data extraction form</li>
+          <li>PRISMA flow diagram</li>
+          <li>Narrative summary</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline" style="width:100%;justify-content:center;">Get Started</a>
+      </div>
+      <div class="pricing-card featured fade-up">
+        <div class="badge">Best Value</div>
+        <h4>Standard</h4>
+        <div class="price">$400 <span>/ review</span></div>
+        <p class="pricing-desc">Comprehensive · up to 2,000 records</p>
+        <ul class="pricing-features">
+          <li>Everything in Basic</li>
+          <li>Multi-database search (5+)</li>
+          <li>Grey literature search</li>
+          <li>Risk of Bias (RoB 2 / ROBINS-I)</li>
+          <li>GRADE assessment + SoF table</li>
+          <li>Manuscript-ready report</li>
+        </ul>
+        <a href="#contact" class="btn btn-primary" style="width:100%;justify-content:center;">Choose This &rarr;</a>
+      </div>
+      <div class="pricing-card fade-up">
+        <h4>Standard + Meta-Analysis</h4>
+        <div class="price">$600 <span>/ review</span></div>
+        <p class="pricing-desc">Full synthesis · up to 3,000 records</p>
+        <ul class="pricing-features">
+          <li>Everything in Standard</li>
+          <li>Statistical meta-analysis</li>
+          <li>Forest &amp; funnel plots</li>
+          <li>Subgroup &amp; sensitivity analyses</li>
+          <li>Heterogeneity exploration</li>
+          <li>Publication bias assessment</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline" style="width:100%;justify-content:center;">Get Started</a>
+      </div>
+    </div>
+
+    <div class="guarantee-banner fade-up">
+      <div class="big">&#x1F91D;</div>
+      <h3>Quality Guarantee</h3>
+      <p style="max-width:700px;">Not satisfied? We revise until you are. We stand behind the quality of every systematic review we deliver — rigorous, transparent, and reproducible from protocol to PRISMA.</p>
+      <a href="#contact" class="btn btn-primary">Start Your Review &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NO QUESTION BANNER 2 ─── -->
+<section>
+  <div class="section-inner">
+    <p style="background:#e6f7e6;border-radius:12px;padding:1.5rem 1.75rem;margin-bottom:0;font-size:0.98rem;border:1px solid #b8e6b8;text-align:center;" class="fade-up">
+      &#x1F4A1; <strong>Don't have a research question?</strong> Tell us your field of interest and our experts will help you formulate a focused, answerable question — free with any plan.
+    </p>
+  </div>
+</section>
+
+<!-- ─── CONTACT FORM ─── -->
+<section id="contact" style="background:var(--bg-alt);">
+  <div class="section-inner">
+    <div class="section-label">Start Your Review</div>
+    <h2 class="section-title">Request Your Systematic Review</h2>
+    <p class="section-sub">Tell us about your research area and target scope. Our team will respond within 24 hours with a tailored proposal and timeline.</p>
+    <div class="contact-grid" style="display:grid;grid-template-columns:1fr 1.3fr;gap:3rem;align-items:start;">
+      <div class="contact-info">
+        <h3>What We Need From You</h3>
+        <p>A focused question — or just your field of interest. If you have any of the following, include them; if not, we'll build everything from your topic.</p>
+        <p style="background:#e6f7e6;border-radius:10px;padding:0.85rem 1rem;font-size:0.9rem;border:1px solid #b8e6b8;">&#x1F4A1; <strong>No research question?</strong> Tell us your field of interest and our experts will help you formulate a focused, answerable question — free with any plan.</p>
+        <div style="margin:1.5rem 0;">
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;">
+            <div style="font-size:1.2rem;flex-shrink:0;">&#x1F4A1;</div>
+            <div><strong>Research Question / Topic</strong><br><span style="font-size:0.88rem;color:var(--text-muted);">A PICO question, a topic, or just your field of interest — that's enough to start.</span></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;">
+            <div style="font-size:1.2rem;flex-shrink:0;">&#x1F4DC;</div>
+            <div><strong>Service Level</strong><br><span style="font-size:0.88rem;color:var(--text-muted);">Choose Basic, Standard, or Standard + Meta-Analysis based on your scope.</span></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:1rem;">
+            <div style="font-size:1.2rem;flex-shrink:0;">&#x1F4C5;</div>
+            <div><strong>Target Deadline</strong><br><span style="font-size:0.88rem;color:var(--text-muted);">Tell us your timeline — typical turnaround is 4–8 weeks per review.</span></div>
+          </div>
+        </div>
+        <div style="background:var(--accent-light);border-radius:12px;padding:1.25rem;border:1px solid #d0e2f5;">
+          <p style="font-size:0.9rem;margin:0;">&#x1F465; <strong>20+ experienced researchers</strong> ready to work on your systematic review manually, from protocol to PRISMA. No AI, no shortcuts — just expert human methodology.</p>
+        </div>
+      </div>
+      <form class="contact-form" id="reviewForm" style="display:flex;flex-direction:column;gap:1rem;">
+        <div class="form-row" style="display:flex;gap:1rem;">
+          <div style="flex:1;display:flex;flex-direction:column;gap:0.4rem;">
+            <label class="form-label" for="sr_name">Full Name <span class="req">*</span></label>
+            <input type="text" id="sr_name" name="name" placeholder="Your Full Name" required>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:0.4rem;">
+            <label class="form-label" for="sr_email">Email Address <span class="req">*</span></label>
+            <input type="email" id="sr_email" name="email" placeholder="Email Address" required>
+          </div>
+        </div>
+        <div>
+          <label class="form-label" for="sr_whatsapp">WhatsApp <span class="opt">(optional — include country code or username)</span></label>
+          <input type="text" id="sr_whatsapp" name="whatsapp" placeholder="WhatsApp (with country code, e.g. +1 555 123 4567) or username — optional">
+        </div>
+        <div>
+          <label class="form-label" for="sr_country">Country <span class="req">*</span></label>
+          <input type="text" id="sr_country" name="country" list="sr_countrylist" placeholder="Type to search your country..." required style="width:100%;padding:0.85rem 1rem;border:1.5px solid #dde3ed;border-radius:12px;font-family:inherit;font-size:0.9rem;background:#fff;outline:none;">
+          <datalist id="sr_countrylist">
+            <option value="Afghanistan">
+            <option value="Albania">
+            <option value="Algeria">
+            <option value="Andorra">
+            <option value="Angola">
+            <option value="Antigua and Barbuda">
+            <option value="Argentina">
+            <option value="Armenia">
+            <option value="Australia">
+            <option value="Austria">
+            <option value="Azerbaijan">
+            <option value="Bahamas">
+            <option value="Bahrain">
+            <option value="Bangladesh">
+            <option value="Barbados">
+            <option value="Belarus">
+            <option value="Belgium">
+            <option value="Belize">
+            <option value="Benin">
+            <option value="Bhutan">
+            <option value="Bolivia">
+            <option value="Bosnia and Herzegovina">
+            <option value="Botswana">
+            <option value="Brazil">
+            <option value="Brunei">
+            <option value="Bulgaria">
+            <option value="Burkina Faso">
+            <option value="Burundi">
+            <option value="Cabo Verde">
+            <option value="Cambodia">
+            <option value="Cameroon">
+            <option value="Canada">
+            <option value="Central African Republic">
+            <option value="Chad">
+            <option value="Chile">
+            <option value="China">
+            <option value="Colombia">
+            <option value="Comoros">
+            <option value="Congo (Brazzaville)">
+            <option value="Congo (Kinshasa)">
+            <option value="Costa Rica">
+            <option value="Côte d'Ivoire">
+            <option value="Croatia">
+            <option value="Cuba">
+            <option value="Cyprus">
+            <option value="Czech Republic">
+            <option value="Denmark">
+            <option value="Djibouti">
+            <option value="Dominica">
+            <option value="Dominican Republic">
+            <option value="Ecuador">
+            <option value="Egypt">
+            <option value="El Salvador">
+            <option value="Equatorial Guinea">
+            <option value="Eritrea">
+            <option value="Estonia">
+            <option value="Eswatini">
+            <option value="Ethiopia">
+            <option value="Fiji">
+            <option value="Finland">
+            <option value="France">
+            <option value="Gabon">
+            <option value="Gambia">
+            <option value="Georgia">
+            <option value="Germany">
+            <option value="Ghana">
+            <option value="Greece">
+            <option value="Grenada">
+            <option value="Guatemala">
+            <option value="Guinea">
+            <option value="Guinea-Bissau">
+            <option value="Guyana">
+            <option value="Haiti">
+            <option value="Honduras">
+            <option value="Hungary">
+            <option value="Iceland">
+            <option value="India">
+            <option value="Indonesia">
+            <option value="Iran">
+            <option value="Iraq">
+            <option value="Ireland">
+            <option value="Israel">
+            <option value="Italy">
+            <option value="Jamaica">
+            <option value="Japan">
+            <option value="Jordan">
+            <option value="Kazakhstan">
+            <option value="Kenya">
+            <option value="Kiribati">
+            <option value="Kosovo">
+            <option value="Kuwait">
+            <option value="Kyrgyzstan">
+            <option value="Laos">
+            <option value="Latvia">
+            <option value="Lebanon">
+            <option value="Lesotho">
+            <option value="Liberia">
+            <option value="Libya">
+            <option value="Liechtenstein">
+            <option value="Lithuania">
+            <option value="Luxembourg">
+            <option value="Madagascar">
+            <option value="Malawi">
+            <option value="Malaysia">
+            <option value="Maldives">
+            <option value="Mali">
+            <option value="Malta">
+            <option value="Marshall Islands">
+            <option value="Mauritania">
+            <option value="Mauritius">
+            <option value="Mexico">
+            <option value="Micronesia">
+            <option value="Moldova">
+            <option value="Monaco">
+            <option value="Mongolia">
+            <option value="Montenegro">
+            <option value="Morocco">
+            <option value="Mozambique">
+            <option value="Myanmar">
+            <option value="Namibia">
+            <option value="Nauru">
+            <option value="Nepal">
+            <option value="Netherlands">
+            <option value="New Zealand">
+            <option value="Nicaragua">
+            <option value="Niger">
+            <option value="Nigeria">
+            <option value="North Korea">
+            <option value="North Macedonia">
+            <option value="Norway">
+            <option value="Oman">
+            <option value="Pakistan">
+            <option value="Palau">
+            <option value="Panama">
+            <option value="Papua New Guinea">
+            <option value="Paraguay">
+            <option value="Peru">
+            <option value="Philippines">
+            <option value="Poland">
+            <option value="Portugal">
+            <option value="Qatar">
+            <option value="Romania">
+            <option value="Russia">
+            <option value="Rwanda">
+            <option value="Saint Kitts and Nevis">
+            <option value="Saint Lucia">
+            <option value="Saint Vincent and the Grenadines">
+            <option value="Samoa">
+            <option value="San Marino">
+            <option value="Sao Tome and Principe">
+            <option value="Saudi Arabia">
+            <option value="Senegal">
+            <option value="Serbia">
+            <option value="Seychelles">
+            <option value="Sierra Leone">
+            <option value="Singapore">
+            <option value="Slovakia">
+            <option value="Slovenia">
+            <option value="Solomon Islands">
+            <option value="Somalia">
+            <option value="South Africa">
+            <option value="South Korea">
+            <option value="South Sudan">
+            <option value="Spain">
+            <option value="Sri Lanka">
+            <option value="Sudan">
+            <option value="Suriname">
+            <option value="Sweden">
+            <option value="Switzerland">
+            <option value="Syria">
+            <option value="Taiwan">
+            <option value="Tajikistan">
+            <option value="Tanzania">
+            <option value="Thailand">
+            <option value="Timor-Leste">
+            <option value="Togo">
+            <option value="Tonga">
+            <option value="Trinidad and Tobago">
+            <option value="Tunisia">
+            <option value="Turkey">
+            <option value="Turkmenistan">
+            <option value="Tuvalu">
+            <option value="Uganda">
+            <option value="Ukraine">
+            <option value="United Arab Emirates">
+            <option value="United Kingdom">
+            <option value="United States">
+            <option value="Uruguay">
+            <option value="Uzbekistan">
+            <option value="Vanuatu">
+            <option value="Vatican City">
+            <option value="Venezuela">
+            <option value="Vietnam">
+            <option value="Yemen">
+            <option value="Zambia">
+            <option value="Zimbabwe">
+          </datalist>
+        </div>
+        <div>
+          <label class="form-label" for="sr_service">Service Level <span class="req">*</span></label>
+          <select id="sr_service" name="service" required style="width:100%;padding:0.85rem 1rem;border:1.5px solid #dde3ed;border-radius:12px;font-family:inherit;font-size:0.9rem;background:#fff;outline:none;">
+            <option value="">Select Service Level</option>
+            <option>Basic ($200)</option>
+            <option>Standard ($400)</option>
+            <option>Standard + Meta-Analysis ($600)</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label" for="sr_topic">Research Topic / Question <span class="req">*</span></label>
+          <input type="text" id="sr_topic" name="topic" placeholder="Research Topic / Question (or just your field of interest — we'll formulate a question)" required>
+        </div>
+        <div>
+          <label class="form-label" for="sr_description">Description <span class="opt">(optional)</span></label>
+          <textarea id="sr_description" name="description" placeholder="Describe your research area, population, intervention, comparison, outcomes (PICO), any existing protocols, and specific requirements." style="min-height:130px;"></textarea>
+        </div>
+        <div class="form-row" style="display:flex;gap:1rem;">
+          <input type="date" name="deadline" placeholder="Target Deadline">
+          <input type="text" name="references" placeholder="Key references (DOI/PMID, optional)">
+        </div>
+        <input type="text" name="honeypot" style="display:none" tabindex="-1" autocomplete="off">
+        <button type="submit" class="btn btn-primary" style="align-self:flex-start;border:none;cursor:pointer;">Submit Request &rarr;</button>
+        <div id="formFeedback" style="font-size:0.9rem;margin-top:0.25rem;"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  &copy; 2026 medresearch.me &nbsp;|&nbsp;
+  <a href="abstract-conference.html" style="color:var(--accent);text-decoration:none;">Conference Abstract</a> &nbsp;|&nbsp;
+  <a href="systematic-review.html" style="color:var(--accent);text-decoration:none;">Systematic Review</a> &nbsp;|&nbsp;
+  <a href="meta-analysis.html" style="color:var(--accent);text-decoration:none;">Meta-Analysis</a> &nbsp;|&nbsp;
+  <a href="manuscript-writing.html" style="color:var(--accent);text-decoration:none;">Manuscript Writing</a> &nbsp;|&nbsp;
+  <a href="scoping-review.html" style="color:var(--accent);text-decoration:none;">Scoping Review</a> &nbsp;|&nbsp;
+  <a href="literature-review.html" style="color:var(--accent);text-decoration:none;">Literature Review</a> &nbsp;|&nbsp;
+  <a href="dashboard.html" style="color:var(--accent);text-decoration:none;">Dashboard</a> &nbsp;|&nbsp;
+  <a href="privacy.html" style="color:var(--accent);text-decoration:none;">Privacy</a> &nbsp;|&nbsp;
+  contact@medresearch.me
+  &nbsp;|&nbsp; <a href="admin.html" style="color:var(--accent);text-decoration:none;">Admin</a>
+</footer>
+
+<script>
+// Scroll-triggered animations
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ── Form handler ────────────────────────────
+const FORMSPREE_ID = document.querySelector('input[name="honeypot"]')?.dataset?.formspree;
+const FORMSPREE_URL = FORMSPREE_ID ? `https://formspree.io/f/${FORMSPREE_ID}` : null;
+
+document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = this.querySelector('button');
+  const feedback = document.getElementById('formFeedback');
+  const original = btn.textContent;
+  const data = new URLSearchParams(new FormData(this));
+
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  feedback.textContent = ''; feedback.style.color = '';
+
+  const ok = (msg) => {
+    feedback.innerHTML = '&#x2713; ' + msg;
+    feedback.style.color = '#1b7a3d'; this.reset();
+  };
+  const fallback = () => {
+    feedback.innerHTML = '&#x2717; Could not send. Email us at <a href="mailto:contact@medresearch.me" style="color:var(--accent);font-weight:600">contact@medresearch.me</a>';
+    feedback.style.color = '#c62828';
+  };
+
+  try {
+    let res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: data
+    });
+    let json = await res.json();
+    if (json.ok) { ok('Request received! We\'ll respond within 24 hours.'); return; }
+    throw new Error(json.error || 'Server error');
+  } catch (_) {
+    if (FORMSPREE_URL) {
+      try {
+        let res = await fetch(FORMSPREE_URL, {
+          method: 'POST', headers: { 'Accept': 'application/json' }, body: data
+        });
+        if (res.ok) { ok('Request received! We\'ll respond within 24 hours.'); return; }
+      } catch (_) {}
+    }
+    fallback();
+  } finally {
+    btn.textContent = original; btn.disabled = false;
+  }
+});
+
+// Mobile menu
+const navEl = document.getElementById('nav');
+window.addEventListener('scroll', () => navEl.classList.toggle('scrolled', window.scrollY > 40));
+const toggle = document.getElementById('menuToggle');
+const links = document.getElementById('navLinks');
+if (toggle) { toggle.addEventListener('click', () => links.classList.toggle('open')); }
+document.querySelectorAll('.nav-links a:not(.dropdown > a)').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+document.querySelectorAll('.dropdown > a').forEach(a => a.addEventListener('click', function(e) { if (window.innerWidth <= 768) { e.preventDefault(); this.parentElement.classList.toggle('open'); } }));
+</script>
+</body>
+</html>
