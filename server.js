@@ -135,7 +135,7 @@ async function sendHtmlEmail({ to, cc, bcc, subject, html, text, replyTo, attach
       console.error('SMTP send failed, falling back to Brevo API:', smtpErr.message);
     }
   }
-  return await sendViaBrevoApi({ to, cc, bcc, subject, html: finalHtml, text, replyTo, attachments, brandBanner });
+  return await sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, attachments, brandBanner });
 }
 
 const upload = multer({ dest: path.join(__dirname, 'uploads'), limits: { fileSize: 50 * 1024 * 1024 } });
