@@ -16,10 +16,12 @@ const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 const CHAT_FILE = path.join(DATA_DIR, 'chat.json');
 const EMAILS_FILE = path.join(DATA_DIR, 'emails.json');
+const EMAIL_TEMPLATES_FILE = path.join(DATA_DIR, 'email-templates.json');
 if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, '[]');
 if (!fs.existsSync(ORDERS_FILE)) fs.writeFileSync(ORDERS_FILE, '[]');
 if (!fs.existsSync(CHAT_FILE)) fs.writeFileSync(CHAT_FILE, '{}');
 if (!fs.existsSync(EMAILS_FILE)) fs.writeFileSync(EMAILS_FILE, '[]');
+if (!fs.existsSync(EMAIL_TEMPLATES_FILE)) fs.writeFileSync(EMAIL_TEMPLATES_FILE, '[]');
 
 // Reusable email sender (chat notifications, etc.) — routes through sendHtmlEmail
 // so it benefits from the Brevo API fallback when SMTP egress is blocked.
@@ -37,25 +39,13 @@ async function sendEmail({ fromName, replyTo, subject, text }) {
 }
 
 // ── Brand email banner ──
-// Public path where the banner is served, plus an inlined data-URI copy so the
-// banner always renders even if a mail client blocks external images.
-const BANNER_PUBLIC_URL = '/brand/email-banner.png';
-const BANNER_FILE = path.join(__dirname, 'public', 'brand', 'email-banner.png');
-let _bannerDataUri = null;
-function getBannerDataUri() {
-  if (_bannerDataUri) return _bannerDataUri;
-  try {
-    const buf = fs.readFileSync(BANNER_FILE);
-    const ext = path.extname(BANNER_FILE).replace('.', '') || 'png';
-    _bannerDataUri = 'data:image/' + ext + ';base64,' + buf.toString('base64');
-  } catch (e) { _bannerDataUri = ''; }
-  return _bannerDataUri;
-}
+// Referenced as a hosted absolute URL (not a data-URI) so the email stays small
+// and Gmail does not clip it. The image is served from the site at /brand/email-banner.png.
+const SITE_URL = (process.env.SITE_URL || 'https://medresearch.me').replace(/\/+$/, '');
+const BANNER_URL = SITE_URL + '/brand/email-banner.png';
 function wrapWithBanner(html, brandBanner) {
   if (!brandBanner) return html;
-  const uri = getBannerDataUri();
-  if (!uri) return html;
-  const banner = `<div style="margin:0 0 18px 0;text-align:center;"><img src="${uri}" alt="medresearch.me" style="max-width:600px;width:100%;height:auto;border:0;display:inline-block;" /></div>`;
+  const banner = `<div style="margin:0 0 18px 0;text-align:center;"><img src="${BANNER_URL}" alt="medresearch.me" style="max-width:600px;width:100%;height:auto;border:0;display:inline-block;" /></div>`;
   return banner + (html || '');
 }
 
@@ -747,8 +737,29 @@ const EMAIL_TEMPLATES = {
 };
 
 app.get('/api/admin/emails/templates', adminAuth, (req, res) => {
-  const list = Object.keys(EMAIL_TEMPLATES).map(k => ({ id: k, subject: EMAIL_TEMPLATES[k].subject }));
-  res.json(list);
+  let custom = [];
+  try { custom = JSON.parse(fs.readFileSync(EMAIL_TEMPLATES_FILE, 'utf8')); } catch (e) { custom = []; }
+  const builtin = Object.keys(EMAIL_TEMPLATES).map(k => ({ id: k, subject: EMAIL_TEMPLATES[k].subject, custom: false }));
+  const saved = custom.map(t => ({ id: 'custom:' + t.id, subject: t.name, html: t.html, custom: true }));
+  res.json([...builtin, ...saved]);
+});
+
+// Save the current composer content as a reusable custom template
+app.post('/api/admin/emails/templates', adminAuth, express.json(), (req, res) => {
+  try {
+    const name = (req.body.name || '').trim();
+    const subject = (req.body.subject || '').trim();
+    const html = (req.body.html || '').trim();
+    if (!name || !subject) return res.status(400).json({ ok: false, error: 'Name and subject are required.' });
+    let custom = [];
+    try { custom = JSON.parse(fs.readFileSync(EMAIL_TEMPLATES_FILE, 'utf8')); } catch (e) { custom = []; }
+    const id = 't' + Date.now().toString(36);
+    custom.push({ id, name, subject, html });
+    fs.writeFileSync(EMAIL_TEMPLATES_FILE, JSON.stringify(custom, null, 2));
+    res.json({ ok: true, id: 'custom:' + id });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
 });
 
 // Send an email on behalf of the company (HTML, with attachments)

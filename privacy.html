@@ -23,7 +23,7 @@ nav {
   padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between;
   background:rgba(255,255,255,0.92); backdrop-filter:blur(12px); box-shadow:0 1px 12px rgba(0,0,0,0.06);
 }
-.logo { font-weight:800; font-size:1.3rem; color:var(--primary); text-decoration:none !important; }
+.logo { font-weight:800; font-size:1.3rem; color:var(--primary); text-decoration:none !important; letter-spacing:-0.02em; line-height:1; }
 .logo span { color:var(--accent); }
 .logo-img { height: 34px; width: auto; display: block; vertical-align: middle; }
 .logo-accent { color:#0a2540; font-weight: 800; }
@@ -68,6 +68,10 @@ footer { text-align:center; padding:2rem; font-size:0.85rem; color:var(--text-mu
   .container { padding-left: 1.2rem; padding-right: 1.2rem; }
   nav#nav, .nav, .topbar { padding: 0.8rem 1.2rem; }
   .hero h1 { font-size: clamp(1.9rem, 8vw, 2.8rem); }
+
+  .form-row { flex-direction: column !important; gap: 0.9rem !important; }
+  .contact-form input, .contact-form select, .contact-form textarea { width: 100%; font-size: 16px; padding: 0.9rem 1rem; }
+  .contact-grid, .contact-form { width: 100%; }
 }
 </style>
 </head>

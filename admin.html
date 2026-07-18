@@ -46,7 +46,7 @@ a { color:var(--accent); text-decoration:none; }
 
 /* Header */
 .admin-header { background:#fff; box-shadow:0 1px 12px rgba(0,0,0,0.06); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
-.admin-header .brand { font-weight:800; font-size:1.2rem; color:var(--primary); display:flex; align-items:center; gap:0.6rem; }
+.admin-header .brand { font-weight:800; font-size:1.2rem; color:var(--primary); display:flex; align-items:center; gap:0.6rem; letter-spacing:-0.02em; line-height:1; }
 .admin-header .brand .admin-logo-img { height:30px; width:auto; }
 .admin-header .brand span { color:var(--accent); }
 .admin-header .right { display:flex; align-items:center; gap:1rem; }
@@ -452,6 +452,7 @@ select.pay-state[data-paystate] { }
 
           <div class="row-actions" style="margin-top:0.5rem;">
             <button type="button" class="btn btn-ghost btn-sm" id="emailPreviewBtn">&#x1F441; Live Preview</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="emailSaveTplBtn">&#x1F4BE; Save as Template</button>
             <button type="submit" class="btn btn-green">&#x1F4E4; Send Email</button>
             <span id="emailFeedback" class="muted" style="margin-left:0.6rem;font-size:0.85rem;"></span>
           </div>
@@ -1100,12 +1101,14 @@ async function loadEmailTab() {
   loadEmailHistory();
 }
 
+let emailTemplateList = [];
 async function loadEmailTemplates() {
   try {
     const res = await apiFetch('/api/admin/emails/templates');
     const list = await res.json();
+    emailTemplateList = list;
     const sel = $('#emailTemplate');
-    sel.innerHTML = '<option value="">— Choose a template —</option>' + list.map(t => `<option value="${t.id}">${esc(t.subject)}</option>`).join('');
+    sel.innerHTML = '<option value="">— Choose a template —</option>' + list.map(t => `<option value="${t.id}">${esc(t.subject)}${t.custom ? '  ★' : ''}</option>`).join('');
   } catch(e) {}
 }
 
@@ -1133,11 +1136,13 @@ document.addEventListener('click', (e) => {
 $('#emailTemplate').addEventListener('change', async () => {
   const id = $('#emailTemplate').value;
   if (!id) return;
-  // Templates are static on the server; re-fetch list to get html body
-  const res = await apiFetch('/api/admin/emails/templates');
-  const list = await res.json();
-  // Server only returns subjects; we fetch full template html via a dedicated route is overkill —
-  // instead build body client-side from a known map mirrored here.
+  if (id.startsWith('custom:')) {
+    const tpl = emailTemplateList.find(t => t.id === id);
+    if (!tpl) return;
+    $('#emailSubject').value = tpl.subject || '';
+    $('#emailBody').innerHTML = tpl.html || '';
+    return;
+  }
   const tpl = EMAIL_TEMPLATE_BODIES[id];
   if (!tpl) return;
   $('#emailSubject').value = fillTemplate(tpl.subject);
@@ -1217,6 +1222,31 @@ $('#emailPreviewBtn').addEventListener('click', () => {
   const frame = $('#emailPreviewFrame');
   frame.srcdoc = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Inter,Arial,sans-serif;color:#1a1a2e;padding:1rem;line-height:1.6;}</style></head><body>' + html + '</body></html>';
   $('#emailPreviewCard').scrollIntoView({ behavior: 'smooth' });
+});
+
+// Save current composer as a reusable template
+$('#emailSaveTplBtn').addEventListener('click', async () => {
+  const subject = $('#emailSubject').value.trim();
+  const html = $('#emailBody').innerHTML.trim();
+  if (!subject) { alert('Add a subject first so the template has a name reference.'); return; }
+  if (!html) { alert('Add some message content before saving a template.'); return; }
+  const name = prompt('Name this template:', subject);
+  if (!name) return;
+  const fb = $('#emailFeedback'); fb.style.color = ''; fb.textContent = 'Saving…';
+  try {
+    const res = await apiFetch('/api/admin/emails/templates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.trim(), subject, html })
+    });
+    const d = await res.json();
+    if (!res.ok) { fb.textContent = d.error || 'Failed to save.'; fb.style.color = '#c62828'; return; }
+    fb.textContent = 'Template saved ✓'; fb.style.color = '#1b7a1b';
+    await loadEmailTemplates();
+    $('#emailTemplate').value = d.id;
+  } catch (e) {
+    fb.textContent = 'Failed to save template.'; fb.style.color = '#c62828';
+  }
 });
 
 // Send
