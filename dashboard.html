@@ -140,7 +140,14 @@ a { color:var(--accent); text-decoration:none; }
 .chat-foot input:focus { border-color:var(--accent); }
 .chat-foot button { background:var(--accent); color:#fff; border:none; width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.1rem; flex-shrink:0; }
 .chat-foot button:hover { background:#0052a3; }
-@media (max-width:768px) { .dash-container { padding:1rem; } .chat-panel { height:70vh; } }
+@media (max-width:768px) { .dash-container { padding:1rem; } .chat-panel { height:70vh; } 
+  img { max-width: 100%; height: auto; }
+  * { -webkit-text-size-adjust: 100%; }
+  body { overflow-x: hidden; }
+  .container { padding-left: 1.2rem; padding-right: 1.2rem; }
+  nav#nav, .nav, .topbar { padding: 0.8rem 1.2rem; }
+  .hero h1 { font-size: clamp(1.9rem, 8vw, 2.8rem); }
+}
 </style>
 </head>
 <body>
@@ -158,12 +165,12 @@ a { color:var(--accent); text-decoration:none; }
     <div class="login-divider"><span>Don't have an account yet?</span></div>
     <div class="login-services-label">Request access for your service:</div>
     <div class="login-services">
-      <a class="svc-btn" href="systematic-review.html#contact">Systematic Review</a>
-      <a class="svc-btn" href="meta-analysis.html#contact">Meta-Analysis</a>
-      <a class="svc-btn" href="manuscript-writing.html#contact">Manuscript Writing</a>
-      <a class="svc-btn" href="abstract-conference.html#contact">Abstract / Conference</a>
-      <a class="svc-btn" href="scoping-review.html#contact">Scoping Review</a>
-      <a class="svc-btn" href="literature-review.html#contact">Literature Review</a>
+      <a class="svc-btn" href="systematic-review#contact">Systematic Review</a>
+      <a class="svc-btn" href="meta-analysis#contact">Meta-Analysis</a>
+      <a class="svc-btn" href="manuscript-writing#contact">Manuscript Writing</a>
+      <a class="svc-btn" href="abstract-conference#contact">Abstract / Conference</a>
+      <a class="svc-btn" href="scoping-review#contact">Scoping Review</a>
+      <a class="svc-btn" href="literature-review#contact">Literature Review</a>
     </div>
     <a class="login-contact-mail" href="mailto:medresearch77@gmail.com">Or email us at medresearch77@gmail.com</a>
   </div>
@@ -227,7 +234,7 @@ a { color:var(--accent); text-decoration:none; }
       </div>
     </div>
   </div>
-  <footer class="dash-footer"><a href="privacy.html">Privacy Policy</a></footer>
+  <footer class="dash-footer"><a href="privacy">Privacy Policy</a></footer>
 </div>
 
 <!-- Chat widget -->
@@ -308,7 +315,7 @@ function cardHtml(o) {
   let action;
   if (o.paymentEnabled) {
     const label = o.paid ? 'View Agreement &amp; Payment' : (isSplit && o.depositPaid ? 'Pay Remaining 50%' : 'Agreement &amp; Payment');
-    action = `<a class="pay-btn" href="agreement.html?project=${o.id}" data-pay="${o.id}">&#x1F4B3; ${label}</a>`;
+    action = `<a class="pay-btn" href="agreement?project=${o.id}" data-pay="${o.id}">&#x1F4B3; ${label}</a>`;
   } else {
     action = `<div class="pay-disabled-note">Agreement &amp; Payment will be enabled by your administrator.</div>`;
   }

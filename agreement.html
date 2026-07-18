@@ -20,6 +20,13 @@ a { color:var(--accent); text-decoration:none; }
 .topbar { background:var(--primary); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; }
 .topbar .logo { font-weight:800; color:#fff; font-size:1.1rem; }
 .topbar .logo span { color:#7bbaff; }
+@media (max-width: 768px) {
+  img { max-width: 100%; height: auto; }
+  body { overflow-x: hidden; }
+  .topbar { padding: 0.8rem 1.2rem; }
+  .wrap { padding: 1.5rem 1.2rem; }
+  h1 { font-size: 1.6rem; }
+}
 .topbar a { color:#cfe3ff; font-size:0.85rem; }
 .card { background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:2.2rem; margin-top:1.5rem; }
 .card h1 { font-size:1.6rem; font-weight:800; color:var(--primary); margin-bottom:0.3rem; }
@@ -47,7 +54,7 @@ a { color:var(--accent); text-decoration:none; }
 <body>
 <div class="topbar">
   <div class="logo"><a href="/" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:0.5rem;"><img src="/logo.png" alt="medresearch.me" style="height:28px;width:auto;"><span>Med<span style="color:#0a2540;">Research</span></span></a></div>
-  <a href="dashboard.html">← Dashboard</a>
+  <a href="dashboard">← Dashboard</a>
 </div>
 <div class="wrap">
   <div class="card" id="mainCard">
@@ -118,7 +125,7 @@ acceptBtn.addEventListener('click', async () => {
 });
 
 async function load() {
-  if (!token || !user) { location.href = 'dashboard.html'; return; }
+  if (!token || !user) { location.href = 'dashboard'; return; }
   if (!projectId) { document.getElementById('loading').textContent = 'No project specified.'; return; }
   try {
     const res = await fetch(API + '/api/orders/' + projectId, { headers:{ Authorization:'Bearer ' + token } });

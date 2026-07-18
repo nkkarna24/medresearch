@@ -37,25 +37,14 @@ async function sendEmail({ fromName, replyTo, subject, text }) {
 }
 
 // ── Brand email banner ──
-// Public path where the banner is served, plus an inlined data-URI copy so the
-// banner always renders even if a mail client blocks external images.
-const BANNER_PUBLIC_URL = '/brand/email-banner.png';
-const BANNER_FILE = path.join(__dirname, 'public', 'brand', 'email-banner.png');
-let _bannerDataUri = null;
-function getBannerDataUri() {
-  if (_bannerDataUri) return _bannerDataUri;
-  try {
-    const buf = fs.readFileSync(BANNER_FILE);
-    const ext = path.extname(BANNER_FILE).replace('.', '') || 'png';
-    _bannerDataUri = 'data:image/' + ext + ';base64,' + buf.toString('base64');
-  } catch (e) { _bannerDataUri = ''; }
-  return _bannerDataUri;
-}
+// Referenced as a hosted absolute URL (not a data-URI) so the email stays small
+// and Gmail does not clip it with "[Message clipped]". The image is served from
+// the site itself at /brand/email-banner.png.
+const SITE_URL = (process.env.SITE_URL || 'https://medresearch.me').replace(/\/+$/, '');
+const BANNER_URL = SITE_URL + '/brand/email-banner.png';
 function wrapWithBanner(html, brandBanner) {
   if (!brandBanner) return html;
-  const uri = getBannerDataUri();
-  if (!uri) return html;
-  const banner = `<div style="margin:0 0 18px 0;text-align:center;"><img src="${uri}" alt="medresearch.me" style="max-width:600px;width:100%;height:auto;border:0;display:inline-block;" /></div>`;
+  const banner = `<div style="margin:0 0 18px 0;text-align:center;"><img src="${BANNER_URL}" alt="medresearch.me" style="max-width:600px;width:100%;height:auto;border:0;display:inline-block;" /></div>`;
   return banner + (html || '');
 }
 
@@ -270,6 +259,23 @@ app.use((req, res, next) => {
   if (STATIC_DENY.some(rx => rx.test(p))) return res.status(404).end();
   next();
 });
+
+// Serve the favicon at the conventional root path browsers auto-request.
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'favicon', 'favicon.ico'));
+});
+
+// Extensionless URLs: /systematic-review serves /systematic-review.html (clean URL)
+const PAGES = ['index','abstract-conference','systematic-review','meta-analysis','manuscript-writing','scoping-review','literature-review','privacy','agreement','dashboard','admin'];
+app.use((req, res, next) => {
+  const p = (req.path || '/').split('?')[0];
+  if (p === '/' || p.length < 2) return next();
+  if (p.includes('.') || p.startsWith('/api') || p.startsWith('/uploads') || p.startsWith('/favicon') || p.startsWith('/brand') || p.startsWith('/logo')) return next();
+  const name = p.replace(/^\//, '');
+  if (PAGES.includes(name)) { req.url = '/' + name + '.html' + (req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''); }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '.')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
