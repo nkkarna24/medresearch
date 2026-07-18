@@ -51,12 +51,13 @@ async function sendViaBrevoApi({ to, cc, bcc, subject, html, text, replyTo, atta
     return String(val).split(',').map(s => s.trim()).filter(Boolean).map(email => ({ email }));
   };
   const replyToVal = (replyTo || process.env.CONTACT_EMAIL || 'info@medresearch.me');
+  const plainText = text || (html ? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '') || ' ';
   const msg = {
     sender,
     to: buildRecipients(to),
     subject,
-    html: html || undefined,
-    text: text || (html ? html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : undefined),
+    htmlContent: html || undefined,
+    textContent: plainText,
     replyTo: { email: String(replyToVal).trim() },
   };
   const ccList = buildRecipients(cc);
