@@ -507,6 +507,21 @@ select.pay-state[data-paystate] { }
   </div>
 </div>
 
+<!-- RTA modal -->
+<div class="modal-back" id="rtaModalBack" style="display:none;">
+  <div class="modal" id="rtaModalBox" style="max-width:860px;width:95%;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <h3 style="margin:0;">&#x1F4E1; Right Transfer Agreement Preview</h3>
+      <div>
+        <button class="btn btn-green btn-sm" id="rtaPrintBtn">&#x1F5D8; Print / Save PDF</button>
+        <button class="btn btn-ghost btn-sm" id="rtaCloseBtn" style="margin-left:0.5rem;">Close</button>
+      </div>
+    </div>
+    <div id="rtaFrame" style="background:#fff;border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:72vh;"></div>
+  </div>
+</div>
+</div>
+
 <script>
 const $ = (s) => document.querySelector(s);
 const API = '';
@@ -1293,6 +1308,174 @@ $('#invoiceCloseBtn').addEventListener('click', () => { $('#invoiceModalBack').s
 $('#invoicePrintBtn').addEventListener('click', () => {
   const w = window.open('', '_blank');
   w.document.write($('#invoiceFrame').innerHTML);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); }, 300);
+});
+
+// ── Right Transfer Agreement (light theme, matching invoice) ──
+function svcCode(o) {
+  const svc = (o.service || '').toLowerCase();
+  const MAP = { 'systematic review':'SR', 'conference abstract':'ABS', 'meta analysis':'META', 'meta-analysis':'META', 'literature review':'LIT', 'case report':'CR', 'research article':'ART', 'manuscript':'ART', 'grant proposal':'GR', 'thesis':'TH' };
+  for (const k in MAP) { if (svc.indexOf(k) !== -1) return MAP[k]; }
+  return 'PRJ';
+}
+const CODE39 = {
+  '0':'101001101101','1':'110100101011','2':'101100101011','3':'110110010101','4':'101001101011','5':'110100110101','6':'101100110101','7':'101001011011','8':'110100101101','9':'101100101101',
+  'A':'110101001011','B':'101101001011','C':'110110100101','D':'101011001011','E':'110101100101','F':'101101100101','G':'101010011011','H':'110101001101','I':'101101001101','J':'101011001101',
+  'K':'110101010011','L':'101101010011','M':'110110101001','N':'101011010011','O':'110101101001','P':'101101101001','Q':'101010110011','R':'110101011001','S':'101101011001','T':'101011011001',
+  'U':'110010101011','V':'100110101011','W':'110011010101','X':'100101101011','Y':'110010110101','Z':'100110110101','-':'100101011011','.':'110010101101',' ':'100110101101','$':'100100100101','/':'100100101001','+':'100100010101','%':'110010010101','*':'100101101101'
+};
+function code39(text) {
+  const Unit = 2; // px
+  const data = ('*' + String(text).toUpperCase() + '*').split('');
+  let bars = '';
+  data.forEach((ch, idx) => {
+    const pat = CODE39[ch] || CODE39[' '];
+    for (let i = 0; i < pat.length; i++) {
+      const wide = pat[i] === '1';
+      const wpx = (wide ? 3 : 1) * Unit;
+      if (i % 2 === 0) bars += `<i style="display:inline-block;width:${wpx}px;height:54px;background:#0a2540;"></i>`;
+      else bars += `<i style="display:inline-block;width:${wpx}px;height:54px;background:#fff;"></i>`;
+    }
+    if (idx < data.length - 1) bars += `<i style="display:inline-block;width:${Unit}px;height:54px;background:#fff;"></i>`;
+  });
+  return `<div style="display:flex;align-items:center;justify-content:center;">${bars}</div>`;
+}
+function openRTA(o) {
+  const amount = Number(o.amount) || 0;
+  const client = o.client || (o.clientEmail || o.userEmail || 'Client');
+  const email = o.clientEmail || o.userEmail || '';
+  const today = new Date().toISOString().slice(0,10);
+  const num = (parseInt(o.id, 10) || 0).toString().padStart(4, '0');
+  const code = svcCode(o);
+  const year = today.slice(0,4);
+  const projRef = 'MR-' + code + '-' + year + '-' + num;
+  const clientId = 'CL-' + num;
+  const bcVal = 'MR' + code + year + num;
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    @page { size: A4; margin: 14mm; }
+    html,body{font-family:'Inter',Arial,sans-serif;color:#1a1a2e;background:#fff;line-height:1.55;}
+    .doc{width:100%;}
+    .hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #0066cc;padding-bottom:10px;}
+    .hdr .l{display:flex;align-items:center;gap:10px;}
+    .hdr .l img{height:38px;}
+    .hdr .l .n{font-size:19px;font-weight:800;color:#0a2540;letter-spacing:-0.02em;}
+    .hdr .l .n span{color:#0066cc;}
+    .hdr .r{text-align:right;}
+    .hdr .r h1{font-size:18px;color:#0a2540;letter-spacing:0.03em;}
+    .hdr .r .no{font-size:11px;color:#5a6a7e;margin-top:2px;}
+    .parties{display:flex;gap:14px;margin:14px 0;}
+    .party{flex:1;background:#f8fafc;border:1px solid #e3e8ef;border-radius:8px;padding:10px 12px;}
+    .party h3{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#0066cc;margin-bottom:4px;}
+    .party .b{font-size:14px;font-weight:700;color:#0a2540;}
+    .party p{font-size:12px;margin:1px 0;}
+    .meta{display:flex;gap:18px;flex-wrap:wrap;background:#e8f0fe;border-radius:8px;padding:8px 12px;margin-bottom:14px;}
+    .meta div{font-size:12px;}
+    .meta .k{font-size:10px;text-transform:uppercase;color:#5a6a7e;}
+    .meta .v{font-weight:700;color:#0a2540;}
+    h2.sec{font-size:13px;color:#0066cc;text-transform:uppercase;letter-spacing:0.05em;margin:16px 0 6px;border-bottom:1px solid #e3e8ef;padding-bottom:3px;}
+    p.cl{font-size:12px;margin:5px 0;text-align:justify;}
+    ol.art{margin:4px 0 4px 18px;}
+    ol.art li{font-size:12px;margin:5px 0;text-align:justify;}
+    .badge{display:flex;align-items:center;gap:8px;background:#e6f7e6;border:1px solid #bfe6c8;border-radius:8px;padding:6px 10px;margin:8px 0;font-size:11px;color:#1b7a1b;}
+    .badge .chk{font-size:14px;font-weight:800;}
+    table{width:100%;border-collapse:collapse;margin:8px 0;}
+    thead th{background:#e8f0fe;color:#0a2540;text-align:left;padding:7px 10px;font-size:11px;text-transform:uppercase;border-bottom:2px solid #0066cc;}
+    tbody td{padding:7px 10px;font-size:12px;border-bottom:1px solid #e3e8ef;vertical-align:top;}
+    .sign{display:flex;gap:24px;margin-top:22px;}
+    .sign .box{flex:1;}
+    .sign .ln{border-top:1px solid #0a2540;margin-top:34px;padding-top:4px;font-size:11px;color:#5a6a7e;}
+    .bc{margin-top:18px;text-align:center;border-top:1px solid #e3e8ef;padding-top:12px;}
+    .bc .cap{font-size:11px;letter-spacing:2px;color:#0a2540;margin-top:4px;font-weight:700;}
+    .ft{text-align:center;font-size:10px;color:#7a8a9e;margin-top:14px;}
+    @media print{.nop{display:none;}}
+  </style></head><body>
+  <div class="doc">
+    <div class="hdr">
+      <div class="l"><img src="/logo.png" onerror="this.style.display='none'"><div class="n">Med<span>Research</span></div></div>
+      <div class="r"><h1>RIGHT TRANSFER AGREEMENT</h1><div class="no">Ref. <strong>${esc(projRef)}</strong></div></div>
+    </div>
+    <div class="parties">
+      <div class="party"><h3>Provider</h3><div class="b">MedResearch</div><p>info@medresearch.me</p><p>medresearch.me</p></div>
+      <div class="party"><h3>Recipient (Client)</h3><div class="b">${esc(client)}</div>${email?`<p>${esc(email)}</p>`:''}${esc(o.clientOrg||'')?`<p>${esc(o.clientOrg)}</p>`:''}<p>Client ID: <strong>${esc(clientId)}</strong></p></div>
+    </div>
+    <div class="meta">
+      <div><div class="k">Agreement Date</div><div class="v">${esc(today)}</div></div>
+      <div><div class="k">Project Reference</div><div class="v">${esc(projRef)}</div></div>
+      <div><div class="k">Amount Settled</div><div class="v">${money(amount)}</div></div>
+    </div>
+    <div class="badge"><span class="chk">&#10003;</span><span><strong>Digitally Generated</strong> &middot; Verified by MedResearch &middot; Rights transfer effective upon full payment</span></div>
+
+    <h2 class="sec">1. Parties &amp; Subject</h2>
+    <p class="cl">This Right Transfer Agreement (the &ldquo;Agreement&rdquo;) is entered into on <strong>${esc(today)}</strong> between <strong>MedResearch</strong> (the &ldquo;Provider&rdquo;), operating at medresearch.me, and <strong>${esc(client)}</strong> (the &ldquo;Recipient&rdquo;), in relation to the project identified as <strong>${esc(projRef)}</strong> (&ldquo;the Project&rdquo;). The Project deliverables are summarised below.</p>
+    <table><thead><tr><th>Service</th><th>Plan</th><th>Project Title</th><th class="num">Amount</th></tr></thead>
+    <tbody><tr><td>${esc(o.service || '—')}</td><td>${esc(o.plan || '—')}</td><td>${esc(o.title || 'Research service')}</td><td style="text-align:right;">${money(amount)}</td></tr></tbody></table>
+
+    <h2 class="sec">2. Transfer of Rights</h2>
+    <ol class="art">
+      <li>Upon receipt of full payment for the Project, the Provider hereby assigns, transfers and conveys to the Recipient all right, title and interest in and to the final deliverables, including all copyright, authorship credit and intellectual property rights subsisting therein, to the fullest extent permitted by applicable law.</li>
+      <li>The Recipient is granted a perpetual, worldwide, irrevocable and royalty-free licence to use, reproduce, adapt, publish, present and commercially exploit the deliverables for any lawful purpose.</li>
+      <li>Where the deliverables are incorporated into a larger work authored by the Recipient, ownership of that larger work remains with the Recipient, subject to this transfer.</li>
+    </ol>
+
+    <h2 class="sec">3. Exclusions &amp; Provider Reservations</h2>
+    <ol class="art">
+      <li>The transfer does not include the transfer of any pre-existing materials, templates, methodologies, internal know-how or general research frameworks owned by the Provider, which the Provider retains the right to reuse.</li>
+      <li>The Provider makes no claim of originality over facts, data sourced from third parties, or standard scientific conventions reflected in the deliverables.</li>
+      <li>Nothing in this Agreement transfers trademark, trade name or brand rights of MedResearch to the Recipient.</li>
+    </ol>
+
+    <h2 class="sec">4. Warranties &amp; Disclaimers</h2>
+    <ol class="art">
+      <li>The Provider warrants that the deliverables are produced by its research team through expert review and manual quality control, and that to the best of its knowledge they do not infringe the intellectual property rights of any third party.</li>
+      <li>Deliverables are prepared for academic and research support purposes and do not constitute medical, legal or clinical advice. The Recipient bears responsibility for the final use, submission and compliance with relevant institutional or journal policies.</li>
+      <li>Except as expressly stated, the deliverables are provided &ldquo;as is&rdquo; without further warranty of merchantability or fitness for a particular purpose.</li>
+    </ol>
+
+    <h2 class="sec">5. Confidentiality</h2>
+    <ol class="art">
+      <li>All submitted documents, research data and communications are handled confidentially by the Provider. Client information is never shared with third parties.</li>
+      <li>The Provider shall not disclose the Recipient&rsquo;s identity or project details without prior written consent, except where required by law.</li>
+    </ol>
+
+    <h2 class="sec">6. Payment &amp; Effectiveness</h2>
+    <ol class="art">
+      <li>This transfer of rights is effective only upon the Provider&rsquo;s confirmation of full payment of <strong>${money(amount)}</strong> for the Project.</li>
+      <li>If payment is disputed or reversed, the rights granted under this Agreement revert to the Provider until the matter is resolved.</li>
+    </ol>
+
+    <h2 class="sec">7. Governing Law &amp; Miscellaneous</h2>
+    <ol class="art">
+      <li>This Agreement is governed by the laws of the jurisdiction in which MedResearch operates, without regard to conflict-of-law principles.</li>
+      <li>This Agreement constitutes the entire understanding between the parties regarding the transfer of rights for the Project and supersedes all prior discussions.</li>
+      <li>This is a computer-generated agreement and is valid without a physical signature once the Recipient accepts the terms in the client dashboard and full payment is recorded.</li>
+    </ol>
+
+    <div class="sign">
+      <div class="box"><div class="ln">MedResearch (Provider)</div></div>
+      <div class="box"><div class="ln">${esc(client)} (Recipient)</div></div>
+    </div>
+
+    <div class="bc">
+      ${code39(bcVal)}
+      <div class="cap">${esc(bcVal)}</div>
+    </div>
+    <div class="ft">MedResearch &middot; Expert Medical Research Support &middot; info@medresearch.me &middot; medresearch.me</div>
+  </div>
+  </body></html>`;
+  $('#rtaFrame').innerHTML = html;
+  $('#rtaModalBack').style.display = 'flex';
+}
+function previewRTA(id) {
+  const o = allOrders.find(x => String(x.id) === String(id));
+  if (o) openRTA(o);
+}
+$('#rtaCloseBtn').addEventListener('click', () => { $('#rtaModalBack').style.display = 'none'; });
+$('#rtaPrintBtn').addEventListener('click', () => {
+  const w = window.open('', '_blank');
+  w.document.write($('#rtaFrame').innerHTML);
   w.document.close();
   w.focus();
   setTimeout(() => { w.print(); }, 300);
