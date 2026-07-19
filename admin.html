@@ -1234,6 +1234,7 @@ function openInvoice(o) {
   const year = today.slice(0,4);
   const projRef = 'MR-' + code + '-' + year + '-' + num;
   const clientId = 'CL-' + (parseInt(o.id, 10) || 0).toString().padStart(4, '0');
+  const bcVal = 'MR' + code + year + num;
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
     *{box-sizing:border-box;margin:0;padding:0;}
     @page { size: A4; margin: 12mm; }
@@ -1269,6 +1270,8 @@ function openInvoice(o) {
     .badge .chk{font-size:14px;font-weight:800;}
     .note{font-size:11px;color:#5a6a7e;border-top:1px solid #e3e8ef;padding-top:10px;margin-top:auto;line-height:1.5;text-align:center;}
     .ft{text-align:center;font-size:10px;color:#7a8a9e;padding-top:8px;}
+    .bc{margin-top:12px;text-align:center;border-top:1px solid #e3e8ef;padding-top:10px;}
+    .bc .cap{font-size:11px;letter-spacing:2px;color:#0a2540;margin-top:4px;font-weight:700;}
     .paid{display:inline-block;background:#e6f7e6;color:#1b7a1b;font-weight:700;padding:2px 8px;border-radius:100px;font-size:11px;}
     @media print{.nop{display:none;}}
   </style></head><body>
@@ -1299,6 +1302,10 @@ function openInvoice(o) {
     </div>
     <div class="note">This invoice confirms that full payment has been received. After completion of the project, all the final deliverables together with the Right Transfer Agreement will be released to the client. All deliverables are prepared by our research team through expert review and manual quality control. All submitted documents, research data, and communications are handled confidentially. Client information is never shared with third parties.<br><br>This is a computer-generated invoice and is valid without a physical signature.</div>
     <div class="ft">MedResearch &middot; Expert Medical Research Support &middot; info@medresearch.me &middot; medresearch.me</div>
+    <div class="bc">
+      ${code39(bcVal)}
+      <div class="cap">${esc(bcVal)}</div>
+    </div>
   </div>
   </body></html>`;
   $('#invoiceFrame').innerHTML = html;
@@ -1406,7 +1413,6 @@ function openRTA(o) {
       <div><div class="k">Project Reference</div><div class="v">${esc(projRef)}</div></div>
       <div><div class="k">Amount Settled</div><div class="v">${money(amount)}</div></div>
     </div>
-    <div class="badge"><span class="chk">&#10003;</span><span><strong>Digitally Generated</strong> &middot; Verified by MedResearch &middot; Rights transfer effective upon full payment</span></div>
 
     <h2 class="sec">1. Parties &amp; Subject</h2>
     <p class="cl">This Right Transfer Agreement (the &ldquo;Agreement&rdquo;) is entered into on <strong>${esc(today)}</strong> between <strong>MedResearch</strong> (the &ldquo;Provider&rdquo;), operating at medresearch.me, and <strong>${esc(client)}</strong> (the &ldquo;Recipient&rdquo;), in relation to the project identified as <strong>${esc(projRef)}</strong> (&ldquo;the Project&rdquo;). The Project deliverables are summarised below.</p>
@@ -1454,7 +1460,7 @@ function openRTA(o) {
     </ol>
 
     <div class="sign">
-      <div class="box"><div class="ln">MedResearch (Provider)</div></div>
+      <div class="box" style="position:relative;"><img src="/stamp.png" onerror="this.style.display='none'" style="position:absolute;top:-26px;left:0;height:84px;opacity:0.9;pointer-events:none;"><div class="ln">MedResearch (Provider)</div></div>
       <div class="box"><div class="ln">${esc(client)} (Recipient)</div></div>
     </div>
 
