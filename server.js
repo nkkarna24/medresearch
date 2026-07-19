@@ -156,16 +156,6 @@ const transporter =
       })
     : null;
 
-if (transporter) {
-  transporter.verify((err) => {
-    if (err) {
-      console.error("SMTP connection failed:", err.message);
-    } else {
-      console.log("✅ SMTP server is ready.");
-    }
-  });
-}
-
 // Admin -> client project file uploads (keeps original filename)
 const PROJECT_UPLOADS = path.join(__dirname, 'project-uploads');
 if (!fs.existsSync(PROJECT_UPLOADS)) fs.mkdirSync(PROJECT_UPLOADS);
