@@ -1391,10 +1391,12 @@ function openRTA(o) {
     table{width:100%;border-collapse:collapse;margin:8px 0;}
     thead th{background:#e8f0fe;color:#0a2540;text-align:left;padding:7px 10px;font-size:11px;text-transform:uppercase;border-bottom:2px solid #0066cc;}
     tbody td{padding:7px 10px;font-size:12px;border-bottom:1px solid #e3e8ef;vertical-align:top;}
-    .sign{display:flex;gap:24px;margin-top:22px;}
-    .sign .box{flex:1;}
-    .sign .ln{border-top:1px solid #0a2540;margin-top:34px;padding-top:4px;font-size:11px;color:#5a6a7e;}
-    .bc{margin-top:18px;text-align:center;border-top:1px solid #e3e8ef;padding-top:12px;}
+    .signpage{page-break-before:always;text-align:center;padding-top:40px;}
+    .sign{display:flex;justify-content:center;gap:60px;margin-top:30px;}
+    .sign .box{flex:0 0 240px;position:relative;}
+    .sign .stamp{display:block;margin:0 auto 8px;height:90px;opacity:0.9;}
+    .sign .ln{border-top:1px solid #0a2540;margin-top:8px;padding-top:4px;font-size:11px;color:#5a6a7e;}
+    .bc{margin-top:28px;text-align:center;border-top:1px solid #e3e8ef;padding-top:14px;}
     .bc .cap{font-size:11px;letter-spacing:2px;color:#0a2540;margin-top:4px;font-weight:700;}
     .ft{text-align:center;font-size:10px;color:#7a8a9e;margin-top:14px;}
     @media print{.nop{display:none;}}
@@ -1411,13 +1413,12 @@ function openRTA(o) {
     <div class="meta">
       <div><div class="k">Agreement Date</div><div class="v">${esc(today)}</div></div>
       <div><div class="k">Project Reference</div><div class="v">${esc(projRef)}</div></div>
-      <div><div class="k">Amount Settled</div><div class="v">${money(amount)}</div></div>
     </div>
 
     <h2 class="sec">1. Parties &amp; Subject</h2>
     <p class="cl">This Right Transfer Agreement (the &ldquo;Agreement&rdquo;) is entered into on <strong>${esc(today)}</strong> between <strong>MedResearch</strong> (the &ldquo;Provider&rdquo;), operating at medresearch.me, and <strong>${esc(client)}</strong> (the &ldquo;Recipient&rdquo;), in relation to the project identified as <strong>${esc(projRef)}</strong> (&ldquo;the Project&rdquo;). The Project deliverables are summarised below.</p>
-    <table><thead><tr><th>Service</th><th>Plan</th><th>Project Title</th><th class="num">Amount</th></tr></thead>
-    <tbody><tr><td>${esc(o.service || '—')}</td><td>${esc(o.plan || '—')}</td><td>${esc(o.title || 'Research service')}</td><td style="text-align:right;">${money(amount)}</td></tr></tbody></table>
+    <table><thead><tr><th>Service</th><th>Plan</th><th>Project Title</th></tr></thead>
+    <tbody><tr><td>${esc(o.service || '—')}</td><td>${esc(o.plan || '—')}</td><td>${esc(o.title || 'Research service')}</td></tr></tbody></table>
 
     <h2 class="sec">2. Transfer of Rights</h2>
     <ol class="art">
@@ -1448,7 +1449,7 @@ function openRTA(o) {
 
     <h2 class="sec">6. Payment &amp; Effectiveness</h2>
     <ol class="art">
-      <li>This transfer of rights is effective only upon the Provider&rsquo;s confirmation of full payment of <strong>${money(amount)}</strong> for the Project.</li>
+      <li>This transfer of rights is effective only upon the Provider&rsquo;s confirmation of full payment for the Project.</li>
       <li>If payment is disputed or reversed, the rights granted under this Agreement revert to the Provider until the matter is resolved.</li>
     </ol>
 
@@ -1459,14 +1460,21 @@ function openRTA(o) {
       <li>This is a computer-generated agreement and is valid without a physical signature once the Recipient accepts the terms in the client dashboard and full payment is recorded.</li>
     </ol>
 
-    <div class="sign">
-      <div class="box" style="position:relative;"><img src="/stamp.png" onerror="this.style.display='none'" style="position:absolute;top:-26px;left:0;height:84px;opacity:0.9;pointer-events:none;"><div class="ln">MedResearch (Provider)</div></div>
-      <div class="box"><div class="ln">${esc(client)} (Recipient)</div></div>
-    </div>
+    <div class="signpage">
+      <div class="sign">
+        <div class="box">
+          <img class="stamp" src="/stamp.png" onerror="this.style.display='none'">
+          <div class="ln">MedResearch (Provider)</div>
+        </div>
+        <div class="box">
+          <div class="ln">${esc(client)} (Recipient)</div>
+        </div>
+      </div>
 
-    <div class="bc">
-      ${code39(bcVal)}
-      <div class="cap">${esc(bcVal)}</div>
+      <div class="bc">
+        ${code39(bcVal)}
+        <div class="cap">${esc(bcVal)}</div>
+      </div>
     </div>
     <div class="ft">MedResearch &middot; Expert Medical Research Support &middot; info@medresearch.me &middot; medresearch.me</div>
   </div>
