@@ -1253,7 +1253,7 @@ function openInvoice(o) {
       <div class="r"><h1>INVOICE</h1><div class="no">No. <strong>${esc(invNo)}</strong></div></div>
     </div>
     <div class="parties">
-      <div class="party"><h3>From</h3><div class="b">MedResearch</div><p>info@medresearch.me</p></div>
+      <div class="party"><h3>From</h3><div class="b">MedResearch</div><p>info@medresearch.me</p><p>medresearch.me</p></div>
       <div class="party"><h3>Bill To</h3><div class="b">${esc(client)}</div>${email?`<p>${esc(email)}</p>`:''}<p>${esc(o.clientOrg||'')}</p></div>
     </div>
     <div class="meta">
