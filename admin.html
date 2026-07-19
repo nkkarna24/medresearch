@@ -1210,13 +1210,21 @@ function openInvoice(o) {
   const client = o.client || (o.clientEmail || o.userEmail || 'Client');
   const email = o.clientEmail || o.userEmail || '';
   const today = new Date().toISOString().slice(0,10);
-  const invNo = 'MR-' + String(o.id).toUpperCase();
-  const desc = [o.service, o.plan, o.title].filter(Boolean).join(' — ');
+  const num = (parseInt(o.id, 10) || 0).toString().padStart(4, '0');
+  const invNo = 'MR-' + num;
+  const svc = (o.service || '').toLowerCase();
+  const SERVICE_CODES = { 'systematic review':'SR', 'conference abstract':'ABS', 'meta analysis':'META', 'meta-analysis':'META', 'literature review':'LIT', 'case report':'CR', 'research article':'ART', 'manuscript':'ART', 'grant proposal':'GR', 'thesis':'TH' };
+  let code = 'PRJ';
+  for (const k in SERVICE_CODES) { if (svc.indexOf(k) !== -1) { code = SERVICE_CODES[k]; break; } }
+  const year = today.slice(0,4);
+  const projRef = 'MR-' + code + '-' + year + '-' + num;
+  const clientId = 'CL-' + (parseInt(o.id, 10) || 0).toString().padStart(4, '0');
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
     *{box-sizing:border-box;margin:0;padding:0;}
     @page { size: A4; margin: 12mm; }
-    html,body{font-family:'Inter',Arial,sans-serif;color:#1a1a2e;background:#fff;}
-    .inv{width:100%;height:273mm;overflow:hidden;display:flex;flex-direction:column;padding:6mm 4mm;}
+    html,body{font-family:'Inter',Arial,sans-serif;color:#1a1a2e;background:#fff;position:relative;}
+    .wm{position:absolute;top:50%;left:50%;width:340px;transform:translate(-50%,-50%);opacity:0.07;z-index:0;pointer-events:none;}
+    .inv{position:relative;z-index:1;width:100%;height:273mm;overflow:hidden;display:flex;flex-direction:column;padding:6mm 4mm;}
     .hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #0066cc;padding-bottom:10px;}
     .hdr .l{display:flex;align-items:center;gap:10px;}
     .hdr .l img{height:40px;}
@@ -1242,11 +1250,14 @@ function openInvoice(o) {
     .tot{margin-left:auto;width:280px;}
     .tot .row{display:flex;justify-content:space-between;padding:4px 10px;font-size:12px;}
     .tot .row.grand{background:#0066cc;border-radius:6px;font-weight:800;color:#fff;font-size:14px;margin-top:4px;}
-    .note{font-size:11px;color:#5a6a7e;border-top:1px solid #e3e8ef;padding-top:10px;margin-top:auto;}
-    .ft{text-align:center;font-size:11px;color:#5a6a7e;padding-top:8px;}
+    .badge{display:flex;align-items:center;gap:8px;background:#e6f7e6;border:1px solid #bfe6c8;border-radius:8px;padding:6px 10px;margin:6px 0 12px;font-size:11px;color:#1b7a1b;}
+    .badge .chk{font-size:14px;font-weight:800;}
+    .note{font-size:11px;color:#5a6a7e;border-top:1px solid #e3e8ef;padding-top:10px;margin-top:auto;line-height:1.5;}
+    .ft{text-align:center;font-size:10px;color:#7a8a9e;padding-top:8px;}
     .paid{display:inline-block;background:#e6f7e6;color:#1b7a1b;font-weight:700;padding:2px 8px;border-radius:100px;font-size:11px;}
     @media print{.nop{display:none;}}
   </style></head><body>
+  <img class="wm" src="/logo.png" onerror="this.style.display='none'">
   <div class="inv">
     <div class="hdr">
       <div class="l"><img src="/logo.png" onerror="this.style.display='none'"><div class="n">Med<span>Research</span></div></div>
@@ -1254,24 +1265,25 @@ function openInvoice(o) {
     </div>
     <div class="parties">
       <div class="party"><h3>From</h3><div class="b">MedResearch</div><p>info@medresearch.me</p><p>medresearch.me</p></div>
-      <div class="party"><h3>Bill To</h3><div class="b">${esc(client)}</div>${email?`<p>${esc(email)}</p>`:''}<p>${esc(o.clientOrg||'')}</p></div>
+      <div class="party"><h3>Bill To</h3><div class="b">${esc(client)}</div>${email?`<p>${esc(email)}</p>`:''}${esc(o.clientOrg||'')?`<p>${esc(o.clientOrg)}</p>`:''}<p>Client ID: <strong>${esc(clientId)}</strong></p></div>
     </div>
     <div class="meta">
       <div><div class="k">Issue Date</div><div class="v">${esc(today)}</div></div>
-      <div><div class="k">Project Ref</div><div class="v">#${esc(o.id)}</div></div>
+      <div><div class="k">Project Reference</div><div class="v">${esc(projRef)}</div></div>
       <div><div class="k">Status</div><div class="v"><span class="paid">PAID</span></div></div>
     </div>
-    <table><thead><tr><th>#</th><th>Description</th><th class="num">Amount</th></tr></thead>
+    <div class="badge"><span class="chk">&#10003;</span><span><strong>Digitally Generated</strong> &middot; Verified by MedResearch</span></div>
+    <table><thead><tr><th>Service</th><th>Plan</th><th>Project Title</th><th class="num">Amount</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>${esc(desc || 'Research service')}</td><td class="num">${money(amount)}</td></tr>
+      <tr><td>${esc(o.service || '—')}</td><td>${esc(o.plan || '—')}</td><td>${esc(o.title || 'Research service')}</td><td class="num">${money(amount)}</td></tr>
     </tbody></table>
     <div class="tot">
       <div class="row"><span>Subtotal</span><span>${money(amount)}</span></div>
       <div class="row"><span>Tax (0%)</span><span>${money(0)}</span></div>
       <div class="row grand"><span>Total Paid</span><span>${money(amount)}</span></div>
     </div>
-    <div class="note"><strong>Payment received in full.</strong> This invoice is issued only after 100% payment has been recorded; the project is fully settled and no balance remains due.</div>
-    <div class="ft">MedResearch · Expert Medical Research Support · info@medresearch.me · medresearch.me</div>
+    <div class="note">This invoice confirms that full payment has been received. After completion of the project, all the final deliverables together with the Right Transfer Agreement will be released to the client. All deliverables are prepared by our research team through expert review and manual quality control. All submitted documents, research data, and communications are handled confidentially. Client information is never shared with third parties.<br><br>This is a computer-generated invoice and is valid without a physical signature.</div>
+    <div class="ft">MedResearch &middot; Expert Medical Research Support &middot; info@medresearch.me &middot; medresearch.me</div>
   </div>
   </body></html>`;
   $('#invoiceFrame').innerHTML = html;
