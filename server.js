@@ -392,7 +392,7 @@ app.post('/api/contact', async (req, res) => {
   if (transporter) {
     try {
       const info = await sendHtmlEmail({
-        to: process.env.CONTACT_EMAIL || 'medresearch77@gmail.com',
+        to: process.env.CONTACT_EMAIL || 'info@medresearch.me',
         replyTo: email,
         subject: `[medresearch.me] New Inquiry — ${String(subjectService).slice(0, 60)}`,
         text: body,
@@ -1283,7 +1283,7 @@ function buildInvoiceDoc(order, user) {
   doc.moveTo(50, footTop).lineTo(W - 50, footTop).lineWidth(1).strokeColor(LINE).stroke();
   const footY = footTop + 12;
   doc.font('Helvetica').fontSize(8).fillColor(GRAY);
-  doc.text('medresearch.me  •  ' + (process.env.CONTACT_EMAIL || 'medresearch77@gmail.com'), 50, footY);
+  doc.text('medresearch.me  •  ' + (process.env.CONTACT_EMAIL || 'info@medresearch.me'), 50, footY);
   const msg = order.paid ? 'Thank you for your payment. This is your official receipt.' : 'Please complete payment using the link provided in your dashboard.';
   doc.text(msg, RIGHT - doc.widthOfString(msg), footY, { width: 260, align: 'right' });
   return doc;
@@ -1317,7 +1317,7 @@ function buildRTADoc(order, user) {
   // Parties block
   doc.font('Helvetica-Bold').fontSize(8).fillColor(GRAY).text('PROVIDER', 50, doc.y);
   doc.font('Helvetica').fontSize(10).fillColor('#000').text('medresearch.me', 50, doc.y + 14);
-  doc.fontSize(9).fillColor('#444').text((process.env.CONTACT_EMAIL || 'medresearch77@gmail.com'), 50, doc.y + 28);
+  doc.fontSize(9).fillColor('#444').text((process.env.CONTACT_EMAIL || 'info@medresearch.me'), 50, doc.y + 28);
 
   doc.font('Helvetica-Bold').fontSize(8).fillColor(GRAY).text('CLIENT', 330, doc.y - 28);
   doc.font('Helvetica').fontSize(10).fillColor('#000').text(cn, 330, doc.y - 14);
@@ -1361,7 +1361,7 @@ function buildRTADoc(order, user) {
   const footY = doc.page.height - 50;
   doc.moveTo(50, footY - 8).lineTo(W - 50, footY - 8).lineWidth(1).strokeColor(LINE).stroke();
   doc.font('Helvetica').fontSize(8).fillColor(GRAY);
-  doc.text('medresearch.me  •  ' + (process.env.CONTACT_EMAIL || 'medresearch77@gmail.com'), 50, footY);
+  doc.text('medresearch.me  •  ' + (process.env.CONTACT_EMAIL || 'info@medresearch.me'), 50, footY);
   doc.text('Generated ' + today.toLocaleDateString('en-US'), RIGHT - doc.widthOfString('Generated ' + today.toLocaleDateString('en-US')), footY);
   return doc;
 }

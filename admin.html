@@ -1253,25 +1253,24 @@ function openInvoice(o) {
       <div class="r"><h1>INVOICE</h1><div class="no">No. <strong>${esc(invNo)}</strong></div></div>
     </div>
     <div class="parties">
-      <div class="party"><h3>From</h3><div class="b">MedResearch</div><p>medresearch77@gmail.com</p><p>info@medresearch.me</p></div>
+      <div class="party"><h3>From</h3><div class="b">MedResearch</div><p>info@medresearch.me</p></div>
       <div class="party"><h3>Bill To</h3><div class="b">${esc(client)}</div>${email?`<p>${esc(email)}</p>`:''}<p>${esc(o.clientOrg||'')}</p></div>
     </div>
     <div class="meta">
       <div><div class="k">Issue Date</div><div class="v">${esc(today)}</div></div>
       <div><div class="k">Project Ref</div><div class="v">#${esc(o.id)}</div></div>
-      <div><div class="k">Status</div><div class="v"><span class="paid">${(o.paid?'PAID':(o.depositPaid?'50% PAID':'UNPAID'))}</span></div></div>
+      <div><div class="k">Status</div><div class="v"><span class="paid">PAID</span></div></div>
     </div>
     <table><thead><tr><th>#</th><th>Description</th><th class="num">Amount</th></tr></thead>
     <tbody>
       <tr><td>1</td><td>${esc(desc || 'Research service')}</td><td class="num">${money(amount)}</td></tr>
-      ${o.depositPaid && !o.paid ? `<tr><td>2</td><td>Remaining 50% (deposit already received)</td><td class="num">${money(0)}</td></tr>` : ''}
     </tbody></table>
     <div class="tot">
       <div class="row"><span>Subtotal</span><span>${money(amount)}</span></div>
       <div class="row"><span>Tax (0%)</span><span>${money(0)}</span></div>
-      <div class="row grand"><span>Total Due</span><span>${money(o.paid?0:amount)}</span></div>
+      <div class="row grand"><span>Total Paid</span><span>${money(amount)}</span></div>
     </div>
-    <div class="note"><strong>Payment:</strong> Complete payment via the secure link in the client dashboard, or by bank transfer to the account provided separately. Final deliverables and the Right Transfer Agreement are released after full payment is recorded.<br>All deliverables are prepared manually by our research team — no AI-generated content.</div>
+    <div class="note"><strong>Payment received in full.</strong> This invoice is issued only after 100% payment has been recorded; the project is fully settled and no balance remains due. Final deliverables and the Right Transfer Agreement have been released to the client.<br>All deliverables are prepared manually by our research team — no AI-generated content.</div>
     <div class="ft">MedResearch · Expert Medical Research Support · info@medresearch.me · medresearch.me</div>
   </div>
   </body></html>`;
