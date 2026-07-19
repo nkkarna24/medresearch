@@ -18,16 +18,16 @@ body { font-family:'Inter',-apple-system,sans-serif; color:var(--text); backgrou
 a { color:var(--accent); text-decoration:none; }
 
 /* NAV */
-.dash-nav { background:var(--primary); color:#fff; padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+.dash-nav { background:#fff; box-shadow:0 1px 12px rgba(0,0,0,0.06); color:var(--primary); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; }
 .dash-nav .logo { font-weight:800; font-size:1.2rem; letter-spacing:-0.02em; line-height:1; }
-.dash-nav .logo span { color:#7bbaff; }
+.dash-nav .logo span { color:var(--accent); }
 .dash-nav .user-info { display:flex; align-items:center; gap:1rem; font-size:0.9rem; }
 .dash-nav .avatar { width:36px; height:36px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; }
-.dash-nav a.site-link { color:#cfe3ff; font-size:0.9rem; font-weight:500; }
+.dash-nav a.site-link { color:var(--accent); font-size:0.9rem; font-weight:500; }
 #logoutBtn { background:rgba(255,255,255,0.15); border:none; color:#fff; padding:0.4rem 1rem; border-radius:8px; cursor:pointer; font-family:inherit; font-size:0.85rem; }
 #logoutBtn:hover { background:rgba(255,255,255,0.25); }
-.dash-footer { text-align:center; padding:1.25rem; background:var(--primary); }
-.dash-footer a { color:#bcd4f5; font-size:0.85rem; font-weight:500; }
+.dash-footer { text-align:center; padding:1.25rem; background:#fff; border-top:1px solid #eaeef5; }
+.dash-footer a { color:var(--accent); font-size:0.85rem; font-weight:500; }
 
 .dash-container { flex:1; padding:2rem; max-width:1120px; margin:0 auto; width:100%; }
 .tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
