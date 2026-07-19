@@ -346,6 +346,13 @@ footer {
   .contact-form input, .contact-form select, .contact-form textarea { width: 100%; font-size: 16px; padding: 0.9rem 1rem; }
   .contact-grid, .contact-form { width: 100%; }
 }
+
+@media (max-width: 768px) {
+  .contact-grid { grid-template-columns: 1fr !important; }
+  .form-row { flex-direction: column !important; }
+  .form-row > div { width: 100% !important; min-width: 0; }
+  .dropdown-menu { margin-top: 6px; }
+}
 </style>
 </head>
 <body>
@@ -926,11 +933,16 @@ const links = document.getElementById('navLinks');
 toggle.addEventListener('click', () => links.classList.toggle('open'));
 
 // Close mobile menu on link click
+let dropdownOpenAt = 0;
 document.querySelectorAll('.nav-links a:not(.dropdown > a)').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
 
 // Mobile dropdown toggle
 document.querySelectorAll('.dropdown > a').forEach(a => a.addEventListener('click', function(e) {
-  if (window.innerWidth <= 768) { e.preventDefault(); this.parentElement.classList.toggle('open'); }
+  e.preventDefault(); e.stopPropagation();
+  if (window.innerWidth <= 768) { this.parentElement.classList.toggle('open'); dropdownOpenAt = Date.now(); }
+}));
+document.querySelectorAll('.dropdown-menu a').forEach(a => a.addEventListener('click', function(e) {
+  if (window.innerWidth <= 768 && Date.now() - dropdownOpenAt < 500) { e.preventDefault(); e.stopPropagation(); }
 }));
 
 // Scroll-triggered animations
