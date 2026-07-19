@@ -493,6 +493,20 @@ select.pay-state[data-paystate] { }
   <div class="modal" id="modalBox"></div>
 </div>
 
+<!-- Invoice modal -->
+<div class="modal-back" id="invoiceModalBack" style="display:none;">
+  <div class="modal" id="invoiceModalBox" style="max-width:860px;width:95%;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <h3 style="margin:0;">&#x1F5D2; Invoice Preview</h3>
+      <div>
+        <button class="btn btn-green btn-sm" id="invoicePrintBtn">&#x1F5D8; Print / Save PDF</button>
+        <button class="btn btn-ghost btn-sm" id="invoiceCloseBtn" style="margin-left:0.5rem;">Close</button>
+      </div>
+    </div>
+    <div id="invoiceFrame" style="background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;"></div>
+  </div>
+</div>
+
 <script>
 const $ = (s) => document.querySelector(s);
 const API = '';
@@ -633,11 +647,13 @@ $('#createClientForm').addEventListener('submit', async (e) => {
 });
 
 /* ── Projects ── */
+let allOrders = [];
 async function loadProjects() {
   try {
     const res = await apiFetch('/api/admin/orders');
     if (res.status === 401) { clearToken(); location.reload(); return; }
     const orders = await res.json();
+    allOrders = orders;
     const managed = orders.filter(o => o.adminManaged);
     renderStats(managed);
     renderProjects(managed);
@@ -677,7 +693,7 @@ function renderProjects(orders) {
       <td>${o.agreementAccepted ? `<span class="badge b-completed">&#x2713; ${new Date(o.agreementAcceptedAt).toLocaleDateString()}</span>` : `<span class="badge b-pending">Not yet</span>`}</td>
       <td><span class="badge ${STATUS_BADGE[o.status]}">${o.status.replace('-',' ')}</span><br><select class="status-select" data-status="${o.id}" style="margin-top:0.4rem;">${opts}</select></td>
       <td class="hide-sm"><input class="link-edit" data-notes="${o.id}" value="${o.notes || ''}" placeholder="note to client…"></td>
-      <td><button class="btn btn-ghost btn-sm" data-email-project="${o.id}">&#x2709; Email</button></td>
+       <td><button class="btn btn-ghost btn-sm" data-email-project="${o.id}">&#x2709; Email</button><br><button class="btn btn-ghost btn-sm" data-invoice="${o.id}" style="margin-top:0.3rem;">&#x1F5D2; Invoice</button></td>
       <td><button class="del" data-delp="${o.id}">Delete</button></td>
     </tr>`;
   }).join('');
@@ -711,6 +727,10 @@ function bindProjectActions() {
     if (!o) return;
     switchTab('email');
     composeEmailToClient(o.clientEmail || o.userEmail || '', o.client || '', o.title || '', o.service || '', Number(o.amount) || 0, o.id);
+  }));
+  document.querySelectorAll('[data-invoice]').forEach(b => b.addEventListener('click', () => {
+    const o = allOrders.find(x => String(x.id) === String(b.dataset.invoice));
+    if (o) openInvoice(o);
   }));
   loadOverview();
   loadChatSummary();
@@ -1177,6 +1197,96 @@ function composeEmailToClient(email, clientName, title, service, amount, project
   if (clientName) { $('#emailClientSearch').value = clientName; }
   loadEmailTab();
 }
+
+// ── Invoice generator (light theme, single-page A4) ──
+function previewInvoice(id) {
+  const o = allOrders.find(x => String(x.id) === String(id));
+  if (o) openInvoice(o);
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function money(n){ return '$' + (Number(n)||0).toFixed(2); }
+function openInvoice(o) {
+  const amount = Number(o.amount) || 0;
+  const client = o.client || (o.clientEmail || o.userEmail || 'Client');
+  const email = o.clientEmail || o.userEmail || '';
+  const today = new Date().toISOString().slice(0,10);
+  const invNo = 'MR-' + String(o.id).toUpperCase();
+  const desc = [o.service, o.plan, o.title].filter(Boolean).join(' — ');
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    @page { size: A4; margin: 12mm; }
+    html,body{font-family:'Inter',Arial,sans-serif;color:#1a1a2e;background:#fff;}
+    .inv{width:100%;height:273mm;overflow:hidden;display:flex;flex-direction:column;padding:6mm 4mm;}
+    .hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #0066cc;padding-bottom:10px;}
+    .hdr .l{display:flex;align-items:center;gap:10px;}
+    .hdr .l img{height:40px;}
+    .hdr .l .n{font-size:20px;font-weight:800;color:#0a2540;letter-spacing:-0.02em;}
+    .hdr .l .n span{color:#0066cc;}
+    .hdr .r{text-align:right;}
+    .hdr .r h1{font-size:22px;color:#0a2540;letter-spacing:0.04em;}
+    .hdr .r .no{font-size:12px;color:#5a6a7e;margin-top:2px;}
+    .parties{display:flex;gap:14px;margin:14px 0;}
+    .party{flex:1;background:#f8fafc;border:1px solid #e3e8ef;border-radius:8px;padding:10px 12px;}
+    .party h3{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#0066cc;margin-bottom:4px;}
+    .party .b{font-size:14px;font-weight:700;color:#0a2540;}
+    .party p{font-size:12px;margin:1px 0;color:#1a1a2e;}
+    .meta{display:flex;gap:18px;flex-wrap:wrap;background:#e8f0fe;border-radius:8px;padding:8px 12px;margin-bottom:12px;}
+    .meta div{font-size:12px;}
+    .meta .k{font-size:10px;text-transform:uppercase;color:#5a6a7e;}
+    .meta .v{font-weight:700;color:#0a2540;}
+    table{width:100%;border-collapse:collapse;margin-bottom:10px;}
+    thead th{background:#e8f0fe;color:#0a2540;text-align:left;padding:7px 10px;font-size:11px;text-transform:uppercase;border-bottom:2px solid #0066cc;}
+    thead th.num{text-align:right;}
+    tbody td{padding:7px 10px;font-size:12px;border-bottom:1px solid #e3e8ef;vertical-align:top;}
+    tbody td.num{text-align:right;font-variant-numeric:tabular-nums;}
+    .tot{margin-left:auto;width:280px;}
+    .tot .row{display:flex;justify-content:space-between;padding:4px 10px;font-size:12px;}
+    .tot .row.grand{background:#0066cc;border-radius:6px;font-weight:800;color:#fff;font-size:14px;margin-top:4px;}
+    .note{font-size:11px;color:#5a6a7e;border-top:1px solid #e3e8ef;padding-top:10px;margin-top:auto;}
+    .ft{text-align:center;font-size:11px;color:#5a6a7e;padding-top:8px;}
+    .paid{display:inline-block;background:#e6f7e6;color:#1b7a1b;font-weight:700;padding:2px 8px;border-radius:100px;font-size:11px;}
+    @media print{.nop{display:none;}}
+  </style></head><body>
+  <div class="inv">
+    <div class="hdr">
+      <div class="l"><img src="/logo.png" onerror="this.style.display='none'"><div class="n">Med<span>Research</span></div></div>
+      <div class="r"><h1>INVOICE</h1><div class="no">No. <strong>${esc(invNo)}</strong></div></div>
+    </div>
+    <div class="parties">
+      <div class="party"><h3>From</h3><div class="b">MedResearch</div><p>medresearch77@gmail.com</p><p>info@medresearch.me</p></div>
+      <div class="party"><h3>Bill To</h3><div class="b">${esc(client)}</div>${email?`<p>${esc(email)}</p>`:''}<p>${esc(o.clientOrg||'')}</p></div>
+    </div>
+    <div class="meta">
+      <div><div class="k">Issue Date</div><div class="v">${esc(today)}</div></div>
+      <div><div class="k">Project Ref</div><div class="v">#${esc(o.id)}</div></div>
+      <div><div class="k">Status</div><div class="v"><span class="paid">${(o.paid?'PAID':(o.depositPaid?'50% PAID':'UNPAID'))}</span></div></div>
+    </div>
+    <table><thead><tr><th>#</th><th>Description</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>${esc(desc || 'Research service')}</td><td class="num">${money(amount)}</td></tr>
+      ${o.depositPaid && !o.paid ? `<tr><td>2</td><td>Remaining 50% (deposit already received)</td><td class="num">${money(0)}</td></tr>` : ''}
+    </tbody></table>
+    <div class="tot">
+      <div class="row"><span>Subtotal</span><span>${money(amount)}</span></div>
+      <div class="row"><span>Tax (0%)</span><span>${money(0)}</span></div>
+      <div class="row grand"><span>Total Due</span><span>${money(o.paid?0:amount)}</span></div>
+    </div>
+    <div class="note"><strong>Payment:</strong> Complete payment via the secure link in the client dashboard, or by bank transfer to the account provided separately. Final deliverables and the Right Transfer Agreement are released after full payment is recorded.<br>All deliverables are prepared manually by our research team — no AI-generated content.</div>
+    <div class="ft">MedResearch · Expert Medical Research Support · info@medresearch.me · medresearch.me</div>
+  </div>
+  </body></html>`;
+  $('#invoiceFrame').innerHTML = html;
+  $('#invoiceModalBack').style.display = 'flex';
+}
+$('#invoiceCloseBtn').addEventListener('click', () => { $('#invoiceModalBack').style.display = 'none'; });
+$('#invoicePrintBtn').addEventListener('click', () => {
+  const w = window.open('', '_blank');
+  w.document.write($('#invoiceFrame').innerHTML);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); }, 300);
+});
+
 
 // Rich-text toolbar
 document.querySelectorAll('#rteToolbar [data-cmd]').forEach(btn => btn.addEventListener('click', () => {
